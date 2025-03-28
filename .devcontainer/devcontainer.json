@@ -1,0 +1,15 @@
+{
+  "name": "Vite App DevContainer",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:18", // Choose a Node.js image
+  "forwardPorts": [5173], // Forward Vite's port
+  "postCreateCommand": "npm install && npm run dev -- --host 0.0.0.0", // Install deps and start Vite
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode"
+        // Add other VS Code extensions here
+      ]
+    }
+  }
+}
