@@ -1,8 +1,8 @@
 import { WebR } from 'webr';
 import type { WebR as WebRType } from 'webr';
 import { useEffect, useState } from 'react';
-import { v4 as uuidv4 } from 'uuid';
 import { computed, signal } from '@preact/signals-react';
+import { DataElement, readWebREvents } from '../stream/webREventReader';
 
 const rCode = `
   mass_action_seir <- function(R_o, population_size, initial_exposed = 1, initial_infected = 1, time_steps = 1000, gamma = 1/14, sigma = 1/5) {
@@ -27,7 +27,7 @@ const rCode = `
     output_list <- list()
 
     # Simulation loop (same as before, but store in list)
-    for (t in 1:time_steps) {
+    for (t in 1:time_steps + 1) {
       beta <- R_o * gamma
       dS <- -beta * S * I / population_size
       dE <- beta * S * I / population_size - sigma * E
@@ -43,69 +43,30 @@ const rCode = `
       recovered <- R_new - R
 
       output_list[[t]] <- list(time = t, new_cases = new_cases, recovered = recovered)
+      json_output <- jsonlite::toJSON(output_list[[t]], pretty = TRUE)
+      cat(paste(json_output, collapse = NULL))
+      flush.console()
 
       S <- S_new
       E <- E_new
       I <- I_new
       R <- R_new
-    }
 
-    # Convert list to JSON
-    json_output <- jsonlite::toJSON(output_list, pretty = TRUE)
-    cat(paste(json_output, collapse = NULL))
-    flush.console()
+      Sys.sleep(0.1)
+    }
   }
 
   R_o <- 2.5
-  population_size <- 100
+  population_size <- 1000000
   mass_action_seir(R_o, population_size)
 `;
 
-type DataElement = {
-  streamingId: string;
-  time: number;
-  new_cases: number;
-  recovered: number;
-};
-
-type ParsedMessage = {
-  streamingId: string;
-  dataElement: DataElement;
-  remainingString: string;
-}
-
-const extractJsonObject = (inputString: string): ParsedMessage | null => {
-  const regex = /\{[^}]*\}/; // Matches { followed by any characters except }, until the first }
-  const match = inputString.match(regex);
-
-  if(!match) {
-    return null; // No JSON object found
-  }
-
-  const jsonString = match[0];
-  const startIndex = inputString.indexOf(jsonString);
-  const endIndex = startIndex + jsonString.length;
-
-  return {
-    streamingId: uuidv4(),
-    dataElement: JSON.parse(jsonString) as DataElement,
-    remainingString: inputString.substring(endIndex),
-  };
-}
 
 const dataSignal = signal<DataElement[]>([]);
 const length = computed(() => dataSignal.value.length);
 
 export const WebRComponent = () => {
   const [webR, setWebR] = useState<WebRType|null>(null);
-  const [read, setRead] = useState<AsyncGenerator<DataElement, void, unknown>|null>(null);
-  // const [outputList, setOutputList] = useState<DataElement[]>([]);
-  // const [streamEvent, setStreamEvent] = useState<DataElement>();
-
-  console.log('WebRComponent - dataSignal.value.length=', dataSignal.value.length);
-
-  // setOutputList([...outputList, streamEvent] as DataElement[]);
-  // console.log('WebRComponent - outputList=', outputList);
 
   useEffect(() => {
     const setupR = async () => {
@@ -113,30 +74,7 @@ export const WebRComponent = () => {
 
       await r.init();
       await r.installPackages(['jsonlite']);
-      setWebR(r); 
-
-      async function* read() {
-        let buffer = "";
-        for (;;) {
-          const item = await r.read();
-          if (item.type !== 'stdout') {
-            continue;
-          }
-          buffer += item.data;
-          const parseResult = extractJsonObject(buffer);
-          if (!parseResult) {
-            continue;
-          }
-          const { dataElement, remainingString } = parseResult;
-          buffer = remainingString;
-          yield {
-            ...dataElement,
-            streamingId: parseResult.streamingId,
-          };
-
-        }
-      }
-      setRead(read);
+      setWebR(r);
   
     };
     setupR();
@@ -147,16 +85,13 @@ export const WebRComponent = () => {
 
     const compute = async () => {
       webR.writeConsole(rCode);
-      for await (const item of read ?? []) {
-        console.log('WebRComponent - item=', item);
-        // dataSignal.value.push(item);
+      for await (const item of readWebREvents(webR) ?? []) {
         dataSignal.value = [...dataSignal.value, item];
-        console.log('WebRComponent - dataSignal.value=', dataSignal.value);
       }
     };
 
     compute();
-  }, [webR, read]);
+  }, [webR]);
 
   if(!webR) {
     return <div>Loading...</div>;
