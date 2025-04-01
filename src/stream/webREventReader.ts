@@ -33,7 +33,7 @@ const extractJsonObject = (inputString: string): ParsedMessage | null => {
   };
 };
 
-export const readWebREvents = async function*(r: WebRType): AsyncGenerator<DataElement, void, unknown> {
+export const readWebRDataElementsEvents = async function*(r: WebRType): AsyncGenerator<DataElement, void, unknown> {
   let buffer = "";
   for (;;) {
     const item = await r.read();
@@ -51,5 +51,17 @@ export const readWebREvents = async function*(r: WebRType): AsyncGenerator<DataE
       ...dataElement,
       streamingId: parseResult.streamingId,
     };
+  }
+}
+
+
+export const readWebREvents = async function*(r: WebRType): AsyncGenerator<string, void, unknown> {
+  for (;;) {
+    const item = await r.read();
+    // if (item.type !== 'stdout') {
+    //   continue;
+    // }
+    console.log('webREventReader - item.data=', item.data);
+    yield item.data;
   }
 }
