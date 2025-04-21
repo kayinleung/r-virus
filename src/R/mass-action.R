@@ -1,28 +1,5 @@
-
-# library(remotes)
-# install_github("rivm-syso/escape2024")
-
-install.packages("escape2024", repos = "https://github.com/rivm-syso/escape2024", type = "source")
-
-# remote .tar.gz file (without proxy) - CORS isue
-# webr::mount(
-#   mountpoint = "/library",
-#   source = "https://codeload.github.com/rivm-syso/escape2024/legacy.tar.gz/HEAD"
-# )
-
-# local .tar.gz file
-# webr::mount(
-#   mountpoint = "/library",
-#   source = "http://localhost:5173/rivm-syso/escape2024/legacy.tar.gz"
-# )
-
-# remote .tar.gz file through proxy
-# webr::mount(
-#   mountpoint = "/library",
-#   source = "http://localhost:5173/github-proxy/rivm-syso/escape2024/legacy.tar.gz/HEAD"
-# )
-
-# .libPaths(c(.libPaths(), "/library"))
+install.packages("escape2024", repos = c("https://jgf5013.r-universe.dev", "https://cloud.r-project.org"))
+library(escape2024)
 
 installed_packages <- installed.packages()
 package_info <- data.frame(
@@ -40,15 +17,6 @@ list_directories <- function(path) {
 print(".libPaths():")
 r_library_path = .libPaths()
 print(r_library_path)
-
-# nested_folders <- list_directories(r_library_path)
-# print("Nested folders:")
-# print(nested_folders)
-# library(escape2024)
-# flush.console()
-
-
-# library(escape2024)
 
 # mass_action_seir <- function(R_o, population_size, initial_exposed = 1, initial_infected = 1, time_steps = 1000, gamma = 1/14, sigma = 1/5) {
 

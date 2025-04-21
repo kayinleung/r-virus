@@ -24,7 +24,7 @@ export const WebRComponent = () => {
         // await r.installPackages(['jsonlite', 'http://localhost:5173/github-proxy/rivm-syso/escape2024/legacy.tar.gz/HEAD'], {
         //   quiet: false,
         // });
-        await r.installPackages(['jsonlite'], {
+        await r.installPackages(['jsonlite', 'pak'], {
           quiet: false,
         });
         console.log("Packages installed successfully");
