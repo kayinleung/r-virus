@@ -1,11 +1,23 @@
 import { v4 as uuidv4 } from 'uuid';
 import type { WebR as WebRType } from 'webr';
 
+type DataElementR = {
+  time: number[];
+  state: {
+    S: number[],
+    E: number[],
+    I: number[],
+    R: number[]
+  };
+};
 export type DataElement = {
-  streamingId: string;
   time: number;
-  new_cases: number;
-  recovered: number;
+  state: {
+    S: number,
+    E: number,
+    I: number,
+    R: number
+  };
 };
 
 type ParsedMessage = {
@@ -28,7 +40,7 @@ const extractJsonObject = (inputString: string): ParsedMessage | null => {
 
   return {
     streamingId: uuidv4(),
-    dataElement: JSON.parse(jsonString) as DataElement,
+    dataElement: parseAndFlatten(jsonString),
     remainingString: inputString.substring(endIndex),
   };
 };
@@ -37,7 +49,6 @@ export const readWebRDataElementsEvents = async function*(r: WebRType): AsyncGen
   let buffer = "";
   for (;;) {
     const item = await r.read();
-    console.log(item.data);
     if (item.type !== 'stdout') {
       continue;
     }
@@ -50,19 +61,21 @@ export const readWebRDataElementsEvents = async function*(r: WebRType): AsyncGen
     buffer = remainingString;
     yield {
       ...dataElement,
-      streamingId: parseResult.streamingId,
     };
   }
 }
 
+const parseAndFlatten = (jsonString: string): DataElement => {
+  const parsed = JSON.parse(jsonString) as DataElementR;
+  const flattened = {
+    time: parsed.time[0],
+    state: Object.fromEntries(
+      Object.entries(parsed.state).map(([key, value]) => {
+        const numberValue = value[0];
+        return [key, Math.max(numberValue, 0)];
+      })
+    )
+  } as DataElement;
 
-// export const readWebREvents = async function*(r: WebRType): AsyncGenerator<string, void, unknown> {
-//   for (;;) {
-//     const item = await r.read();
-//     // if (item.type !== 'stdout') {
-//     //   continue;
-//     // }
-//     console.log('webREventReader - item.data=', item.data);
-//     yield item.data;
-//   }
-// }
+  return flattened;
+}

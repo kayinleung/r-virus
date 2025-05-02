@@ -47,9 +47,6 @@ export const WebRComponent = () => {
     compute();
   }, [webR]);
 
-  // console.log("virusDataLength updated:", dataSignal); // Debugging log to track updates
-  // const virusDataLengthValue = dataSignal.length;
-
   if (!webR) {
     return <LoadingSpinner text='Loading project...' />;
   };
