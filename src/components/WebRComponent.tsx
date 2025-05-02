@@ -1,20 +1,21 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { WebR } from 'webr';
 import type { WebR as WebRType } from 'webr';
-import { useEffect, useState } from 'react';
-import { computed, signal } from '@preact/signals-react';
+import { useEffect, useState } from 'preact/hooks';
+// import { signal } from '@preact/signals-react';
 import type { DataElement } from '../stream/webREventReader';
 import { readWebRDataElementsEvents } from '../stream/webREventReader';
 import { LoadingSpinner } from './LoadingSpinner';
 import { VirusPlot } from './VirusPlot';
 const rCode = (await import(`../R/mass-action.R?raw`)).default;
 
-const dataSignal = signal<DataElement[]>([]);
+// const dataSignal = signal<DataElement[]>([]);
 // const virusDataLength = computed(() => dataSignal.value.length);
 
 
 export const WebRComponent = () => {
   const [webR, setWebR] = useState<WebRType|null>(null);
+  const [dataSignal, setDataSignal] = useState<DataElement[]>([]);
 
   useEffect(() => {
     const setupR = async () => {
@@ -36,27 +37,24 @@ export const WebRComponent = () => {
     const compute = async () => {
       webR.writeConsole(rCode);
       for await (const item of readWebRDataElementsEvents(webR) ?? []) {
-        console.log(item);
-        // dataSignal.value = [...dataSignal.value, item];
-        dataSignal.value.push(item);
-        console.log('WebRComponent - dataSignal.value=', dataSignal.value);
+        setDataSignal((prev) => {
+          const newData = [...prev, item];
+          return newData;
+        });
       }
     };
 
     compute();
   }, [webR]);
 
-  console.log("virusDataLength updated:", dataSignal.value); // Debugging log to track updates
-
-  const virusDataLengthValue = dataSignal.value.length; // Explicitly access the computed signal to trigger re-render
-
-  console.log("Rendering WebRComponent with virusDataLengthValue:", virusDataLengthValue); // Debugging log to track rendering
+  // console.log("virusDataLength updated:", dataSignal); // Debugging log to track updates
+  // const virusDataLengthValue = dataSignal.length;
 
   if (!webR) {
     return <LoadingSpinner text='Loading project...' />;
   };
 
-  if (virusDataLengthValue === 0) { // Use the explicitly accessed value
+  if (dataSignal.length === 0) { // Use the explicitly accessed value
     return <LoadingSpinner text='Starting simulation...' />;
   }
 

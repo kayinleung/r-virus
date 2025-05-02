@@ -1,10 +1,10 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import { defineConfig } from 'vite';
+import preact from '@preact/preset-vite';
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
-    react(),
+    preact(),
     {
       name: "configure-response-headers",
       configureServer: (server) => {
@@ -17,6 +17,12 @@ export default defineConfig({
       }
     }
   ],
+  resolve: {
+    alias: {
+      react: 'preact/compat',
+      'react-dom': 'preact/compat',
+    },
+  },
   server: {
     proxy: {
       '/github-proxy': { //  Choose a path to prefix your GitHub requests

@@ -37,7 +37,7 @@ export const readWebRDataElementsEvents = async function*(r: WebRType): AsyncGen
   let buffer = "";
   for (;;) {
     const item = await r.read();
-    // console.log(item.data);
+    console.log(item.data);
     if (item.type !== 'stdout') {
       continue;
     }
