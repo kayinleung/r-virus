@@ -11,5 +11,8 @@
         // Add other VS Code extensions here
       ]
     }
-  }
+  },
+"mounts": [
+    "type=bind,source=${localEnv:HOME}/.ssh,target=/root/.ssh,readonly"
+  ]
 }

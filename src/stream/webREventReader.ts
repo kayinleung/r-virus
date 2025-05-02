@@ -15,7 +15,7 @@ type ParsedMessage = {
 }
 
 const extractJsonObject = (inputString: string): ParsedMessage | null => {
-  const regex = /\{[^}]*\}/; // Matches { followed by any characters except }, until the first }
+  const regex = /\{[^}]*\}[^}]*\}/; // Matches { followed by any characters except }, until the second }
   const match = inputString.match(regex);
 
   if(!match) {
@@ -37,6 +37,7 @@ export const readWebRDataElementsEvents = async function*(r: WebRType): AsyncGen
   let buffer = "";
   for (;;) {
     const item = await r.read();
+    // console.log(item.data);
     if (item.type !== 'stdout') {
       continue;
     }
@@ -55,13 +56,13 @@ export const readWebRDataElementsEvents = async function*(r: WebRType): AsyncGen
 }
 
 
-export const readWebREvents = async function*(r: WebRType): AsyncGenerator<string, void, unknown> {
-  for (;;) {
-    const item = await r.read();
-    // if (item.type !== 'stdout') {
-    //   continue;
-    // }
-    console.log('webREventReader - item.data=', item.data);
-    yield item.data;
-  }
-}
+// export const readWebREvents = async function*(r: WebRType): AsyncGenerator<string, void, unknown> {
+//   for (;;) {
+//     const item = await r.read();
+//     // if (item.type !== 'stdout') {
+//     //   continue;
+//     // }
+//     console.log('webREventReader - item.data=', item.data);
+//     yield item.data;
+//   }
+// }
