@@ -1,10 +1,10 @@
 import * as d3 from 'd3';
 import { useEffect, useRef } from 'react';
+import styles from './VirusPlot.module.css';
 import type { DataElement } from '../stream/webREventReader';
+import { useSignals } from '@preact/signals-react/runtime';
+import { dataSignal } from '@state/input-controls';
 
-type VirusPlotProps = {
-  dataSignal: DataElement[];
-};
 
 type StateKey = 'S' | 'E' | 'I' | 'R'; //typeof infectionStateKeys[number];
 type InfectionStateMap = Record<StateKey, {
@@ -19,11 +19,13 @@ const infectionStates: InfectionStateMap = {
   R: { label: 'Recovered', color: '#d62728' },
 };
 
-const VirusPlot = ({ dataSignal }: VirusPlotProps) => {
+const VirusPlot = () => {
+  useSignals();
+  const data = dataSignal.value;
   const svgRef = useRef<SVGSVGElement | null>(null);
 
   useEffect(() => {
-    if (!dataSignal || dataSignal.length === 0) return;
+    if (!data || data.length === 0) return;
 
     // const legendWidth = 100;
     const margin = { top: 20, right: 130, bottom: 30, left: 100 };
@@ -36,7 +38,7 @@ const VirusPlot = ({ dataSignal }: VirusPlotProps) => {
       .append('g')
       .attr('transform', `translate(${margin.left},${margin.top})`);
 
-    const time = dataSignal.map((d) => d.time);
+    const time = data.map((d) => d.time);
 
     const color = d3.scaleOrdinal<string>()
       .domain(Object.keys(infectionStates))
@@ -48,8 +50,8 @@ const VirusPlot = ({ dataSignal }: VirusPlotProps) => {
 
     const y = d3.scaleLinear()
       .domain([
-        d3.min(dataSignal, (d) => Math.min(...Object.values(d.state).flat())) || 0,
-        d3.max(dataSignal, (d) => Math.max(...Object.values(d.state).flat())) || 0
+        d3.min(data, (d) => Math.min(...Object.values(d.state).flat())) || 0,
+        d3.max(data, (d) => Math.max(...Object.values(d.state).flat())) || 0
       ])
       .nice()
       .range([height, 0]);
@@ -67,7 +69,7 @@ const VirusPlot = ({ dataSignal }: VirusPlotProps) => {
         .y((d) => Math.max(y(d.state[key as StateKey]), 0));
 
       svg.append('path')
-        .datum(dataSignal)
+        .datum(data)
         .attr('fill', 'none')
         .attr('stroke', color(state.color))
         .attr('stroke-width', 1.5)
@@ -98,10 +100,10 @@ const VirusPlot = ({ dataSignal }: VirusPlotProps) => {
     return () => {
       d3.select(svgRef.current).selectAll('*').remove();
     };
-  }, [dataSignal]);
+  }, [data]);
 
   return (
-    <div>
+    <div className={styles.Root}>
       <h2>Virus Plot</h2>
       <svg ref={svgRef}></svg>
     </div>

@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
 import preact from '@preact/preset-vite';
+import tsconfigPaths from 'vite-tsconfig-paths';
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -8,13 +9,14 @@ export default defineConfig({
   },
   plugins: [
     preact(),
+    tsconfigPaths(),
     {
-      name: "configure-response-headers",
+      name: 'configure-response-headers',
       configureServer: (server) => {
         server.middlewares.use((_req, res, next) => {
-          res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
-          res.setHeader("Cross-Origin-Embedder-Policy", "require-corp");
-          // res.setHeader("Access-Control-Allow-Origin", "*");
+          res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+          res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
+          // res.setHeader('Access-Control-Allow-Origin', '*');
           next();
         });
       }

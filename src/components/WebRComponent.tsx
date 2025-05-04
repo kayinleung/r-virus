@@ -1,21 +1,21 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { WebR } from 'webr';
 import type { WebR as WebRType } from 'webr';
-import { useEffect, useState } from 'preact/hooks';
-// import { signal } from '@preact/signals-react';
-import type { DataElement } from '../stream/webREventReader';
+import { useEffect, useState } from 'preact/hooks'
 import { readWebRDataElementsEvents } from '../stream/webREventReader';
-import { LoadingSpinner } from './LoadingSpinner';
-import { VirusPlot } from './VirusPlot';
+import { VirusPlotContainer } from '@components/VirusPlotContainer';
+
+import { useSignals } from '@preact/signals-react/runtime';
+import { dataSignal, population } from '@state/input-controls';
+
+
 const rCode = (await import(`../R/mass-action.R?raw`)).default;
 
-// const dataSignal = signal<DataElement[]>([]);
-// const virusDataLength = computed(() => dataSignal.value.length);
-
-
 export const WebRComponent = () => {
+
+  useSignals();
+
   const [webR, setWebR] = useState<WebRType|null>(null);
-  const [dataSignal, setDataSignal] = useState<DataElement[]>([]);
 
   useEffect(() => {
     const setupR = async () => {
@@ -35,25 +35,21 @@ export const WebRComponent = () => {
     if (!webR) return;
 
     const compute = async () => {
-      webR.writeConsole(rCode);
+
+      const parameterizedRCode = rCode
+        .replace(/`\${population_size}`/g, String(population.value));
+      webR.writeConsole(parameterizedRCode);
       for await (const item of readWebRDataElementsEvents(webR) ?? []) {
-        setDataSignal((prev) => {
-          const newData = [...prev, item];
-          return newData;
-        });
+        // setDataSignal((prev) => {
+        //   const newData = [...prev, item];
+        //   return newData;
+        // });
+        dataSignal.value = [...dataSignal.value, item];
       }
     };
 
     compute();
-  }, [webR]);
+  }, [webR, population.value]);
 
-  if (!webR) {
-    return <LoadingSpinner text='Loading project...' />;
-  };
-
-  if (dataSignal.length === 0) { // Use the explicitly accessed value
-    return <LoadingSpinner text='Starting simulation...' />;
-  }
-
-  return <VirusPlot dataSignal={dataSignal} />;
+  return <VirusPlotContainer webR={webR} />
 };

@@ -1,0 +1,23 @@
+.Root {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	gap: 1rem;
+	text-align: left;
+	max-width: 50%;
+}
+.InputError {
+	font-size: 1.4rem;
+  
+  color: var(--font-color-error-light);
+  @media(prefers-color-scheme: dark) {
+    color: var(--font-color-error-dark);
+  }
+}
+
+.Field {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	width: 100%;
+}

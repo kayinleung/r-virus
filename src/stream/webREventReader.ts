@@ -59,6 +59,7 @@ export const readWebRDataElementsEvents = async function*(r: WebRType): AsyncGen
     }
     const { dataElement, remainingString } = parseResult;
     buffer = remainingString;
+    // console.log('webREventReader - buffer=', buffer);
     yield {
       ...dataElement,
     };

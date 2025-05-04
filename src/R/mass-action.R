@@ -10,7 +10,7 @@ result = tryCatch({
     recovery_rate = 0.2,
     time_end = 400,
     increment = 1,
-    population_size = 20E6,
+    population_size = `${population_size}`,
     seed_infected = 1E-3
   )
   print(data)
@@ -22,7 +22,6 @@ result = tryCatch({
   print("Error...")
   print(e)
 }, finally = {
-  print("All done!")
   flush.console()
 })
 
