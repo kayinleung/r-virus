@@ -3,6 +3,9 @@ import preact from '@preact/preset-vite';
 
 // https://vite.dev/config/
 export default defineConfig({
+  build: {
+    target: 'esnext',
+  },
   plugins: [
     preact(),
     {
@@ -31,5 +34,6 @@ export default defineConfig({
         rewrite: (path) => path.replace(/^\/github-proxy/, ''), //  Removes the '/github-proxy' prefix
       },
     },
-  }
+  },
+  base: '/r-virus/', // Replace 'r-virus' with your repository name
 })
