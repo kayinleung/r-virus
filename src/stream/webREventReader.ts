@@ -1,24 +1,7 @@
+import { DataElement, DataElementR } from '@state/input-controls';
 import { v4 as uuidv4 } from 'uuid';
-import type { WebR as WebRType } from 'webr';
 
-type DataElementR = {
-  time: number[];
-  state: {
-    S: number[],
-    E: number[],
-    I: number[],
-    R: number[]
-  };
-};
-export type DataElement = {
-  time: number;
-  state: {
-    S: number,
-    E: number,
-    I: number,
-    R: number
-  };
-};
+import type { WebR as WebRType } from 'webr';
 
 type ParsedMessage = {
   streamingId: string;

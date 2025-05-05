@@ -1,9 +1,8 @@
 import * as d3 from 'd3';
 import { useEffect, useRef } from 'react';
 import styles from './VirusPlot.module.css';
-import type { DataElement } from '../stream/webREventReader';
 import { useSignals } from '@preact/signals-react/runtime';
-import { dataSignal } from '@state/input-controls';
+import { DataElement, dataSignal } from '@state/input-controls';
 
 
 type StateKey = 'S' | 'E' | 'I' | 'R'; //typeof infectionStateKeys[number];

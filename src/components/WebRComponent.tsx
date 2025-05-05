@@ -1,12 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { WebR } from 'webr';
 import type { WebR as WebRType } from 'webr';
-import { useEffect, useState } from 'preact/hooks'
+import { useEffect, useMemo, useState } from 'preact/hooks'
 import { readWebRDataElementsEvents } from '../stream/webREventReader';
 import { VirusPlotContainer } from '@components/VirusPlotContainer';
 
 import { useSignals } from '@preact/signals-react/runtime';
-import { dataSignal, population } from '@state/input-controls';
+import { dataSignal, population, simulationRuns } from '@state/input-controls';
+import { getWebR } from 'utils/R';
 
 
 const rCode = (await import(`../R/mass-action.R?raw`)).default;
@@ -17,21 +18,15 @@ export const WebRComponent = () => {
 
   const [webR, setWebR] = useState<WebRType|null>(null);
 
-  useEffect(() => {
+  useMemo(() => {
     const setupR = async () => {
-      const r = new WebR({ baseUrl: 'https://webr.r-wasm.org/latest/' });
-      await r.init();
-      await r.installPackages(['PBSddesolve', 'escape2024', 'jsonlite'], {
-        repos: ['https://jgf5013.r-universe.dev', 'https://r-forge.r-universe.dev', 'https://karlines.r-universe.dev', 'https://repo.r-wasm.org'],
-        quiet: false,
-      });
-      console.log("Packages installed successfully");
+      const r = await getWebR();
       setWebR(r);
     };
     setupR();
   }, []);
 
-  useEffect(() => {
+  useMemo(() => {
     if (!webR) return;
 
     const compute = async () => {
@@ -40,16 +35,12 @@ export const WebRComponent = () => {
         .replace(/`\${population_size}`/g, String(population.value));
       webR.writeConsole(parameterizedRCode);
       for await (const item of readWebRDataElementsEvents(webR) ?? []) {
-        // setDataSignal((prev) => {
-        //   const newData = [...prev, item];
-        //   return newData;
-        // });
         dataSignal.value = [...dataSignal.value, item];
       }
     };
 
     compute();
-  }, [webR, population.value]);
+  }, [webR, simulationRuns.value]);
 
   return <VirusPlotContainer webR={webR} />
 };

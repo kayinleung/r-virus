@@ -6,8 +6,8 @@ function App() {
 
   return (
     <div className={styles.Root}>
-      <WebRComponent />
       <InputControls />
+      <WebRComponent />
     </div>
   )
 }
