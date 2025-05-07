@@ -1,8 +1,9 @@
-import * as d3 from 'd3';
-import { useEffect, useRef } from 'react';
-import styles from './VirusPlot.module.css';
 import { useSignals } from '@preact/signals-react/runtime';
-import { DataElement, virusData } from '@state/input-controls';
+import { DataElement, simulationId, simulationRun, simulationRunNumber } from '@state/input-controls';
+import * as d3 from 'd3';
+import { useRef } from 'react';
+import styles from './VirusPlot.module.css';
+import { useEffect } from 'preact/hooks';
 
 type StateKey = 'S' | 'E' | 'I' | 'R'; //typeof infectionStateKeys[number];
 type InfectionStateMap = Record<StateKey, {
@@ -34,10 +35,10 @@ const area = {
 }
 
 const VirusPlot = () => {
-  useSignals();
-  const data = virusData.value;
+
   const svgRef = useRef<SVGSVGElement | null>(null);
 
+  const data = simulationRun.value;
   useEffect(() => {
     if (!data || data.length === 0) return;
 
@@ -57,16 +58,22 @@ const VirusPlot = () => {
       .domain(d3.extent(time) as [number, number])
       .range([0, area.plot.width]);
 
+    const yData = data.map((d) => ({
+      S: d.S,
+      E: d.E,
+      I: d.I,
+      R: d.R
+    }))
     const y = d3.scaleLinear()
       .domain([
-        d3.min(data, (d) => Math.min(...Object.values(d).flat())) || 0,
-        d3.max(data, (d) => Math.max(...Object.values(d).flat())) || 0
+        d3.min(yData, (d) => Math.min(...Object.values(d).flat())) || 0,
+        d3.max(yData, (d) => Math.max(...Object.values(d).flat())) || 0
       ])
       .nice()
-      .range([area.plot.height - (area.legend.height + area.plot.margin.top + area.plot.margin.bottom), 0]);
+      .range([area.plot.height - (area.legend.height + area.plot.margin.top + area.plot.margin.bottom), 20]);
 
     svg.append('g')
-      .attr('transform', `translate(0,${area.plot.width})`)
+      .attr('transform', `translate(0, ${area.plot.height - (area.legend.height + area.plot.margin.top + area.plot.margin.bottom)})`)
       .call(d3.axisBottom(x));
 
     svg.append('g')
@@ -88,7 +95,7 @@ const VirusPlot = () => {
     });
 
     // Adjust legend position and text color
-    const runNumber = 0 + 1; //virusData.value.
+    const runNumber = simulationRunNumber.value; //virusData.value.
     const legendSvg = svg.append('g')
       .attr('transform', `translate(${area.plot.margin.left}, ${area.plot.height - area.legend.height})`); // Move legend under the plot
 
@@ -109,15 +116,12 @@ const VirusPlot = () => {
         .style('font-size', '0.9rem')
         .text(`Run ${runNumber}: ${state.label}`);
     });
-
     return () => {
       d3.select(svgRef.current).selectAll('*').remove();
     };
   }, [data]);
-
   return (
     <div className={styles.root}>
-      <h2>Virus Plot</h2>
       <svg ref={svgRef}></svg>
     </div>
   );

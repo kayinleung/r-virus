@@ -4,6 +4,5 @@
 	flex-wrap: wrap;
 	justify-content: left;
 	text-align: left;
-	max-width: 40vw;
-	gap: 2rem;
+	gap: 1rem;
 }

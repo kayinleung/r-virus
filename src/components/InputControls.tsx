@@ -4,15 +4,18 @@ import { TextField, Box, InputLabel, Select, MenuItem, SelectChangeEvent, FormCo
 import styles from "./InputControls.module.css";
 import type { FormValues } from "@state/input-controls";
 import type { SimulationRunState } from "@state/input-controls";
-import { simulationRuns, currentForm, currentSimulationRunState, SimulaitonRunStates } from "@state/input-controls";
+import { simulationRuns, currentForm, currentSimulationRunState, SimulaitonRunStates, simulationId, plottedSimulationId } from "@state/input-controls";
 import { useSignals } from "@preact/signals-react/runtime";
 import AutoRenewIcon from '@mui/icons-material/AutoRenew';
 
 
 const InputControls = () => {
 
+  useSignals();
+
   const disableRerun = [
-    SimulaitonRunStates.LOADING_R
+    SimulaitonRunStates.LOADING_R,
+    SimulaitonRunStates.IN_PROGRESS,
   ].includes(currentSimulationRunState.value as SimulationRunState);
 
   const handleTextChange: React.ChangeEventHandler<HTMLTextAreaElement | HTMLInputElement> = (event) => {
@@ -34,64 +37,46 @@ const InputControls = () => {
     event.preventDefault();
     const formValues = Object.fromEntries(new FormData(event.currentTarget).entries()) as unknown as FormValues;
 
-    simulationRuns.value = [...simulationRuns.value, {
-      id: uuidv4(),
+    const uuid = uuidv4();
+    const currentNumberOfRuns = simulationRuns.value[simulationId.value]?.runNumber;
+    simulationRuns.value[uuid] = {
       formValues: {
         ...formValues,
       },
-    }];
+      results: [],
+      runNumber: currentNumberOfRuns + 1,
+    };
+    simulationId.value = uuid; // triggers a new simulation
+    plottedSimulationId.value = uuid; // update the chart to show the new simulation
+
     currentSimulationRunState.value = SimulaitonRunStates.IN_PROGRESS;
   };
 
-  useSignals();
 
   return (
     <Box
       className={styles.root}
       component="form"
       onSubmit={handleSubmit}>
-
       <FormControl>
-        <TextField
-          className={styles.textField}
-          label="Population"
-          name="population"
-          type="number"
-          value={currentForm.value.population}
-          onChange={handleTextChange}
-          slotProps={{
-            htmlInput: {
-              min: 10,
-              max: 18e6
-            },
-          }}
-          required
-          helperText="Population size (10-18e6)"
-        />
-      </FormControl>
-      <FormControl>
-        <TextField
-          className={styles.textField}
-          label="Time End"
-          name="timeEnd"
-          type="number"
-          value={currentForm.value.timeEnd}
-          onChange={handleTextChange}
-          slotProps={{
-            htmlInput: {
-              min: 10,
-              max: 1000
-            },
-          }}
-          required
-          helperText="Time the simulation ends(10-1e3)"
-        />
+        <InputLabel id="model-type-label">Model Type</InputLabel>
+        <Select
+          name="modelType"
+          labelId="model-type-label"
+          id="demo-simple-select"
+          value={currentForm.value.modelType}
+          label="Model Type"
+          onChange={handleSelectChange}
+        >
+          <MenuItem value={'model_reference'}>model_reference</MenuItem>
+          {/* <MenuItem value={'model_network'}>model_network</MenuItem> */}
+        </Select>
       </FormControl>
       <FormControl>
         <TextField
           className={styles.textField}
           label="Transmission Rate"
-          name="transmisstionRate"
+          name="transmissionRate"
           type="number"
           value={currentForm.value.transmissionRate}
           onChange={handleTextChange}
@@ -105,20 +90,6 @@ const InputControls = () => {
           required
           helperText="Transmission rate (0-1)"
         />
-      </FormControl>
-      <FormControl>
-        <InputLabel id="model-type-label">Model Type</InputLabel>
-        <Select
-          name="modelType"
-          labelId="model-type-label"
-          id="demo-simple-select"
-          value={currentForm.value.modelType}
-          label="Model Type"
-          onChange={handleSelectChange}
-        >
-          <MenuItem value={'model_reference'}>model_reference</MenuItem>
-          <MenuItem value={'model_network'}>model_network</MenuItem>
-        </Select>
       </FormControl>
       <FormControl>
         <TextField
@@ -161,20 +132,37 @@ const InputControls = () => {
       <FormControl>
         <TextField
           className={styles.textField}
-          label="Time Increment"
-          name="increment"
+          label="Time End"
+          name="timeEnd"
           type="number"
-          value={currentForm.value.increment}
+          value={currentForm.value.timeEnd}
           onChange={handleTextChange}
           slotProps={{
             htmlInput: {
-              min: 0,
-              max: currentForm.value.timeEnd,
-              step: 0.01,
+              min: 10,
+              max: 1000
             },
           }}
           required
-          helperText={`Time increment (0-${currentForm.value.timeEnd})`}
+          helperText="Time the simulation ends(10-1e3)"
+        />
+      </FormControl>
+      <FormControl>
+        <TextField
+          className={styles.textField}
+          label="Population"
+          name="populationSize"
+          type="number"
+          value={currentForm.value.populationSize}
+          onChange={handleTextChange}
+          slotProps={{
+            htmlInput: {
+              min: 10,
+              max: 1e10
+            },
+          }}
+          required
+          helperText="Population size (10-1e10)"
         />
       </FormControl>
       <FormControl>
@@ -194,6 +182,25 @@ const InputControls = () => {
           }}
           required
           helperText="Seed infected (0-1)"
+        />
+      </FormControl>
+      <FormControl>
+        <TextField
+          className={styles.textField}
+          label="Time Increment"
+          name="increment"
+          type="number"
+          value={currentForm.value.increment}
+          onChange={handleTextChange}
+          slotProps={{
+            htmlInput: {
+              min: 0,
+              max: currentForm.value.timeEnd,
+              step: 0.01,
+            },
+          }}
+          required
+          helperText={`Time increment (0-${currentForm.value.timeEnd})`}
         />
       </FormControl>
 
