@@ -6,7 +6,7 @@ import type { FormValues } from "@state/input-controls";
 import type { SimulationRunState } from "@state/input-controls";
 import { simulationRuns, currentForm, currentSimulationRunState, SimulaitonRunStates, simulationId, plottedSimulationId } from "@state/input-controls";
 import { useSignals } from "@preact/signals-react/runtime";
-import AutoRenewIcon from '@mui/icons-material/AutoRenew';
+import { Autorenew } from '@mui/icons-material';
 
 
 const InputControls = () => {
@@ -205,7 +205,7 @@ const InputControls = () => {
       </FormControl>
 
       <Fab type="submit" disabled={disableRerun} color="primary" aria-label="rerun simulation with current parameters">
-        <AutoRenewIcon />
+        <Autorenew />
       </Fab>
     </Box>
   )
