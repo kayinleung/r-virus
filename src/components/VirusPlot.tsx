@@ -2,7 +2,7 @@ import * as d3 from 'd3';
 import { useEffect, useRef } from 'react';
 import styles from './VirusPlot.module.css';
 import { useSignals } from '@preact/signals-react/runtime';
-import { DataElement, dataSignal } from '@state/input-controls';
+import { DataElement, virusData } from '@state/input-controls';
 
 
 type StateKey = 'S' | 'E' | 'I' | 'R'; //typeof infectionStateKeys[number];
@@ -20,7 +20,7 @@ const infectionStates: InfectionStateMap = {
 
 const VirusPlot = () => {
   useSignals();
-  const data = dataSignal.value;
+  const data = virusData.value;
   const svgRef = useRef<SVGSVGElement | null>(null);
 
   useEffect(() => {
@@ -30,6 +30,8 @@ const VirusPlot = () => {
     const margin = { top: 20, right: 130, bottom: 30, left: 100 };
     const width = 800 - margin.left - margin.right;
     const height = 400 - margin.top - margin.bottom;
+
+    // d3.select(svgRef.current).selectAll('*').remove(); // Clear previous SVG content
 
     const svg = d3.select(svgRef.current)
       .attr('width', width + margin.left + margin.right)
@@ -49,8 +51,8 @@ const VirusPlot = () => {
 
     const y = d3.scaleLinear()
       .domain([
-        d3.min(data, (d) => Math.min(...Object.values(d.state).flat())) || 0,
-        d3.max(data, (d) => Math.max(...Object.values(d.state).flat())) || 0
+        d3.min(data, (d) => Math.min(...Object.values(d).flat())) || 0,
+        d3.max(data, (d) => Math.max(...Object.values(d).flat())) || 0
       ])
       .nice()
       .range([height, 0]);
@@ -62,10 +64,12 @@ const VirusPlot = () => {
     svg.append('g')
       .call(d3.axisLeft(y));
 
-    Object.entries(infectionStates).forEach(([key, state]) => {
+    Object.entries(infectionStates)
+      .filter(([key]) => key !== 'time') // Exclude Susceptible from the plot
+      .forEach(([key, state]) => {
       const line = d3.line<DataElement>()
         .x((d) => x(d.time))
-        .y((d) => Math.max(y(d.state[key as StateKey]), 0));
+        .y((d) => Math.max(y(d[key as StateKey]), 0));
 
       svg.append('path')
         .datum(data)
@@ -102,7 +106,7 @@ const VirusPlot = () => {
   }, [data]);
 
   return (
-    <div className={styles.Root}>
+    <div className={styles.root}>
       <h2>Virus Plot</h2>
       <svg ref={svgRef}></svg>
     </div>

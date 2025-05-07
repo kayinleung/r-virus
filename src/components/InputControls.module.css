@@ -1,23 +1,9 @@
-.Root {
+.root {
 	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	gap: 1rem;
+	flex-direction: row;
+	flex-wrap: wrap;
+	justify-content: left;
 	text-align: left;
 	max-width: 40vw;
-}
-.InputError {
-	font-size: 1.4rem;
-  
-  color: var(--font-color-error-light);
-  @media(prefers-color-scheme: dark) {
-    color: var(--font-color-error-dark);
-  }
-}
-
-.Field {
-	display: flex;
-	flex-direction: column;
-	gap: 0.5rem;
-	width: 100%;
+	gap: 2rem;
 }

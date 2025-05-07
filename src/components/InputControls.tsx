@@ -1,42 +1,121 @@
-import { Form } from "radix-ui";
-import { v4 as uuidv4 } from 'uuid';
-import styles from "./InputControls.module.css";
-import { population, simulationRuns } from "../state/input-controls";
 
-/* Application State */
+import { v4 as uuidv4 } from 'uuid';
+import { TextField, Button, Box, InputLabel, Select, MenuItem, SelectChangeEvent, FormControl } from '@mui/material';
+import styles from "./InputControls.module.css";
+import type { FormValues } from "@state/input-controls";
+import { simulationRuns, currentForm } from "@state/input-controls";
 import { useSignals } from "@preact/signals-react/runtime";
 
 
-const handleOnSubmit: React.FormEventHandler<HTMLFormElement> = (event) => {
-  /* Query parameters are uploaded and page reloads without this :( */
-  event.preventDefault();
-  const data = Object.fromEntries(new FormData(event.currentTarget));
-  population.value = Number(data.population);
-  simulationRuns.value = [...simulationRuns.value, { id: uuidv4() }];
-};
-
 const InputControls = () => {
+
+  const handleTextChange: React.ChangeEventHandler<HTMLTextAreaElement | HTMLInputElement> = (event) => {
+    const { name, value } = event.currentTarget;
+    currentForm.value = {
+      ...currentForm.value,
+      [name]: value,
+    };
+  };
+  const handleSelectChange = (event: SelectChangeEvent) => {
+    const { name, value } = event.target;
+    currentForm.value = {
+      ...currentForm.value,
+      [name]: value,
+    };
+  };
+
+  const handleSubmit: React.FormEventHandler<HTMLFormElement> = (event) => {
+    event.preventDefault();
+    const formValues = Object.fromEntries(new FormData(event.currentTarget).entries()) as unknown as FormValues;
+
+    simulationRuns.value = [...simulationRuns.value, {
+      id: uuidv4(),
+      formValues: {
+        ...formValues,
+      },
+    }];
+  };
 
   useSignals();
 
   return (
-    <Form.Root
-      className={styles.Root}
-			onSubmit={handleOnSubmit}>
-      <Form.Field className={styles.Field} name="population">
-        <Form.Label className={styles.Label}>Population</Form.Label>
-        <Form.Control value={String(population.value)} onChange={(e) => population.value = Number(e.target.value)} required />
-        <Form.Message className={styles.InputError} match={(value) => Number(value) < 100 || Number(value) > 1e10}>
-          Please provide a population between 100 and 10 billion
-        </Form.Message>
-      </Form.Field>
-      
-      <Form.Submit asChild>
-        <button className={styles.Button} style={{ marginTop: 10 }}>
-          {simulationRuns.value.length > 0 ? 'Rerun' : 'Run'} simulation
-        </button>
-      </Form.Submit>
-    </Form.Root>
+    <Box
+      className={styles.root}
+      component="form"
+      onSubmit={handleSubmit}>
+
+      <FormControl>
+        <TextField
+          className={styles.textField}
+          label="Population"
+          name="population"
+          type="number"
+          value={currentForm.value.population}
+          onChange={handleTextChange}
+          slotProps={{
+            htmlInput: {
+              min: 10,
+              max: 18e6
+            },
+          }}
+          required
+          helperText="Population size (10-18e6)"
+        />
+      </FormControl>
+      <FormControl>
+        <TextField
+          className={styles.textField}
+          label="Time End"
+          name="timeEnd"
+          type="number"
+          value={currentForm.value.timeEnd}
+          onChange={handleTextChange}
+          slotProps={{
+            htmlInput: {
+              min: 10,
+              max: 1000
+            },
+          }}
+          required
+          helperText="Time the simulation ends(10-1e3)"
+        />
+      </FormControl>
+      <FormControl>
+        <TextField
+          className={styles.textField}
+          label="Transmission Rate"
+          name="transmisstionRate"
+          type="number"
+          value={currentForm.value.transmissionRate}
+          onChange={handleTextChange}
+          slotProps={{
+            htmlInput: {
+              min: 0,
+              max: 1,
+              step: 0.01,
+            },
+          }}
+          required
+          helperText="Transmission rate (0-1)"
+        />
+      </FormControl>
+      <FormControl>
+        <InputLabel id="model-type-label">Model Type</InputLabel>
+        <Select
+          name="modelType"
+          labelId="model-type-label"
+          id="demo-simple-select"
+          value={currentForm.value.modelType}
+          label="Model Type"
+          onChange={handleSelectChange}
+        >
+          <MenuItem value={'model_reference'}>model_reference</MenuItem>
+          <MenuItem value={'model_network'}>model_network</MenuItem>
+        </Select>
+      </FormControl>
+
+      <Button type="submit" variant="contained">Submit</Button>
+    </Box>
   )
 };
 

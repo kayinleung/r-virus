@@ -28,6 +28,7 @@
       "@state/*": ["state/*"],
       "@components/*": ["components/*"],
       "@stream/*": ["stream/*"],
+      "@utils/*": ["utils/*"],
     },
   },
   "include": ["src"],

@@ -1,12 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { WebR } from 'webr';
 import type { WebR as WebRType } from 'webr';
 import { useEffect, useMemo, useState } from 'preact/hooks'
 import { readWebRDataElementsEvents } from '../stream/webREventReader';
 import { VirusPlotContainer } from '@components/VirusPlotContainer';
 
 import { useSignals } from '@preact/signals-react/runtime';
-import { dataSignal, population, simulationRuns } from '@state/input-controls';
+import { virusData, currentForm, simulationId, simulationRuns } from '@state/input-controls';
 import { getWebR } from 'utils/R';
 
 
@@ -26,16 +25,18 @@ export const WebRComponent = () => {
     setupR();
   }, []);
 
-  useMemo(() => {
+  useEffect(() => {
     if (!webR) return;
 
     const compute = async () => {
 
       const parameterizedRCode = rCode
-        .replace(/`\${population_size}`/g, String(population.value));
+        .replace(/`\${population_size}`/g, String(currentForm.value.population))
+        .replace(/`\${time_end}`/g, String(currentForm.value.timeEnd));
+      webR.flush();
       webR.writeConsole(parameterizedRCode);
       for await (const item of readWebRDataElementsEvents(webR) ?? []) {
-        dataSignal.value = [...dataSignal.value, item];
+        virusData.value = [...virusData.value, item];
       }
     };
 
