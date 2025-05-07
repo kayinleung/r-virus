@@ -3,13 +3,13 @@ library(escape2024)
 
 tryCatch({
   model_reference(
-    transmission_rate = 0.2,
-    infectiousness_rate = 0.25,
-    recovery_rate = 0.2,
+    transmission_rate = `${transmission_rate}`,
+    infectiousness_rate = `${infectiousness_rate}`,
+    recovery_rate = `${recovery_rate}`,
     time_end = `${time_end}`,
-    increment = 1,
+    increment = `${increment}`,
     population_size = `${population_size}`,
-    seed_infected = 1E-3
+    seed_infected = `${seed_infected}`
   )
   flush.console()
 }, finally = {

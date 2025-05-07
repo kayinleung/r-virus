@@ -13,7 +13,7 @@ const VirusPlotContainer = ({ webR }: VirusPlotContainerProps) => {
   useSignals();
 
   return (
-    <div style={{ width: '40vw' }}>
+    <div>
       <VirusPlotInner webR={webR} />
     </div>
   );

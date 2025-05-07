@@ -4,7 +4,6 @@ import styles from './VirusPlot.module.css';
 import { useSignals } from '@preact/signals-react/runtime';
 import { DataElement, virusData } from '@state/input-controls';
 
-
 type StateKey = 'S' | 'E' | 'I' | 'R'; //typeof infectionStateKeys[number];
 type InfectionStateMap = Record<StateKey, {
   label: string;
@@ -18,6 +17,22 @@ const infectionStates: InfectionStateMap = {
   R: { label: 'Recovered', color: '#d62728' },
 };
 
+const area = {
+  plot: {
+    width: 600, // Width of the plot area including margins
+    height: 500,  // Height of the plot area including the legend and margins
+    margin: {
+      top: 20,
+      right: 20,
+      bottom: 20,
+      left: 100,
+    },
+  },
+  legend: {
+    height: 100,
+  },
+}
+
 const VirusPlot = () => {
   useSignals();
   const data = virusData.value;
@@ -26,18 +41,11 @@ const VirusPlot = () => {
   useEffect(() => {
     if (!data || data.length === 0) return;
 
-    // const legendWidth = 100;
-    const margin = { top: 20, right: 130, bottom: 30, left: 100 };
-    const width = 800 - margin.left - margin.right;
-    const height = 400 - margin.top - margin.bottom;
-
-    // d3.select(svgRef.current).selectAll('*').remove(); // Clear previous SVG content
-
     const svg = d3.select(svgRef.current)
-      .attr('width', width + margin.left + margin.right)
-      .attr('height', height + margin.top + margin.bottom)
+      .attr('width', area.plot.width)
+      .attr('height', area.plot.height)
       .append('g')
-      .attr('transform', `translate(${margin.left},${margin.top})`);
+      .attr('transform', `translate(${area.plot.margin.left},${area.plot.margin.right})`);
 
     const time = data.map((d) => d.time);
 
@@ -47,7 +55,7 @@ const VirusPlot = () => {
 
     const x = d3.scaleLinear()
       .domain(d3.extent(time) as [number, number])
-      .range([0, width]);
+      .range([0, area.plot.width]);
 
     const y = d3.scaleLinear()
       .domain([
@@ -55,10 +63,10 @@ const VirusPlot = () => {
         d3.max(data, (d) => Math.max(...Object.values(d).flat())) || 0
       ])
       .nice()
-      .range([height, 0]);
+      .range([area.plot.height - (area.legend.height + area.plot.margin.top + area.plot.margin.bottom), 0]);
 
     svg.append('g')
-      .attr('transform', `translate(0,${height})`)
+      .attr('transform', `translate(0,${area.plot.width})`)
       .call(d3.axisBottom(x));
 
     svg.append('g')
@@ -80,11 +88,12 @@ const VirusPlot = () => {
     });
 
     // Adjust legend position and text color
-    const legend = svg.append('g')
-      .attr('transform', `translate(${width + 20}, 20)`); // Move legend to the right of the plot
+    const runNumber = 0 + 1; //virusData.value.
+    const legendSvg = svg.append('g')
+      .attr('transform', `translate(${area.plot.margin.left}, ${area.plot.height - area.legend.height})`); // Move legend under the plot
 
     Object.entries(infectionStates).forEach(([_, state], index) => {
-      const legendRow = legend.append('g')
+      const legendRow = legendSvg.append('g')
         .attr('transform', `translate(0, ${index * 20})`);
 
       legendRow.append('rect')
@@ -97,7 +106,8 @@ const VirusPlot = () => {
         .attr('y', 10)
         .attr('text-anchor', 'start')
         .style('alignment-baseline', 'middle')
-        .text(state.label);
+        .style('font-size', '0.9rem')
+        .text(`Run ${runNumber}: ${state.label}`);
     });
 
     return () => {

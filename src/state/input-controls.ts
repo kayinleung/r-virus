@@ -37,7 +37,7 @@ export const currentForm = signal<FormValues>({
   recoveryRate: 0.2,
   timeEnd: 10,
   increment: 1,
-  seedInfected: 1e-5,
+  seedInfected: 1e-2,
   lambda: 3,
 });
 export const simulationRuns = signal<SimulationRun[]>([{
@@ -47,6 +47,16 @@ export const simulationRuns = signal<SimulationRun[]>([{
     },
   }
 ]);
+
+export const SimulaitonRunStates = {
+  LOADING_R: 'LOADING_R',
+  IN_PROGRESS: 'IN_PROGRESS',
+  COMPLETED: 'COMPLETED',
+  ERROR: 'ERROR',
+};
+
+export type SimulationRunState = typeof SimulaitonRunStates[keyof typeof SimulaitonRunStates];
+export const currentSimulationRunState = signal<SimulationRunState | null>();
 export const population = signal(10);
 export const virusData = signal<DataElement[]>([]);
 export const simulationId = computed(() => {
