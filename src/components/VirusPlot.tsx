@@ -1,4 +1,4 @@
-import { DataElement, simulationRun, simulationRunNumber } from '@state/input-controls';
+import { DataElement, simulationRun } from '@state/input-controls';
 import * as d3 from 'd3';
 import { useRef } from 'react';
 import styles from './VirusPlot.module.css';

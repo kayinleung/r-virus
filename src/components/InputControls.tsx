@@ -1,6 +1,6 @@
 
 import { v4 as uuidv4 } from 'uuid';
-import { TextField, Box, InputLabel, Select, MenuItem, SelectChangeEvent, FormControl, Fab, useThemeProps, useTheme, useMediaQuery } from '@mui/material';
+import { TextField, Box, InputLabel, Select, MenuItem, SelectChangeEvent, FormControl, Fab, useTheme, useMediaQuery } from '@mui/material';
 import styles from "./InputControls.module.css";
 import type { FormValues } from "@state/input-controls";
 import type { SimulationRunState } from "@state/input-controls";
