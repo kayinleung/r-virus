@@ -1,7 +1,7 @@
 /* Light and dark themes */
 :root {
   --background-color-light: rgba(255, 255, 255, 0.75);
-  --background-color-dark: rgba(20, 20, 20, 0.75);
+  --background-color-dark: rgba(45, 45, 45, 0.75);
 
   --content-background-color-light: rgba(255, 255, 255, 0.9);
   --content-background-color-dark: rgba(20, 50, 50, 0.9);
@@ -48,5 +48,4 @@ body {
   min-width: 320px;
   max-width: 1280px;
   min-height: 100vh;
-  font-size: 1.6rem;
 }

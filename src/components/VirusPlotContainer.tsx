@@ -19,7 +19,7 @@ const VirusPlotContainer = ({ webR }: VirusPlotContainerProps) => {
   ].includes(currentSimulationRunState.value as SimulationRunState);
 
   return (
-    <div className={styles.root}>
+    <div className={styles.virusPlotContainerRoot}>
       {showSimulationSelector ? <SimulationSelector /> : null}
       <VirusPlotInner webR={webR} />
     </div>

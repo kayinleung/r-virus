@@ -28,14 +28,14 @@ export type SimulationRun = {
   runNumber: number;
 };
 export const currentForm = signal<FormValues>({
-  populationSize: 1e5,
+  populationSize: 1e7,
   modelType: 'model_reference',
   degreeDistribution: 'degree_distribution',
   infection: 'SEIR',
-  transmissionRate: 0.15,
-  infectiousnessRate: 0.1,
+  transmissionRate: 0.4,
+  infectiousnessRate: 0.3,
   recoveryRate: 0.2,
-  timeEnd: 100,
+  timeEnd: 250,
   increment: 1,
   seedInfected: 1e-2,
   lambda: 3,
@@ -64,6 +64,7 @@ export const SimulaitonRunStates = {
   COMPLETED: 'COMPLETED',
   ERROR: 'ERROR',
 };
+
 
 export const simulationRun = computed(() => simulationRuns.value[plottedSimulationId.value].results ?? []);
 export const simulationRunNumber = computed(() => simulationRuns.value[simulationId.value].runNumber);

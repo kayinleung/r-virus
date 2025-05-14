@@ -1,8 +1,19 @@
-.root {
+.inputControlRoot {
 	display: flex;
 	flex-direction: row;
 	flex-wrap: wrap;
 	justify-content: left;
 	text-align: left;
-	gap: 1rem;
+	justify-content: space-between;
+
+	> div {
+		flex-direction: column;
+	}
+}
+
+
+@media (100px <= width <= 700px) {
+	.inputControlRoot {
+		gap: 1rem;
+	}
 }

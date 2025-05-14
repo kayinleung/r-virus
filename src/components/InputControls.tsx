@@ -1,6 +1,6 @@
 
 import { v4 as uuidv4 } from 'uuid';
-import { TextField, Box, InputLabel, Select, MenuItem, SelectChangeEvent, FormControl, Fab } from '@mui/material';
+import { TextField, Box, InputLabel, Select, MenuItem, SelectChangeEvent, FormControl, Fab, useThemeProps, useTheme, useMediaQuery } from '@mui/material';
 import styles from "./InputControls.module.css";
 import type { FormValues } from "@state/input-controls";
 import type { SimulationRunState } from "@state/input-controls";
@@ -51,14 +51,21 @@ const InputControls = () => {
 
     currentSimulationRunState.value = SimulaitonRunStates.IN_PROGRESS;
   };
-
+  const theme = useTheme();
+  const matches = useMediaQuery(theme.breakpoints.down('md'));
+  console.log('InputControls - matches=', matches);
 
   return (
     <Box
-      className={styles.root}
+      sx={{
+        '& .MuiBox-root': {
+          flexDirection: matches ? 'column' :  'row',
+        }
+      }}
+      className={styles.inputControlRoot}
       component="form"
       onSubmit={handleSubmit}>
-      <FormControl>
+      <FormControl hiddenLabel={matches}>
         <InputLabel id="model-type-label">Model Type</InputLabel>
         <Select
           name="modelType"
@@ -72,7 +79,7 @@ const InputControls = () => {
           {/* <MenuItem value={'model_network'}>model_network</MenuItem> */}
         </Select>
       </FormControl>
-      <FormControl>
+      <FormControl hiddenLabel={matches}>
         <TextField
           className={styles.textField}
           label="Transmission Rate"
@@ -91,7 +98,7 @@ const InputControls = () => {
           helperText="Transmission rate (0-1)"
         />
       </FormControl>
-      <FormControl>
+      <FormControl hiddenLabel={matches}>
         <TextField
           className={styles.textField}
           label="Infectiousness Rate"
@@ -110,7 +117,7 @@ const InputControls = () => {
           helperText="Infectiousness rate (0-1)"
         />
       </FormControl>
-      <FormControl>
+      <FormControl hiddenLabel={matches}>
         <TextField
           className={styles.textField}
           label="Recovery Rate"
@@ -129,7 +136,7 @@ const InputControls = () => {
           helperText="Recovery rate (0-1)"
         />
       </FormControl>
-      <FormControl>
+      <FormControl hiddenLabel={matches}>
         <TextField
           className={styles.textField}
           label="Time End"
@@ -147,7 +154,7 @@ const InputControls = () => {
           helperText="Time the simulation ends(10-1e3)"
         />
       </FormControl>
-      <FormControl>
+      <FormControl hiddenLabel={matches}>
         <TextField
           className={styles.textField}
           label="Population"
@@ -165,7 +172,7 @@ const InputControls = () => {
           helperText="Population size (10-1e10)"
         />
       </FormControl>
-      <FormControl>
+      <FormControl hiddenLabel={matches}>
         <TextField
           className={styles.textField}
           label="Seed Infected"
@@ -184,7 +191,7 @@ const InputControls = () => {
           helperText="Seed infected (0-1)"
         />
       </FormControl>
-      <FormControl>
+      <FormControl hiddenLabel={matches}>
         <TextField
           className={styles.textField}
           label="Time Increment"
@@ -204,7 +211,7 @@ const InputControls = () => {
         />
       </FormControl>
 
-      <Fab type="submit" disabled={disableRerun} color="primary" aria-label="rerun simulation with current parameters">
+      <Fab type="submit" disabled={disableRerun} color="primary" aria-label="rerun simulation with current parameters" sx={{ alignSelf: 'center' }}>
         <Autorenew />
       </Fab>
     </Box>

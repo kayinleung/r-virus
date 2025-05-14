@@ -1,9 +1,18 @@
-.root {
-  width: calc(100% - 3rem);
+.appRoot {
+  width: calc(100% - 4rem);
+  height: calc(100% - 4rem);
   margin: 2rem;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
+}
+
+
+@media (100px <= width <= 700px) {
+  .appRoot {
+    flex-direction: column;
+    justify-content: space-between;
+  }
 }

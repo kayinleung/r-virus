@@ -17,7 +17,7 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           '& .MuiInputBase-input': {
-            'minWidth': '8rem',
+            minWidth: '8rem',
           },
         },
       },
@@ -28,7 +28,7 @@ const theme = createTheme({
 function App() {
 
   return (
-    <div className={styles.root}>
+    <div className={styles.appRoot}>
       <ThemeProvider theme={theme}>
         <InputControls />
         <WebRComponent />

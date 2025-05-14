@@ -1,0 +1,33 @@
+.legendRoot {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 0.125rem;
+}
+
+.legendColor {
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 0.1rem;
+  display: inline-block;
+  margin-right: 0.1rem;
+  border: 0.0125rem solid;
+  border-color: var(--font-color-light);
+}
+
+@media (prefers-color-scheme: dark) {
+  .legendColor {
+    border-color: var(--font-color-dark);
+  }
+}
+
+.legendLabel {
+  font-size: 0.8em;
+}

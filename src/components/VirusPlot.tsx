@@ -3,37 +3,28 @@ import * as d3 from 'd3';
 import { useRef } from 'react';
 import styles from './VirusPlot.module.css';
 import { useEffect } from 'preact/hooks';
-
-type StateKey = 'S' | 'E' | 'I' | 'R'; //typeof infectionStateKeys[number];
-type InfectionStateMap = Record<StateKey, {
-  label: string;
-  color: string;
-}>;
-
-const infectionStates: InfectionStateMap = {
-  S: { label: 'Susceptible', color: '#1f77b4' },
-  E: { label: 'Exposed', color: '#ff7f0e' },
-  I: { label: 'Infected', color: '#2ca02c' },
-  R: { label: 'Recovered', color: '#d62728' },
-};
-
-const area = {
-  plot: {
-    width: 600, // Width of the plot area including margins
-    height: 500,  // Height of the plot area including the legend and margins
-    margin: {
-      top: 20,
-      right: 20,
-      bottom: 20,
-      left: 100,
-    },
-  },
-  legend: {
-    height: 100,
-  },
-}
+import { useMediaQuery, useTheme } from '@mui/material';
+import { Legend } from './Legend';
+import { infectionStates, StateKey } from '@state/chart';
 
 const VirusPlot = () => {
+  const theme = useTheme();
+  const matches = useMediaQuery(theme.breakpoints.down('sm'));
+  const area = {
+    plot: {
+      width: matches ? (document.documentElement.clientWidth / 1.2) : (document.documentElement.clientWidth / 2.5), // Width of the plot area including margins
+      height: matches ? (document.documentElement.clientHeight / 3.5) : (document.documentElement.clientHeight / 1.5),  // Height of the plot area including the legend and margins
+      margin: {
+        top: matches ? 5 : 20,
+        right: matches ? 5 : 20,
+        bottom: 20,
+        left: matches ? 50 : 100,
+      },
+    },
+    legend: {
+      height: 0,
+    },
+  };
 
   const svgRef = useRef<SVGSVGElement | null>(null);
 
@@ -93,35 +84,14 @@ const VirusPlot = () => {
         .attr('d', line);
     });
 
-    // Adjust legend position and text color
-    const runNumber = simulationRunNumber.value; //virusData.value.
-    const legendSvg = svg.append('g')
-      .attr('transform', `translate(${area.plot.margin.left}, ${area.plot.height - area.legend.height})`); // Move legend under the plot
-
-    Object.entries(infectionStates).forEach(([_, state], index) => {
-      const legendRow = legendSvg.append('g')
-        .attr('transform', `translate(0, ${index * 20})`);
-
-      legendRow.append('rect')
-        .attr('width', 10)
-        .attr('height', 10)
-        .attr('fill', color(state.color));
-
-      legendRow.append('text')
-        .attr('x', 15)
-        .attr('y', 10)
-        .attr('text-anchor', 'start')
-        .style('alignment-baseline', 'middle')
-        .style('font-size', '0.9rem')
-        .text(`Run ${runNumber}: ${state.label}`);
-    });
     return () => {
       d3.select(svgRef.current).selectAll('*').remove();
     };
   }, [data]);
   return (
-    <div className={styles.root}>
+    <div className={styles.virusPlotRoot}>
       <svg ref={svgRef}></svg>
+      <Legend/>
     </div>
   );
 };
