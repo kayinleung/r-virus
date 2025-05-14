@@ -1,7 +1,7 @@
 .appRoot {
+  margin: 2rem;
   width: calc(100% - 4rem);
   height: calc(100% - 4rem);
-  margin: 2rem;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -12,6 +12,8 @@
 
 @media (100px <= width <= 700px) {
   .appRoot {
+    margin: 1rem;
+    width: calc(100% - 3rem);
     flex-direction: column;
     justify-content: space-between;
   }

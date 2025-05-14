@@ -4,6 +4,7 @@ import { theme as browserTheme } from '@utils/browser';
 
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { WebRComponent } from '@components/WebRComponent';
+import { Refresh } from '@components/Refresh';
 
 const theme = createTheme({
   palette: {
@@ -17,7 +18,7 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           '& .MuiInputBase-input': {
-            minWidth: '8rem',
+            minWidth: '6rem',
           },
         },
       },
@@ -32,6 +33,7 @@ function App() {
       <ThemeProvider theme={theme}>
         <InputControls />
         <WebRComponent />
+        <Refresh />
       </ThemeProvider>
     </div>
   )

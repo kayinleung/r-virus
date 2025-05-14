@@ -1,4 +1,4 @@
-import type { DataElement } from '@state/input-controls';
+import type { DataElement } from '@state/form-controls';
 import { v4 as uuidv4 } from 'uuid';
 
 import type { WebR as WebRType } from 'webr';

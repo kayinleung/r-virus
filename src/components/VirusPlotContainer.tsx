@@ -3,9 +3,10 @@ import type { WebR } from 'webr';
 import { LoadingSpinner } from '@components/LoadingSpinner';
 import { VirusPlot } from '@components/VirusPlot';
 import { useSignals } from '@preact/signals-react/runtime';
-import { currentSimulationRunState, SimulaitonRunStates, simulationRun, SimulationRunState } from '@state/input-controls';
 import styles from './VirusPlotContainer.module.css';
 import SimulationSelector from './SimulationSelector';
+import { currentSimulationRunState, SimulaitonRunStates, simulationRun } from '@state/simulation-runs';
+import type { SimulationRunState } from '@state/simulation-runs';
 
 type VirusPlotContainerProps = {
   webR: WebR | null;

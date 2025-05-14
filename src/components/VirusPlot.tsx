@@ -1,4 +1,4 @@
-import { DataElement, simulationRun } from '@state/input-controls';
+import { DataElement } from '@state/form-controls';
 import * as d3 from 'd3';
 import { useRef } from 'react';
 import styles from './VirusPlot.module.css';
@@ -6,6 +6,7 @@ import { useEffect } from 'preact/hooks';
 import { useMediaQuery, useTheme } from '@mui/material';
 import { Legend } from './Legend';
 import { infectionStates, StateKey } from '@state/chart';
+import { simulationRun } from '@state/simulation-runs';
 
 const VirusPlot = () => {
   const theme = useTheme();
@@ -13,12 +14,12 @@ const VirusPlot = () => {
   const area = {
     plot: {
       width: matches ? (document.documentElement.clientWidth / 1.2) : (document.documentElement.clientWidth / 2.5), // Width of the plot area including margins
-      height: matches ? (document.documentElement.clientHeight / 3.5) : (document.documentElement.clientHeight / 1.5),  // Height of the plot area including the legend and margins
+      height: matches ? (document.documentElement.clientHeight / 3.75) : (document.documentElement.clientHeight / 1.5),  // Height of the plot area including the legend and margins
       margin: {
         top: matches ? 5 : 20,
         right: matches ? 5 : 20,
         bottom: 20,
-        left: matches ? 50 : 100,
+        left: matches ? 80 : 100,
       },
     },
     legend: {

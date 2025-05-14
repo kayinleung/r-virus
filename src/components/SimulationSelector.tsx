@@ -1,5 +1,5 @@
 import { MenuItem, Select, FormControl, InputLabel, SelectChangeEvent } from '@mui/material';
-import { plottedSimulationId, SimulationRun, simulationRuns } from '../state/input-controls';
+import { plottedSimulationId, SimulationRun, simulationRuns } from '@state/simulation-runs';
 
 const SimulationSelector = () => {
   // const runs = simulationRun.value; // Assuming simulationRun contains an array of runs

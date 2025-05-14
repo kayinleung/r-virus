@@ -4,8 +4,9 @@ import { readWebRDataElementsEvents } from '../stream/webREventReader';
 import { VirusPlotContainer } from '@components/VirusPlotContainer';
 
 import { useSignals } from '@preact/signals-react/runtime';
-import { currentForm, simulationRuns, currentSimulationRunState, SimulaitonRunStates, simulationId } from '@state/input-controls';
+import { currentForm } from '@state/form-controls';
 import { getWebR } from 'utils/R';
+import { currentSimulationRunState, SimulaitonRunStates, simulationRuns, simulationId } from '@state/simulation-runs';
 
 
 const rCode = (await import(`../R/mass-action.R?raw`)).default;
@@ -14,13 +15,14 @@ export const WebRComponent = () => {
 
   useSignals();
   
-  currentSimulationRunState.value = 'LOADING_R';
+  currentSimulationRunState.value = SimulaitonRunStates.LOADING_R
 
   const [webR, setWebR] = useState<WebRType|null>(null);
 
   useMemo(() => {
     const setupR = async () => {
       const r = await getWebR();
+      currentSimulationRunState.value = SimulaitonRunStates.IN_PROGRESS;
       setWebR(r);
     };
     setupR();
@@ -30,7 +32,7 @@ export const WebRComponent = () => {
     if (!webR) return;
 
     const compute = async () => {
-
+      currentSimulationRunState.value = SimulaitonRunStates.IN_PROGRESS;
       const parameterizedRCode = rCode
         .replace(/`\${population_size}`/g, String(currentForm.value.populationSize))
         .replace(/`\${time_end}`/g, String(currentForm.value.timeEnd))
@@ -58,7 +60,6 @@ export const WebRComponent = () => {
     };
 
     compute();
-    currentSimulationRunState.value = SimulaitonRunStates.IN_PROGRESS;
   }, [webR, simulationId.value]);
 
   return <VirusPlotContainer webR={webR} />

@@ -1,22 +1,13 @@
 
-import { v4 as uuidv4 } from 'uuid';
-import { TextField, Box, InputLabel, Select, MenuItem, SelectChangeEvent, FormControl, Fab, useTheme, useMediaQuery } from '@mui/material';
-import styles from "./InputControls.module.css";
-import type { FormValues } from "@state/input-controls";
-import type { SimulationRunState } from "@state/input-controls";
-import { simulationRuns, currentForm, currentSimulationRunState, SimulaitonRunStates, simulationId, plottedSimulationId } from "@state/input-controls";
+import { Box, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, TextField, useMediaQuery, useTheme } from '@mui/material';
 import { useSignals } from "@preact/signals-react/runtime";
-import { Autorenew } from '@mui/icons-material';
+import { currentForm } from "@state/form-controls";
+import styles from "./InputControls.module.css";
 
 
 const InputControls = () => {
 
   useSignals();
-
-  const disableRerun = [
-    SimulaitonRunStates.LOADING_R,
-    SimulaitonRunStates.IN_PROGRESS,
-  ].includes(currentSimulationRunState.value as SimulationRunState);
 
   const handleTextChange: React.ChangeEventHandler<HTMLTextAreaElement | HTMLInputElement> = (event) => {
     const { name, value } = event.currentTarget;
@@ -33,24 +24,6 @@ const InputControls = () => {
     };
   };
 
-  const handleSubmit: React.FormEventHandler<HTMLFormElement> = (event) => {
-    event.preventDefault();
-    const formValues = Object.fromEntries(new FormData(event.currentTarget).entries()) as unknown as FormValues;
-
-    const uuid = uuidv4();
-    const currentNumberOfRuns = simulationRuns.value[simulationId.value]?.runNumber;
-    simulationRuns.value[uuid] = {
-      formValues: {
-        ...formValues,
-      },
-      results: [],
-      runNumber: currentNumberOfRuns + 1,
-    };
-    simulationId.value = uuid; // triggers a new simulation
-    plottedSimulationId.value = uuid; // update the chart to show the new simulation
-
-    currentSimulationRunState.value = SimulaitonRunStates.IN_PROGRESS;
-  };
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.down('md'));
 
@@ -62,8 +35,7 @@ const InputControls = () => {
         }
       }}
       className={styles.inputControlRoot}
-      component="form"
-      onSubmit={handleSubmit}>
+      component="form">
       <FormControl hiddenLabel={matches}>
         <InputLabel id="model-type-label">Model Type</InputLabel>
         <Select
@@ -209,10 +181,6 @@ const InputControls = () => {
           helperText={`Time increment (0-${currentForm.value.timeEnd})`}
         />
       </FormControl>
-
-      <Fab type="submit" disabled={disableRerun} color="primary" aria-label="rerun simulation with current parameters" sx={{ alignSelf: 'center' }}>
-        <Autorenew />
-      </Fab>
     </Box>
   )
 };
