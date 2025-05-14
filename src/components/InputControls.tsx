@@ -53,7 +53,6 @@ const InputControls = () => {
   };
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.down('md'));
-  console.log('InputControls - matches=', matches);
 
   return (
     <Box

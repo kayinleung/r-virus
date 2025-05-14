@@ -4,14 +4,10 @@ import { plottedSimulationId, SimulationRun, simulationRuns } from '../state/inp
 const SimulationSelector = () => {
   // const runs = simulationRun.value; // Assuming simulationRun contains an array of runs
   const selectedRunUuid = plottedSimulationId.value;
-
-  console.log('SimulationSelector - selectedRunUuid=', selectedRunUuid);
-
   const plottedSimulation = simulationRuns.value[selectedRunUuid];
   const selectedRunNumber = String(plottedSimulation?.runNumber);
 
   const runs = Object.entries(simulationRuns.value);
-  console.log('SimulationSelector - runs=', runs);
 
   const handleSelectChange = (event: SelectChangeEvent) => {
     const { value: runNumber } = event.target;
