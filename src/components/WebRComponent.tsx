@@ -9,7 +9,8 @@ import { getWebR } from 'utils/R';
 import { currentSimulationRunState, SimulaitonRunStates, simulationRuns, simulationId } from '@state/simulation-runs';
 
 
-const rCode = (await import(`../R/mass-action.R?raw`)).default;
+const rCodeModelReference = (await import(`../R/model_reference.R?raw`)).default;
+const rCodeModelNetwork = (await import(`../R/model_network.R?raw`)).default;
 
 export const WebRComponent = () => {
 
@@ -33,14 +34,19 @@ export const WebRComponent = () => {
 
     const compute = async () => {
       currentSimulationRunState.value = SimulaitonRunStates.IN_PROGRESS;
+      const rCode = currentForm.value.modelType === 'model_reference' ? rCodeModelReference : rCodeModelNetwork;
       const parameterizedRCode = rCode
         .replace(/`\${population_size}`/g, String(currentForm.value.populationSize))
         .replace(/`\${time_end}`/g, String(currentForm.value.timeEnd))
         .replace(/`\${transmission_rate}`/g, String(currentForm.value.transmissionRate))
+        .replace(/`\${model_type}`/g, currentForm.value.modelType)
         .replace(/`\${infectiousness_rate}`/g, String(currentForm.value.infectiousnessRate))
         .replace(/`\${recovery_rate}`/g, String(currentForm.value.recoveryRate))
         .replace(/`\${increment}`/g, String(currentForm.value.increment))
-        .replace(/`\${seed_infected}`/g, String(currentForm.value.seedInfected));
+        .replace(/`\${lambda}`/g, String(currentForm.value.lambda))
+        .replace(/`\${seed_infected}`/g, String(currentForm.value.seedInfected))
+        .replace(/`\${degree_distribution}`/g, currentForm.value.degreeDistribution);
+      console.log('WebRComponent - parameterizedRCode=', parameterizedRCode);
       webR.flush();
       webR.writeConsole(parameterizedRCode);
       for await (const item of readWebRDataElementsEvents(webR) ?? []) {

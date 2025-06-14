@@ -23,8 +23,8 @@ export type DataElement = {
 };
 export const currentForm = signal<FormValues>({
   populationSize: 1e7,
-  modelType: 'model_reference',
-  degreeDistribution: 'degree_distribution',
+  modelType: 'model_network',
+  degreeDistribution: 'poisson',
   infection: 'SEIR',
   transmissionRate: 0.4,
   infectiousnessRate: 0.3,

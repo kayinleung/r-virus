@@ -3,6 +3,13 @@ import { Box, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, Text
 import { useSignals } from "@preact/signals-react/runtime";
 import { currentForm } from "@state/form-controls";
 import styles from "./InputControls.module.css";
+const modelReferences = [
+  'model_reference',
+  'model_network',
+];
+const degreeDistributions = [
+  'poisson'
+];
 
 
 const InputControls = () => {
@@ -46,8 +53,24 @@ const InputControls = () => {
           label="Model Type"
           onChange={handleSelectChange}
         >
-          <MenuItem value={'model_reference'}>model_reference</MenuItem>
-          {/* <MenuItem value={'model_network'}>model_network</MenuItem> */}
+          {modelReferences.map((model) => (
+            <MenuItem key={model} value={model}>{model}</MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+            <FormControl hiddenLabel={matches}>
+        <InputLabel id="degree-distribution-label">Degree distribution</InputLabel>
+        <Select
+          name="degreeDistribution"
+          labelId="degree-distribution-label"
+          id="demo-simple-select"
+          value={currentForm.value.degreeDistribution}
+          label="Degree Distribution"
+          onChange={handleSelectChange}
+        >
+          {degreeDistributions.map((distribution) => (
+            <MenuItem key={distribution} value={distribution}>{distribution}</MenuItem>
+          ))}
         </Select>
       </FormControl>
       <FormControl hiddenLabel={matches}>
@@ -179,6 +202,25 @@ const InputControls = () => {
           }}
           required
           helperText={`Time increment (0-${currentForm.value.timeEnd})`}
+        />
+      </FormControl>
+      <FormControl hiddenLabel={matches}>
+        <TextField
+          className={styles.textField}
+          label="1/mean degree (λ)"
+          name="lambda"
+          type="number"
+          value={currentForm.value.lambda}
+          onChange={handleTextChange}
+          slotProps={{
+            htmlInput: {
+              min: 0,
+              max: 100,
+              step: 1,
+            },
+          }}
+          required
+          helperText={`lamdbda (0-100)`}
         />
       </FormControl>
     </Box>
