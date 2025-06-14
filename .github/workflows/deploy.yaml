@@ -1,5 +1,9 @@
 name: Deploy to GitHub Pages
-on: [push]
+on:
+  push:
+    # Trigger the workflow on pushes to the main branch
+    branches:
+      - main
 permissions:
   contents: write
 jobs:

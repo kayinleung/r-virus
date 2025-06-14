@@ -10,7 +10,7 @@ type ParsedMessage = {
   remainingString: string;
 }
 
-const extractJsonObject = (inputString: string): ParsedMessage | null => {
+export const extractJsonObject = (inputString: string): ParsedMessage | null => {
   const regex = /\{[^}]*\}/; // Matches { followed by any characters except }
   const match = inputString.match(regex);
 
