@@ -3,11 +3,10 @@ import type { WebR } from 'webr';
 import { LoadingSpinner } from '@components/LoadingSpinner';
 import { VirusPlot } from '@components/VirusPlot';
 import { useSignals } from '@preact/signals-react/runtime';
-import styles from './VirusPlotContainer.module.css';
-import { SimulationSelector } from './SimulationSelector';
-import { currentSimulationRunState, SimulaitonRunStates, simulationRun } from '@state/simulation-runs';
-import type { SimulationRunState } from '@state/simulation-runs';
+import { simulationRun } from '@state/simulation-runs';
 import { MetricSelector } from './MetricSelector';
+import { SimulationSelector } from './SimulationSelector';
+import styles from './VirusPlotContainer.module.css';
 
 type VirusPlotContainerProps = {
   webR: WebR | null;
@@ -15,10 +14,10 @@ type VirusPlotContainerProps = {
 
 const VirusPlotContainer = ({ webR }: VirusPlotContainerProps) => {
 
-  useSignals();
-  const showSimulationSelector = [
-    SimulaitonRunStates.COMPLETED,
-  ].includes(currentSimulationRunState.value as SimulationRunState);
+  // useSignals();
+  // const showSimulationSelector = [
+  //   SimulaitonRunStates.COMPLETED,
+  // ].includes(currentSimulationRunState.value as SimulationRunState);
 
   return (
     <div className={styles.virusPlotContainerRoot}>
