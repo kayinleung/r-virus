@@ -4,7 +4,6 @@ import { useRef } from 'react';
 import styles from './VirusPlot.module.css';
 import { useEffect } from 'preact/hooks';
 import { useMediaQuery, useTheme } from '@mui/material';
-import { Legend } from './Legend';
 import { infectionStates, StateKey } from '@state/chart';
 import { simulationRun } from '@state/simulation-runs';
 
