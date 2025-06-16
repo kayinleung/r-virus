@@ -23,8 +23,7 @@ jobs:
       - name: Build static site
         run: npm run build
         env:
-          BASE_URL: /${{ github.event.repository.name }}-pr-${{ github.event.number }}/
-          PUBLIC_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}-pr-${{ github.event.number }}/
+          BASE_URL: /${{ github.event.repository.name }}/pr-previews/${{ github.event.number }}/
 
       - name: Deploy PR Preview to GitHub Pages
         # Don't deploy if PR is closed
@@ -34,6 +33,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
           publish_branch: gh-pages
+          # This is the target directory within the publish_branch where the action places the contents of your built project
           destination_dir: pr-previews/${{ github.event.number }} # Deploy to a unique subdirectory for each PR
 
       - name: Add PR preview comment
