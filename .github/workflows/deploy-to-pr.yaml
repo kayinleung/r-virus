@@ -1,0 +1,56 @@
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, closed] # Trigger on PR open, update, and close
+
+permissions:
+  contents: write # To push to the gh-pages branch
+  pull-requests: write # To comment on the PR with the preview URL
+
+jobs:
+  deploy_pr_preview:
+    runs-on: ubuntu-latest
+    # Only run for PRs from the same repository, not forks
+    if: github.event.pull_request.head.repo.full_name == github.repository
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install and Build
+        run: npm ci
+
+      - name: Build static site
+        run: npm run build
+        env:
+          BASE_URL: /${{ github.event.repository.name }}-pr-${{ github.event.number }}/
+          PUBLIC_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}-pr-${{ github.event.number }}/
+
+      - name: Deploy PR Preview to GitHub Pages
+        # Don't deploy if PR is closed
+        if: github.event.action != 'closed'
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          publish_branch: gh-pages
+          destination_dir: pr-previews/${{ github.event.number }} # Deploy to a unique subdirectory for each PR
+
+      - name: Add PR preview comment
+        if: github.event.action != 'closed' # Don't comment if PR is closed
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const prNumber = context.payload.pull_request.number;
+            const repoOwner = context.repo.owner;
+            const repoName = context.repo.repo;
+            const previewUrl = `https://${repoOwner}.github.io/${repoName}-pr-${prNumber}/`;
+            github.rest.issues.createComment({
+              issue_number: prNumber,
+              owner: repoOwner,
+              repo: repoName,
+              body: `**PR URL:** [${previewUrl}](${previewUrl})`
+            });
+
+      # TODO: JFisher
+      # - name: Remove PR Preview on Close

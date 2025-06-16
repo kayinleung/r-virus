@@ -8,7 +8,11 @@ import { Legend } from './Legend';
 import { infectionStates, StateKey } from '@state/chart';
 import { simulationRun } from '@state/simulation-runs';
 
-const VirusPlot = () => {
+type VirusPlotProps = {
+  title?: string;
+};
+
+const VirusPlot = ({ title }: VirusPlotProps) => {
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.down('sm'));
   const area = {
@@ -91,6 +95,7 @@ const VirusPlot = () => {
   }, [data]);
   return (
     <div className={styles.virusPlotRoot}>
+      <h2>{title}</h2>
       <svg ref={svgRef}></svg>
       <Legend/>
     </div>

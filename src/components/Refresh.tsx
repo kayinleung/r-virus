@@ -28,13 +28,15 @@ const Refresh = () => {
     currentSimulationRunState.value = SimulaitonRunStates.IN_PROGRESS;
   };
 
-  const showButton = currentSimulationRunState.value !== SimulaitonRunStates.LOADING_R;
-  const disableRerun = currentSimulationRunState.value === SimulaitonRunStates.IN_PROGRESS;
-  return showButton ? (
+  // const showButton = currentSimulationRunState.value !== SimulaitonRunStates.LOADING_R;
+  const disableRerun = currentSimulationRunState.value === SimulaitonRunStates.IN_PROGRESS || currentSimulationRunState.value === SimulaitonRunStates.LOADING_R;
+  return (
     <Box component="form" sx={{
-      position: 'absolute',
-      top: '0.5rem',
-      right: '1.5rem',
+      display: 'flex',
+      flexGrow: 1,
+      justifyContent: 'flex-end',
+      alignContent: 'flex-start',
+      flexWrap: 'wrap',
     }}>
       <Fab disabled={disableRerun} color="primary" aria-label="rerun simulation with current parameters"
       onClick={handleOnClick}
@@ -42,7 +44,7 @@ const Refresh = () => {
         <Autorenew />
       </Fab>
     </Box>
-  ) : null;
+  );
 };
 
 export { Refresh };

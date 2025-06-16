@@ -4,9 +4,10 @@ import { LoadingSpinner } from '@components/LoadingSpinner';
 import { VirusPlot } from '@components/VirusPlot';
 import { useSignals } from '@preact/signals-react/runtime';
 import styles from './VirusPlotContainer.module.css';
-import SimulationSelector from './SimulationSelector';
+import { SimulationSelector } from './SimulationSelector';
 import { currentSimulationRunState, SimulaitonRunStates, simulationRun } from '@state/simulation-runs';
 import type { SimulationRunState } from '@state/simulation-runs';
+import { MetricSelector } from './MetricSelector';
 
 type VirusPlotContainerProps = {
   webR: WebR | null;
@@ -21,13 +22,16 @@ const VirusPlotContainer = ({ webR }: VirusPlotContainerProps) => {
 
   return (
     <div className={styles.virusPlotContainerRoot}>
-      {showSimulationSelector ? <SimulationSelector /> : null}
-      <VirusPlotInner webR={webR} />
+      <div className={styles.virusPlotDisplayOptions}>
+        <SimulationSelector />
+        <MetricSelector />
+      </div>
+      <MultiVirusPlot webR={webR} />
     </div>
   );
 
 };
-const VirusPlotInner = ({ webR }: VirusPlotContainerProps) => {
+const MultiVirusPlot = ({ webR }: VirusPlotContainerProps) => {
 
   useSignals();
 
@@ -39,7 +43,12 @@ const VirusPlotInner = ({ webR }: VirusPlotContainerProps) => {
     return <LoadingSpinner text='Starting simulation...' />;
   }
 
-  return <VirusPlot />;
+  return (
+    <>
+      <VirusPlot title={'Reference'} />
+      <VirusPlot title={'Network'} />
+    </>
+  );
 };
 
 export { VirusPlotContainer };

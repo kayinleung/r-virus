@@ -89,7 +89,6 @@ const InputControls = () => {
             },
           }}
           required
-          helperText="Transmission rate (0-1)"
         />
       </FormControl>
       <FormControl hiddenLabel={matches}>
@@ -108,7 +107,6 @@ const InputControls = () => {
             },
           }}
           required
-          helperText="Infectiousness rate (0-1)"
         />
       </FormControl>
       <FormControl hiddenLabel={matches}>
@@ -127,7 +125,6 @@ const InputControls = () => {
             },
           }}
           required
-          helperText="Recovery rate (0-1)"
         />
       </FormControl>
       <FormControl hiddenLabel={matches}>
@@ -145,7 +142,6 @@ const InputControls = () => {
             },
           }}
           required
-          helperText="Time the simulation ends(10-1e3)"
         />
       </FormControl>
       <FormControl hiddenLabel={matches}>
@@ -163,7 +159,6 @@ const InputControls = () => {
             },
           }}
           required
-          helperText="Population size (10-1e10)"
         />
       </FormControl>
       <FormControl hiddenLabel={matches}>
@@ -182,7 +177,6 @@ const InputControls = () => {
             },
           }}
           required
-          helperText="Seed infected (0-1)"
         />
       </FormControl>
       <FormControl hiddenLabel={matches}>
@@ -201,7 +195,6 @@ const InputControls = () => {
             },
           }}
           required
-          helperText={`Time increment (0-${currentForm.value.timeEnd})`}
         />
       </FormControl>
       <FormControl hiddenLabel={matches}>
@@ -220,7 +213,6 @@ const InputControls = () => {
             },
           }}
           required
-          helperText={`lamdbda (0-100)`}
         />
       </FormControl>
     </Box>

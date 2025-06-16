@@ -16,7 +16,7 @@ const SimulationSelector = () => {
   };
 
   return (
-    <FormControl fullWidth>
+    <FormControl>
       <InputLabel id="simulation-selector-label">Select Simulation Run</InputLabel>
       
       <Select
@@ -36,4 +36,4 @@ const SimulationSelector = () => {
   );
 };
 
-export default SimulationSelector;
+export { SimulationSelector };
