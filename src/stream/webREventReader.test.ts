@@ -32,7 +32,6 @@ describe('extractJsonObject', () => {
     expect(result).not.toBeNull();
     expect(result?.dataElement).toEqual({ a: 1 });
     const nextInput = `${result?.remainingString}":2}{`;
-    console.log('webREventReader.test - nextInput=', nextInput);
     const nextResult = extractJsonObject(nextInput);
     expect(nextResult?.dataElement).toEqual({ b: 2 });
     expect(nextResult?.remainingString).toBe('{');

@@ -7,6 +7,7 @@ import { simulationRun } from '@state/simulation-runs';
 import { MetricSelector } from './MetricSelector';
 import { SimulationSelector } from './SimulationSelector';
 import styles from './VirusPlotContainer.module.css';
+import { Legend } from './Legend';
 
 type VirusPlotContainerProps = {
   webR: WebR | null;
@@ -44,8 +45,11 @@ const MultiVirusPlot = ({ webR }: VirusPlotContainerProps) => {
 
   return (
     <>
-      <VirusPlot title={'Reference'} />
-      <VirusPlot title={'Network'} />
+      <div className={styles.multiVirusPlotContainer}>
+        <VirusPlot title={'Reference'} />
+        <VirusPlot title={'Network'} />
+      </div>
+      <Legend/>
     </>
   );
 };

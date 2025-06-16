@@ -23,7 +23,6 @@ export const WebRComponent = () => {
   useMemo(() => {
     const setupR = async () => {
       const r = await getWebR();
-      currentSimulationRunState.value = SimulaitonRunStates.IN_PROGRESS;
       setWebR(r);
     };
     setupR();
@@ -46,8 +45,8 @@ export const WebRComponent = () => {
         .replace(/`\${lambda}`/g, String(currentForm.value.lambda))
         .replace(/`\${seed_infected}`/g, String(currentForm.value.seedInfected))
         .replace(/`\${degree_distribution}`/g, currentForm.value.degreeDistribution);
-      console.log('WebRComponent - parameterizedRCode=', parameterizedRCode);
       webR.flush();
+      currentSimulationRunState.value = SimulaitonRunStates.IN_PROGRESS;
       webR.writeConsole(parameterizedRCode);
       for await (const item of readWebRDataElementsEvents(webR) ?? []) {
         

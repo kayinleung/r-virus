@@ -11,7 +11,6 @@ const Refresh = () => {
   useSignals();
 
   const handleOnClick = () => {
-    console.log('Refresh - currentForm=', currentForm);
 
     const uuid = uuidv4();
     const currentNumberOfRuns = simulationRuns.value[simulationId.value]?.runNumber;
@@ -28,8 +27,7 @@ const Refresh = () => {
     currentSimulationRunState.value = SimulaitonRunStates.IN_PROGRESS;
   };
 
-  // const showButton = currentSimulationRunState.value !== SimulaitonRunStates.LOADING_R;
-  const disableRerun = currentSimulationRunState.value === SimulaitonRunStates.IN_PROGRESS || currentSimulationRunState.value === SimulaitonRunStates.LOADING_R;
+  const disableRerun = currentSimulationRunState.value !== SimulaitonRunStates.COMPLETED;
   return (
     <Box component="form" sx={{
       display: 'flex',

@@ -1,3 +1,9 @@
+.multiVirusPlotContainer {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
 .virusPlotContainerRoot {
   max-width: 100%;
   min-width: 50%;

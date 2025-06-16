@@ -9,7 +9,7 @@ tryCatch({
     time_end = `${time_end}`,
     increment = `${increment}`,
     population_size = `${population_size}`,
-    seed_infected = `${seed_infected}`,
+    seed_infected = `${seed_infected}`
   )
   flush.console()
 }, finally = {
