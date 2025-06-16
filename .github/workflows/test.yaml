@@ -1,4 +1,4 @@
-name: Vitest CI
+name: Test
 
 on:
   push:
