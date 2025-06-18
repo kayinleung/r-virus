@@ -9,7 +9,6 @@ export type SimulationRun = {
 };
 
 export type SimulationRunState = typeof SimulaitonRunStates[keyof typeof SimulaitonRunStates];
-export const currentSimulationRunState = signal<SimulationRunState | null>();
 
 const initialUuid = uuidv4();
 export const simulationId = signal<string>(initialUuid);
@@ -35,3 +34,15 @@ export const SimulaitonRunStates = {
 
 export const simulationRun = computed(() => simulationRuns.value[plottedSimulationId.value].results ?? []);
 export const simulationRunNumber = computed(() => simulationRuns.value[simulationId.value].runNumber);
+
+
+export const currentSimulationRunState = computed(() => {
+  const currentRun = simulationRuns.value[simulationId.value].results ?? [];
+  if (currentRun?.length === 0) {
+    return SimulaitonRunStates.LOADING_R;
+  }
+
+  if (currentRun?.length > 0 && currentRun?.[currentRun.length - 1].time >= currentForm.value.timeEnd) {
+    return SimulaitonRunStates.COMPLETED;
+  }
+})

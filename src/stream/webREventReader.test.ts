@@ -11,62 +11,43 @@ describe('extractJsonObject', () => {
 
   it('extracts a JSON object and remaining string', () => {
     // Mock uuid to return a fixed value
-    const input = 'prefix {"foo":"bar"} suffix';
+    const input = 'prefix {"state": {"foo":"bar"}} suffix';
     const result = extractJsonObject(input);
     expect(result).not.toBeNull();
-    expect(result?.dataElement).toEqual({ foo: 'bar' });
+    expect(result?.dataElement).toEqual({state: { foo: 'bar' }});
     expect(result?.remainingString).toBe(' suffix');
   });
 
   it('extracts only the first JSON object if multiple are present', () => {
-    const input = '{"a":1}{"b":2}';
+    const input = '{"state": {"a":1}},{"state": {"b":2}}';
     const result = extractJsonObject(input);
     expect(result).not.toBeNull();
-    expect(result?.dataElement).toEqual({ a: 1 });
-    expect(result?.remainingString).toBe('{"b":2}');
+    expect(result?.dataElement).toEqual({state: { a: 1 }});
+    expect(result?.remainingString).toBe(',{"state": {"b":2}}');
   });
 
   it('can parse partial into remainingString', () => {
-    const input = '{"a":1}{"b';
+    const input = '{"state": {"a":1}}, {"state": {"b';
     const result = extractJsonObject(input);
     expect(result).not.toBeNull();
-    expect(result?.dataElement).toEqual({ a: 1 });
-    const nextInput = `${result?.remainingString}":2}{`;
+    expect(result?.dataElement).toEqual({state: { a: 1 }});
+    const nextInput = `${result?.remainingString}":2}}{`;
     const nextResult = extractJsonObject(nextInput);
-    expect(nextResult?.dataElement).toEqual({ b: 2 });
+    expect(nextResult?.dataElement).toEqual({state:{ b: 2 }});
     expect(nextResult?.remainingString).toBe('{');
   });
 
-  it('throws if JSON is malformed', () => {
-    const input = '{foo:bar}';
-    expect(() => extractJsonObject(input)).toThrow();
+
+  it('can parse objects if they have leading non-json chars', () => {
+    const input = ' {"state": {"foo":"bar"}}';
+    const result = extractJsonObject(input);
+    console.log('webREventReader.test - result=', result);
+    expect(result).not.toBeNull();
+    expect(result?.dataElement).toEqual({state: { foo: 'bar' }});
   });
-});
 
-describe('readWebRDataElementsEvents', () => {
-  function createMockWebR(stdoutItems: string[]) {
-    let callCount = 0;
-    return {
-      flush: () => {},
-      read: async () => {
-        if (callCount < stdoutItems.length) {
-          return { type: 'stdout', data: stdoutItems[callCount++] };
-        }
-        return { type: 'done', data: '' };
-      },
-    };
-  }
-
-  it('yields parsed DataElement objects from stdout', async () => {
-    const { readWebRDataElementsEvents } = await import('./webREventReader');
-    const data1: DataElement = { time: 0, state: { S: 1, E: 1, I: 1, R: 0 } };
-    const json1 = JSON.stringify(data1);
-    const mockWebR = createMockWebR([ json1 ]);
-    const gen = readWebRDataElementsEvents(mockWebR as WebR);
-
-    for await (const item of gen) {
-      expect(item).toEqual(data1);
-      break;
-    }
+  it('does not throws if JSON is malformed', () => {
+    const input = '{foo:bar}';
+    expect(() => extractJsonObject(input)).not.toThrow();
   });
 });

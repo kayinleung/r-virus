@@ -23,8 +23,6 @@ const Refresh = () => {
     };
     simulationId.value = uuid; // triggers a new simulation
     plottedSimulationId.value = uuid; // update the chart to show the new simulation
-
-    currentSimulationRunState.value = SimulaitonRunStates.IN_PROGRESS;
   };
 
   const disableRerun = currentSimulationRunState.value !== SimulaitonRunStates.COMPLETED;

@@ -1,57 +1,67 @@
 import type { DataElement } from '@state/form-controls';
-import { v4 as uuidv4 } from 'uuid';
-
+import { simulationId, simulationRuns } from '@state/simulation-runs';
 import type { WebR as WebRType } from 'webr';
 
+export type BufferMap = Record<string, string>;
+
+export const bufferMap: BufferMap = {};
 
 type ParsedMessage = {
-  streamingId: string;
   dataElement: DataElement;
   remainingString: string;
 }
 
 export const extractJsonObject = (inputString: string): ParsedMessage | null => {
-  const regex = /\{[^}]*\}[^}]*\}/; // Matches { followed by any characters except }, until the second }
+  // Regex to match a 2-level deep JSON object: { ... { ... } ... }
+  const regex = /\{[^{}]*\{[^{}]*\}[^{}]*\}/;
   const match = inputString.match(regex);
-
-  if(!match) {
-    return null; // No JSON object found
+  if (!match) {
+    return null;
   }
-
   const jsonString = match[0];
   const startIndex = inputString.indexOf(jsonString);
   const endIndex = startIndex + jsonString.length;
-
+  let dataElement: DataElement;
+  try {
+    dataElement = JSON.parse(jsonString) as DataElement;
+  } catch (e) {
+    console.error('webREventReader - Error parsing JSON:', e);
+    return null;
+  }
   return {
-    streamingId: uuidv4(),
-    dataElement: JSON.parse(jsonString) as DataElement, //parseAndFlatten(jsonString),
+    dataElement,
     remainingString: inputString.substring(endIndex),
   };
 };
 
-export const readWebRDataElementsEvents = async function*(r: WebRType): AsyncGenerator<DataElement, void, unknown> {
-  let buffer = "";
+export const readWebRDataElementsEvents = async function* (r: WebRType) {
   r.flush();
-  for (;;) {
-    r.flush();
-    const item = await r.read();
-    // console.log('webREventReader - item=', item);
+  for await (const item of r.stream()) {
     if (item.type !== 'stdout') {
       continue;
     }
-    buffer += item.data;
+    const uuid = simulationId.value;
+    bufferMap[uuid] = (bufferMap[uuid] ?? '') + (item.data ?? '');
     try {
-      const parseResult = extractJsonObject(buffer); 
+      const parseResult = extractJsonObject(bufferMap[uuid]); 
       if (!parseResult) {
         continue;
       }
       const { dataElement, remainingString } = parseResult;
-      buffer = remainingString;
+      bufferMap[uuid] = remainingString;
       r.flush();
-      yield {
-        ...dataElement,
-      };
-    } catch {
+      simulationRuns.value = {
+        ...simulationRuns.value,
+        [simulationId.value]: {
+          ...simulationRuns.value[simulationId.value],
+          results: [...(simulationRuns.value[simulationId.value].results ?? []), dataElement],
+        },
+      }
+      yield dataElement;
+    } catch (e) {
+      console.error('webREventReader - e=', e);
+      bufferMap[uuid] = ""; // Reset bufferMap on error
+      console.error('webREventReader - Error parsing data element, resetting buffer');
       continue;
     }
   }
