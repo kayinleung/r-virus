@@ -2,9 +2,9 @@ import type { DataElement } from '@state/form-controls';
 import { simulationId, simulationRuns } from '@state/simulation-runs';
 import type { WebR as WebRType } from 'webr';
 
-export type BufferMap = Record<string, string>;
+type BufferMap = Record<string, string>;
 
-export const bufferMap: BufferMap = {};
+const bufferMap: BufferMap = {};
 
 type ParsedMessage = {
   dataElement: DataElement;
@@ -34,14 +34,14 @@ export const extractJsonObject = (inputString: string): ParsedMessage | null => 
   };
 };
 
-export const readWebRDataElementsEvents = async function* (r: WebRType) {
+export const readWebRDataElementsEvents = async (r: WebRType) => {
   r.flush();
   for await (const item of r.stream()) {
     if (item.type !== 'stdout') {
       continue;
     }
     const uuid = simulationId.value;
-    bufferMap[uuid] = (bufferMap[uuid] ?? '') + (item.data ?? '');
+    bufferMap[uuid] += item.data ?? '';
     try {
       const parseResult = extractJsonObject(bufferMap[uuid]); 
       if (!parseResult) {
@@ -50,6 +50,7 @@ export const readWebRDataElementsEvents = async function* (r: WebRType) {
       const { dataElement, remainingString } = parseResult;
       bufferMap[uuid] = remainingString;
       r.flush();
+      
       simulationRuns.value = {
         ...simulationRuns.value,
         [simulationId.value]: {
@@ -57,7 +58,6 @@ export const readWebRDataElementsEvents = async function* (r: WebRType) {
           results: [...(simulationRuns.value[simulationId.value].results ?? []), dataElement],
         },
       }
-      yield dataElement;
     } catch (e) {
       console.error('webREventReader - e=', e);
       bufferMap[uuid] = ""; // Reset bufferMap on error

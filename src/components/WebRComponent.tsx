@@ -13,7 +13,6 @@ const rCodeModelReference = (await import(`../R/model_reference.R?raw`)).default
 const rCodeModelNetwork = (await import(`../R/model_network.R?raw`)).default;
 
 export const WebRComponent = () => {
-  console.log('WebRComponent - ...');
 
   useSignals();
 
@@ -31,7 +30,6 @@ export const WebRComponent = () => {
     if (!webR) return;
 
     const compute = async () => {
-      console.log('WebRComponent - compute called');
       const rCode = currentForm.value.modelType === 'model_reference' ? rCodeModelReference : rCodeModelNetwork;
       const parameterizedRCode = rCode
         .replace(/`\${population_size}`/g, String(currentForm.value.populationSize))
@@ -47,11 +45,8 @@ export const WebRComponent = () => {
       webR.flush();
       webR.evalRVoid(parameterizedRCode, { captureStreams: false });
       const simulationIdValue = simulationId.value;
-      console.log('WebRComponent - simulationIdValue=', simulationIdValue);
       readWebRDataElementsEvents(webR)
     };
-
-    console.log('WebRComponent - computing again...');
     compute();
   }, [webR, simulationId.value]);
 
