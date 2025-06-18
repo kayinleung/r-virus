@@ -21,7 +21,21 @@ jobs:
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v4
         with:
-          publish_dir: dist
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
           publish_branch: gh-pages
-          keep_files: true
-          exclude_assets: '.github,pr-previews/'
+
+      - name: Add PR preview comment
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const prNumber = context.payload.pull_request.number;
+            const repoOwner = context.repo.owner;
+            const repoName = context.repo.repo;
+            const previewUrl = `https://${repoOwner}.github.io/${repoName};
+            github.rest.issues.createComment({
+              issue_number: prNumber,
+              owner: repoOwner,
+              repo: repoName,
+              body: `**URL:** [${previewUrl}](${previewUrl})`
+            });
