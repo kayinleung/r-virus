@@ -11,7 +11,7 @@ type ParsedMessage = {
 }
 
 export const extractJsonObject = (inputString: string): ParsedMessage | null => {
-  const regex = /\{[^}]*\}/; // Matches { followed by any characters except }
+  const regex = /\{[^}]*\}[^}]*\}/; // Matches { followed by any characters except }, until the second }
   const match = inputString.match(regex);
 
   if(!match) {
@@ -35,6 +35,7 @@ export const readWebRDataElementsEvents = async function*(r: WebRType): AsyncGen
   for (;;) {
     r.flush();
     const item = await r.read();
+    // console.log('webREventReader - item=', item);
     if (item.type !== 'stdout') {
       continue;
     }

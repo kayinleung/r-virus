@@ -49,7 +49,7 @@ export const WebRComponent = () => {
       currentSimulationRunState.value = SimulaitonRunStates.IN_PROGRESS;
       webR.writeConsole(parameterizedRCode);
       for await (const item of readWebRDataElementsEvents(webR) ?? []) {
-        
+        // console.log('WebRComponent - item=', item);
         simulationRuns.value = {
           ...simulationRuns.value,
           [simulationId.value]: {

@@ -16,10 +16,12 @@ export type FormValues = {
 
 export type DataElement = {
   time: number;
-  S: number,
-  E: number,
-  I: number,
-  R: number
+  state: {
+    S: number;
+    E: number;
+    I: number;
+    R: number;
+  };
 };
 export const currentForm = signal<FormValues>({
   populationSize: 1e7,

@@ -60,11 +60,11 @@ const VirusPlot = ({ title }: VirusPlotProps) => {
       .domain(d3.extent(time) as [number, number])
       .range([0, plotWidth]);
 
-    const yData = data.map((d) => ({
-      S: d.S,
-      E: d.E,
-      I: d.I,
-      R: d.R
+    const yData = data.map(({state}) => ({
+      S: state.S,
+      E: state.E,
+      I: state.I,
+      R: state.R
     }))
     const y = d3.scaleLinear()
       .domain([
@@ -86,7 +86,7 @@ const VirusPlot = ({ title }: VirusPlotProps) => {
       .forEach(([key, state]) => {
         const line = d3.line<DataElement>()
           .x((d) => x(d.time))
-          .y((d) => Math.max(y(d[key as StateKey]), 0));
+          .y(({ state }) => Math.max(y(state[key as StateKey]), 0));
 
         plotGroup.append('path')
           .datum(data)

@@ -59,7 +59,7 @@ describe('readWebRDataElementsEvents', () => {
 
   it('yields parsed DataElement objects from stdout', async () => {
     const { readWebRDataElementsEvents } = await import('./webREventReader');
-    const data1: DataElement = { time: 0, S: 1, E: 1, I: 1, R: 0 };
+    const data1: DataElement = { time: 0, state: { S: 1, E: 1, I: 1, R: 0 } };
     const json1 = JSON.stringify(data1);
     const mockWebR = createMockWebR([ json1 ]);
     const gen = readWebRDataElementsEvents(mockWebR as WebR);
