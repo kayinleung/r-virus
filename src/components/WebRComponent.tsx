@@ -6,8 +6,7 @@ import { VirusPlotContainer } from '@components/VirusPlotContainer';
 import { useSignals } from '@preact/signals-react/runtime';
 import { currentForm } from '@state/form-controls';
 import { getWebR } from 'utils/R';
-import { simulationRuns, simulationId } from '@state/simulation-runs';
-
+import { simulationId } from '@state/simulation-runs';
 
 const rCodeModelReference = (await import(`../R/model_reference.R?raw`)).default;
 const rCodeModelNetwork = (await import(`../R/model_network.R?raw`)).default;
@@ -44,7 +43,6 @@ export const WebRComponent = () => {
         .replace(/`\${degree_distribution}`/g, currentForm.value.degreeDistribution);
       webR.flush();
       webR.evalRVoid(parameterizedRCode, { captureStreams: false });
-      const simulationIdValue = simulationId.value;
       readWebRDataElementsEvents(webR)
     };
     compute();

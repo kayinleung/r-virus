@@ -1,7 +1,5 @@
 import { describe, it, expect } from 'vitest';
 import { extractJsonObject } from '../../src/stream/webREventReader';
-import { WebR } from 'webr';
-import { DataElement } from '@state/form-controls';
 
 describe('extractJsonObject', () => {
   it('returns null if no JSON object is found', () => {
@@ -41,7 +39,6 @@ describe('extractJsonObject', () => {
   it('can parse objects if they have leading non-json chars', () => {
     const input = ' {"state": {"foo":"bar"}}';
     const result = extractJsonObject(input);
-    console.log('webREventReader.test - result=', result);
     expect(result).not.toBeNull();
     expect(result?.dataElement).toEqual({state: { foo: 'bar' }});
   });
