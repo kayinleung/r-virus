@@ -16,15 +16,17 @@ export type FormValues = {
 
 export type DataElement = {
   time: number;
-  S: number,
-  E: number,
-  I: number,
-  R: number
+  state: {
+    S: number;
+    E: number;
+    I: number;
+    R: number;
+  };
 };
 export const currentForm = signal<FormValues>({
   populationSize: 1e7,
   modelType: 'model_reference',
-  degreeDistribution: 'degree_distribution',
+  degreeDistribution: 'poisson',
   infection: 'SEIR',
   transmissionRate: 0.4,
   infectiousnessRate: 0.3,

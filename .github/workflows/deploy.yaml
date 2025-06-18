@@ -1,4 +1,4 @@
-name: Deploy to GitHub Pages
+name: Deploy
 on:
   push:
     # Trigger the workflow on pushes to the main branch
@@ -8,7 +8,6 @@ permissions:
   contents: write
 jobs:
   build-and-deploy:
-    concurrency: ci-${{ github.ref }} # Recommended if you intend to make multiple deployments in quick succession.
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -20,7 +19,9 @@ jobs:
           npm run build
 
       - name: Deploy
-        uses: JamesIves/github-pages-deploy-action@v4
+        uses: peaceiris/actions-gh-pages@v4
         with:
-          folder: dist
-          commit-message: 'build: Deploy to GitHub Pages'
+          publish_dir: dist
+          publish_branch: gh-pages
+          keep_files: true
+          exclude_assets: '.github,pr-previews/'

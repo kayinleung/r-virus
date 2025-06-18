@@ -11,7 +11,6 @@ const Refresh = () => {
   useSignals();
 
   const handleOnClick = () => {
-    console.log('Refresh - currentForm=', currentForm);
 
     const uuid = uuidv4();
     const currentNumberOfRuns = simulationRuns.value[simulationId.value]?.runNumber;
@@ -24,17 +23,16 @@ const Refresh = () => {
     };
     simulationId.value = uuid; // triggers a new simulation
     plottedSimulationId.value = uuid; // update the chart to show the new simulation
-
-    currentSimulationRunState.value = SimulaitonRunStates.IN_PROGRESS;
   };
 
-  const showButton = currentSimulationRunState.value !== SimulaitonRunStates.LOADING_R;
-  const disableRerun = currentSimulationRunState.value === SimulaitonRunStates.IN_PROGRESS;
-  return showButton ? (
+  const disableRerun = currentSimulationRunState.value !== SimulaitonRunStates.COMPLETED;
+  return (
     <Box component="form" sx={{
-      position: 'absolute',
-      top: '0.5rem',
-      right: '1.5rem',
+      display: 'flex',
+      flexGrow: 1,
+      justifyContent: 'flex-end',
+      alignContent: 'flex-start',
+      flexWrap: 'wrap',
     }}>
       <Fab disabled={disableRerun} color="primary" aria-label="rerun simulation with current parameters"
       onClick={handleOnClick}
@@ -42,7 +40,7 @@ const Refresh = () => {
         <Autorenew />
       </Fab>
     </Box>
-  ) : null;
+  );
 };
 
 export { Refresh };

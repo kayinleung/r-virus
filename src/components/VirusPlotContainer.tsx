@@ -3,10 +3,11 @@ import type { WebR } from 'webr';
 import { LoadingSpinner } from '@components/LoadingSpinner';
 import { VirusPlot } from '@components/VirusPlot';
 import { useSignals } from '@preact/signals-react/runtime';
+import { simulationRun } from '@state/simulation-runs';
+import { MetricSelector } from './MetricSelector';
+import { SimulationSelector } from './SimulationSelector';
 import styles from './VirusPlotContainer.module.css';
-import SimulationSelector from './SimulationSelector';
-import { currentSimulationRunState, SimulaitonRunStates, simulationRun } from '@state/simulation-runs';
-import type { SimulationRunState } from '@state/simulation-runs';
+import { Legend } from './Legend';
 
 type VirusPlotContainerProps = {
   webR: WebR | null;
@@ -14,20 +15,23 @@ type VirusPlotContainerProps = {
 
 const VirusPlotContainer = ({ webR }: VirusPlotContainerProps) => {
 
-  useSignals();
-  const showSimulationSelector = [
-    SimulaitonRunStates.COMPLETED,
-  ].includes(currentSimulationRunState.value as SimulationRunState);
+  // useSignals();
+  // const showSimulationSelector = [
+  //   SimulaitonRunStates.COMPLETED,
+  // ].includes(currentSimulationRunState.value as SimulationRunState);
 
   return (
     <div className={styles.virusPlotContainerRoot}>
-      {showSimulationSelector ? <SimulationSelector /> : null}
-      <VirusPlotInner webR={webR} />
+      <div className={styles.virusPlotDisplayOptions}>
+        <SimulationSelector />
+        <MetricSelector />
+      </div>
+      <MultiVirusPlot webR={webR} />
     </div>
   );
 
 };
-const VirusPlotInner = ({ webR }: VirusPlotContainerProps) => {
+const MultiVirusPlot = ({ webR }: VirusPlotContainerProps) => {
 
   useSignals();
 
@@ -39,7 +43,15 @@ const VirusPlotInner = ({ webR }: VirusPlotContainerProps) => {
     return <LoadingSpinner text='Starting simulation...' />;
   }
 
-  return <VirusPlot />;
+  return (
+    <>
+      <div className={styles.multiVirusPlotContainer}>
+        <VirusPlot title={'Reference'} />
+        <VirusPlot title={'Network'} />
+      </div>
+      <Legend/>
+    </>
+  );
 };
 
 export { VirusPlotContainer };

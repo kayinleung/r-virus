@@ -16,7 +16,7 @@ const SimulationSelector = () => {
   };
 
   return (
-    <FormControl fullWidth>
+    <FormControl>
       <InputLabel id="simulation-selector-label">Select Simulation Run</InputLabel>
       
       <Select
@@ -28,7 +28,7 @@ const SimulationSelector = () => {
       >
         {runs.map(([runUuid, simulation]) => (
           <MenuItem key={runUuid} value={simulation.runNumber}>
-            {`Run #${simulation.runNumber}: escape2024(${simulation.formValues.transmissionRate}, ${simulation.formValues.infectiousnessRate}, ${simulation.formValues.recoveryRate}, ${simulation.formValues.timeEnd}, ${simulation.formValues.populationSize}, ${simulation.formValues.seedInfected}, ${simulation.formValues.increment})`}
+            {`Run #${simulation.runNumber}: escape2024(${simulation.formValues.modelType}, ${simulation.formValues.transmissionRate}, ${simulation.formValues.infectiousnessRate}, ${simulation.formValues.recoveryRate}, ${simulation.formValues.timeEnd}, ${simulation.formValues.populationSize}, ${simulation.formValues.seedInfected}, ${simulation.formValues.increment})`}
           </MenuItem>
         ))}
       </Select>
@@ -36,4 +36,4 @@ const SimulationSelector = () => {
   );
 };
 
-export default SimulationSelector;
+export { SimulationSelector };

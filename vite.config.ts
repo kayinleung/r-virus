@@ -37,5 +37,5 @@ export default defineConfig({
       },
     },
   },
-  base: '/r-virus/', // Replace 'r-virus' with your repository name
+  base: process.env.BASE_URL ?? '/r-virus/',
 })

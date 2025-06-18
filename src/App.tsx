@@ -31,9 +31,11 @@ function App() {
   return (
     <div className={styles.appRoot}>
       <ThemeProvider theme={theme}>
-        <InputControls />
+        <div className={styles.simulationControls}>
+          <InputControls />
+          <Refresh />
+        </div>
         <WebRComponent />
-        <Refresh />
       </ThemeProvider>
     </div>
   )
