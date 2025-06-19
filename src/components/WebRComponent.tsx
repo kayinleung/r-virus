@@ -32,14 +32,14 @@ export const WebRComponent = () => {
       const rCode = currentForm.value.modelType === 'model_reference' ? rCodeModelReference : rCodeModelNetwork;
       const parameterizedRCode = rCode
         .replace(/`\${population_size}`/g, String(currentForm.value.populationSize))
+        .replace(/`\${serial_interval}`/g, String(currentForm.value.serialInterval))
         .replace(/`\${time_end}`/g, String(currentForm.value.timeEnd))
-        .replace(/`\${transmission_rate}`/g, String(currentForm.value.transmissionRate))
         .replace(/`\${model_type}`/g, currentForm.value.modelType)
-        .replace(/`\${infectiousness_rate}`/g, String(currentForm.value.infectiousnessRate))
-        .replace(/`\${recovery_rate}`/g, String(currentForm.value.recoveryRate))
+        .replace(/`\${reproduction_number}`/g, String(currentForm.value.reproductionNumber))
         .replace(/`\${increment}`/g, String(currentForm.value.increment))
         .replace(/`\${lambda}`/g, String(currentForm.value.lambda))
         .replace(/`\${seed_infected}`/g, String(currentForm.value.seedInfected))
+        .replace(/`\${serial_interval}`/g, String(currentForm.value.serialInterval))
         .replace(/`\${degree_distribution}`/g, currentForm.value.degreeDistribution);
       webR.flush();
       webR.evalRVoid(parameterizedRCode, { captureStreams: false });

@@ -76,16 +76,16 @@ const InputControls = () => {
       <FormControl hiddenLabel={matches}>
         <TextField
           className={styles.textField}
-          label="Transmission Rate"
-          name="transmissionRate"
+          label="Serial Interval"
+          name="serialInterval"
           type="number"
-          value={currentForm.value.transmissionRate}
+          value={currentForm.value.serialInterval}
           onChange={handleTextChange}
           slotProps={{
             htmlInput: {
-              min: 0,
-              max: 1,
-              step: 0.01,
+              min: 3.08,
+              max: 10,
+              step: 0.1,
             },
           }}
           required
@@ -94,28 +94,10 @@ const InputControls = () => {
       <FormControl hiddenLabel={matches}>
         <TextField
           className={styles.textField}
-          label="Infectiousness Rate"
-          name="infectiousnessRate"
+          label="Basic reproduction number"
+          name="reproductionNumber"
           type="number"
-          value={currentForm.value.infectiousnessRate}
-          onChange={handleTextChange}
-          slotProps={{
-            htmlInput: {
-              min: 0,
-              max: 1,
-              step: 0.01,
-            },
-          }}
-          required
-        />
-      </FormControl>
-      <FormControl hiddenLabel={matches}>
-        <TextField
-          className={styles.textField}
-          label="Recovery Rate"
-          name="recoveryRate"
-          type="number"
-          value={currentForm.value.recoveryRate}
+          value={currentForm.value.reproductionNumber}
           onChange={handleTextChange}
           slotProps={{
             htmlInput: {
