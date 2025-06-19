@@ -65,6 +65,7 @@ const VirusPlot = ({ title }: VirusPlotProps) => {
       E: state.E,
       I: state.I,
       R: state.R,
+      incidence : state.incidence
     }))
     const y = d3.scaleLinear()
       .domain([

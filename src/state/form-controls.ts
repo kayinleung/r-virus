@@ -20,6 +20,7 @@ export type DataElement = {
     E: number;
     I: number;
     R: number;
+    incidence: number;
   };
 };
 export const currentForm = signal<FormValues>({
