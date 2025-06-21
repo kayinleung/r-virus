@@ -5,13 +5,12 @@ export type FormValues = {
   modelType: string;
   degreeDistribution: string;
   infection: string;
-  transmissionRate: number;
-  infectiousnessRate: number;
-  recoveryRate: number;
   timeEnd: number;
   increment: number;
   seedInfected: number;
   lambda: number;
+  serialInterval: number;
+  reproductionNumber: number;
 };
 
 export type DataElement = {
@@ -21,6 +20,7 @@ export type DataElement = {
     E: number;
     I: number;
     R: number;
+    incidence: number;
   };
 };
 export const currentForm = signal<FormValues>({
@@ -28,11 +28,10 @@ export const currentForm = signal<FormValues>({
   modelType: 'model_reference',
   degreeDistribution: 'poisson',
   infection: 'SEIR',
-  transmissionRate: 0.4,
-  infectiousnessRate: 0.3,
-  recoveryRate: 0.2,
   timeEnd: 250,
   increment: 1,
-  seedInfected: 1e-2,
+  seedInfected: 1e-3,
   lambda: 3,
+  serialInterval: 4,
+  reproductionNumber: 2.3,
 });
