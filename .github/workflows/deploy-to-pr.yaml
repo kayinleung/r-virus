@@ -33,22 +33,3 @@ jobs:
           publish_branch: gh-pages
           # This is the target directory within the publish_branch where the action places the contents of your built project
           destination_dir: pr-previews/${{ github.event.number }} # Deploy to a unique subdirectory for each PR
-
-      - name: Add PR preview comment
-        if: github.event.action != 'closed' # Don't comment if PR is closed
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const prNumber = context.payload.pull_request.number;
-            const repoOwner = context.repo.owner;
-            const repoName = context.repo.repo;
-            const previewUrl = `https://${repoOwner}.github.io/${repoName}-pr-${prNumber}/`;
-            github.rest.issues.createComment({
-              issue_number: prNumber,
-              owner: repoOwner,
-              repo: repoName,
-              body: `**PR URL:** [${previewUrl}](${previewUrl})`
-            });
-
-      # TODO: JFisher
-      # - name: Remove PR Preview on Close
