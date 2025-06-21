@@ -32,7 +32,7 @@ jobs:
             const prNumber = context.payload.pull_request.number;
             const repoOwner = context.repo.owner;
             const repoName = context.repo.repo;
-            const previewUrl = `https://${repoOwner}.github.io/${repoName};
+            const previewUrl = `https://${repoOwner}.github.io/${repoName}`;
             github.rest.issues.createComment({
               issue_number: prNumber,
               owner: repoOwner,
