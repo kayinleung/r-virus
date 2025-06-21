@@ -1,12 +1,7 @@
 .inputControlRoot {
 	display: flex;
-	flex-direction: row;
 	flex-wrap: wrap;
-	justify-content: left;
-	text-align: left;
-	justify-content: space-between;
 	gap: 1rem;
-	max-width: 80%;
 
 	> div {
 		flex-direction: column;
