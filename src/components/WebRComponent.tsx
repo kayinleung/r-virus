@@ -9,7 +9,7 @@ import { getWebR } from 'utils/R';
 import { simulationId } from '@state/simulation-runs';
 
 const rCodeModelReference = (await import(`../R/model_reference.R?raw`)).default;
-const rCodeModelNetwork = (await import(`../R/model_network.R?raw`)).default;
+const rCodeModelNetwork = (await import(`../R/model_reference.R?raw`)).default;
 
 export const WebRComponent = () => {
 
@@ -29,21 +29,33 @@ export const WebRComponent = () => {
     if (!webR) return;
 
     const compute = async () => {
-      const rCode = currentForm.value.modelType === 'model_reference' ? rCodeModelReference : rCodeModelNetwork;
-      const parameterizedRCode = rCode
-        .replace(/`\${population_size}`/g, String(currentForm.value.populationSize))
-        .replace(/`\${time_end}`/g, String(currentForm.value.timeEnd))
-        .replace(/`\${transmission_rate}`/g, String(currentForm.value.transmissionRate))
-        .replace(/`\${model_type}`/g, currentForm.value.modelType)
-        .replace(/`\${infectiousness_rate}`/g, String(currentForm.value.infectiousnessRate))
-        .replace(/`\${recovery_rate}`/g, String(currentForm.value.recoveryRate))
-        .replace(/`\${increment}`/g, String(currentForm.value.increment))
-        .replace(/`\${lambda}`/g, String(currentForm.value.lambda))
-        .replace(/`\${seed_infected}`/g, String(currentForm.value.seedInfected))
-        .replace(/`\${degree_distribution}`/g, currentForm.value.degreeDistribution);
-      webR.flush();
-      webR.evalRVoid(parameterizedRCode, { captureStreams: false });
-      readWebRDataElementsEvents(webR)
+      const computeOptions = [{
+        code: rCodeModelReference,
+        modelType: 'model_reference',
+      }, {
+        code: rCodeModelNetwork,
+        modelType: 'model_network',
+      }] as const;
+      computeOptions.map(({modelType, code}) => {
+        return {
+          modelType,
+          code: code
+            .replace(/`\${population_size}`/g, String(currentForm.value.populationSize))
+            .replace(/`\${time_end}`/g, String(currentForm.value.timeEnd))
+            .replace(/`\${transmission_rate}`/g, String(currentForm.value.transmissionRate))
+            .replace(/`\${model_type}`/g, currentForm.value.modelType)
+            .replace(/`\${infectiousness_rate}`/g, String(currentForm.value.infectiousnessRate))
+            .replace(/`\${recovery_rate}`/g, String(currentForm.value.recoveryRate))
+            .replace(/`\${increment}`/g, String(currentForm.value.increment))
+            .replace(/`\${lambda}`/g, String(currentForm.value.lambda))
+            .replace(/`\${seed_infected}`/g, String(currentForm.value.seedInfected))
+            .replace(/`\${degree_distribution}`/g, currentForm.value.degreeDistribution)
+        };
+      }).forEach(({modelType, code: parameterizedRCode}) => {
+        webR.flush();
+        webR.evalRVoid(parameterizedRCode, { captureStreams: false, throwJsException: false });
+        readWebRDataElementsEvents(webR, modelType);
+      });
     };
     compute();
   }, [webR, simulationId.value]);

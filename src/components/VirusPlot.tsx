@@ -6,12 +6,14 @@ import { useEffect } from 'preact/hooks';
 import { useMediaQuery, useTheme } from '@mui/material';
 import { infectionStates, StateKey } from '@state/chart';
 import { simulationRun } from '@state/simulation-runs';
+// import { useSignal } from '@preact/signals-react';
 
 type VirusPlotProps = {
+  modelType: 'model_reference' | 'model_network';
   title?: string;
 };
 
-const VirusPlot = ({ title }: VirusPlotProps) => {
+const VirusPlot = ({ title, modelType }: VirusPlotProps) => {
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.down('sm'));
   const area = {
@@ -32,7 +34,9 @@ const VirusPlot = ({ title }: VirusPlotProps) => {
 
   const svgRef = useRef<SVGSVGElement | null>(null);
 
-  const data = simulationRun.value;
+  const data = simulationRun.value[modelType];
+  console.log('VirusPlot - simulationRun.value=', simulationRun.value);
+  console.log('VirusPlot - data=', data);
   useEffect(() => {
     if (!data || data.length === 0) return;
 
@@ -99,7 +103,7 @@ const VirusPlot = ({ title }: VirusPlotProps) => {
     return () => {
       d3.select(svgRef.current).selectAll('*').remove();
     };
-  }, [data]);
+  }, [data, modelType]);
   return (
     <div className={styles.virusPlotRoot}>
       <h2>{title}</h2>

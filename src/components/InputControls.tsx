@@ -3,10 +3,8 @@ import { Box, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, Text
 import { useSignals } from "@preact/signals-react/runtime";
 import { currentForm } from "@state/form-controls";
 import styles from "./InputControls.module.css";
-const modelReferences = [
-  'model_reference',
-  'model_network',
-];
+import { ModelTypes } from '@state/chart';
+
 const degreeDistributions = [
   'poisson'
 ];
@@ -53,7 +51,7 @@ const InputControls = () => {
           label="Model Type"
           onChange={handleSelectChange}
         >
-          {modelReferences.map((model) => (
+          {ModelTypes.map((model) => (
             <MenuItem key={model} value={model}>{model}</MenuItem>
           ))}
         </Select>

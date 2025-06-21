@@ -4,7 +4,10 @@ import { currentForm, DataElement, FormValues } from "@state/form-controls";
 
 export type SimulationRun = {
   formValues: FormValues;
-  results?: DataElement[];
+  results?: {
+    model_network: DataElement[];
+    model_reference: DataElement[];
+  };
   runNumber: number;
 };
 
@@ -17,7 +20,10 @@ export const simulationRuns = signal<Record<string, SimulationRun>>({
     formValues: {
       ...currentForm.value,
     },
-    results: [],
+    results: {
+      'model_network': [],
+      'model_reference': []
+    },
     runNumber: 1,
   },
 });
@@ -32,12 +38,16 @@ export const SimulaitonRunStates = {
 };
 
 
-export const simulationRun = computed(() => simulationRuns.value[plottedSimulationId.value].results ?? []);
+export const simulationRun = computed(() => simulationRuns.value[plottedSimulationId.value].results ?? {
+      'model_network': [],
+      'model_reference': []
+    });
 export const simulationRunNumber = computed(() => simulationRuns.value[simulationId.value].runNumber);
 
 
+/** TODO: Hacky solution... just looks at model_network */
 export const currentSimulationRunState = computed(() => {
-  const currentRun = simulationRuns.value[simulationId.value].results ?? [];
+  const currentRun = simulationRuns.value[simulationId.value].results?.model_network ?? [];
   if (currentRun?.length === 0) {
     return SimulaitonRunStates.LOADING_R;
   }

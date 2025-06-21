@@ -8,6 +8,7 @@ import { MetricSelector } from './MetricSelector';
 import { SimulationSelector } from './SimulationSelector';
 import styles from './VirusPlotContainer.module.css';
 import { Legend } from './Legend';
+import { ModelReferences } from '@state/chart';
 
 type VirusPlotContainerProps = {
   webR: WebR | null;
@@ -39,15 +40,16 @@ const MultiVirusPlot = ({ webR }: VirusPlotContainerProps) => {
     return <LoadingSpinner text='Loading project...' />;
   };
 
-  if (simulationRun.value.length === 0) {
+  /** TODO: Fix hacky solution */
+  if (simulationRun.value['model_network'].length === 0) {
     return <LoadingSpinner text='Starting simulation...' />;
   }
 
   return (
     <>
       <div className={styles.multiVirusPlotContainer}>
-        <VirusPlot title={'Reference'} />
-        <VirusPlot title={'Network'} />
+        <VirusPlot modelType={ModelReferences.model_reference.value} title={'Reference'} />
+        <VirusPlot modelType={ModelReferences.model_network.value} title={'Network'} />
       </div>
       <Legend/>
     </>
