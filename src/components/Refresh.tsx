@@ -18,7 +18,10 @@ const Refresh = () => {
       formValues: {
         ...currentForm.value,
       },
-      results: [],
+      results: {
+        model_reference: [],
+        model_network: [],
+      },
       runNumber: currentNumberOfRuns + 1,
     };
     simulationId.value = uuid; // triggers a new simulation
