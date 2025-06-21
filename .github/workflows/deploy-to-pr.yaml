@@ -1,6 +1,6 @@
 name: Deploy (PRs)
 on:
-  pull_request:
+  pull_request_target: # Use pull_request_target to ensure the workflow has access to secrets
     types: [opened, reopened, synchronize, closed] # Use pull_request_target for security reasons
 
 permissions:
