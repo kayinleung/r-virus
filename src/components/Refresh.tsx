@@ -33,6 +33,7 @@ const Refresh = () => {
       justifyContent: 'flex-end',
       alignContent: 'flex-start',
       flexWrap: 'wrap',
+      paddingX: '1rem'
     }}>
       <Fab disabled={disableRerun} color="primary" aria-label="rerun simulation with current parameters"
       onClick={handleOnClick}
