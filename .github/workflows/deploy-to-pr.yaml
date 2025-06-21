@@ -1,6 +1,6 @@
 name: Deploy (PRs)
 on:
-  pull_request_target:
+  pull_request:
     types: [opened, reopened, synchronize, closed] # Use pull_request_target for security reasons
 
 permissions:
