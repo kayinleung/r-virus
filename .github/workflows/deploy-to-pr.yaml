@@ -1,6 +1,6 @@
 name: Deploy (PRs)
 on:
-  pull_request_target:
+  pull_request:
     types: [opened, reopened, synchronize, closed] # Use pull_request_target for security reasons
 
 permissions:
@@ -10,8 +10,6 @@ permissions:
 jobs:
   deploy_pr_preview:
     runs-on: ubuntu-latest
-    # Only run for PRs from the same repository, not forks
-    if: github.event.pull_request.head.repo.full_name == github.repository
 
     steps:
       - name: Checkout code
