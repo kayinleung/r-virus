@@ -22,9 +22,10 @@ tryCatch({
     increment = `${increment}`,
     population_size = `${population_size}`,
     seed_infected = `${seed_infected}`,
-    degree_distribution = `${degree_distribution}`,
+    degree_distribution = "negative_binomial",
     infection = "SEIR",
-    lambda = lambda
+    size = size,
+    prob = prob
   )
   flush.console()
 }, finally = {
