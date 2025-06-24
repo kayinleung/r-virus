@@ -8,7 +8,7 @@ export type FormValues = {
   timeEnd: number;
   increment: number;
   seedInfected: number;
-  lambda: number;
+  mu: number;
   serialInterval: number;
   reproductionNumber: number;
 };
@@ -31,7 +31,7 @@ export const currentForm = signal<FormValues>({
   timeEnd: 250,
   increment: 1,
   seedInfected: 1e-3,
-  lambda: 3,
+  mu: 2.4,
   serialInterval: 4,
   reproductionNumber: 2.3,
 });

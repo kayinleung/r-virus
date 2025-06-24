@@ -182,10 +182,10 @@ const InputControls = () => {
       <FormControl hiddenLabel={matches}>
         <TextField
           className={styles.textField}
-          label="1/mean degree (λ)"
-          name="lambda"
+          label="mean degree"
+          name="mu"
           type="number"
-          value={currentForm.value.lambda}
+          value={currentForm.value.mu}
           onChange={handleTextChange}
           slotProps={{
             htmlInput: {
