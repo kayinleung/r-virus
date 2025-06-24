@@ -28,7 +28,7 @@ const SimulationSelector = () => {
       >
         {runs.map(([runUuid, simulation]) => (
           <MenuItem key={runUuid} value={simulation.runNumber}>
-            {`Run #${simulation.runNumber}: serial interval=${simulation.formValues.serialInterval}, reproduction number=${simulation.formValues.reproductionNumber}, mean degree=${simulation.formValues.mu}, population size=${simulation.formValues.populationSize}`}
+            {`Run #${simulation.runNumber}: serial interval=${simulation.formValues.serialInterval}, reproduction number=${simulation.formValues.reproductionNumber}, mean degree=${simulation.formValues.mu}, dispersion=${simulation.formValues.dispersion}, population size=${simulation.formValues.populationSize}`}
           </MenuItem>
         ))}
       </Select>

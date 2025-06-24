@@ -9,6 +9,7 @@ export type FormValues = {
   increment: number;
   seedInfected: number;
   mu: number;
+  dispersion: number;
   serialInterval: number;
   reproductionNumber: number;
 };
@@ -32,6 +33,7 @@ export const currentForm = signal<FormValues>({
   increment: 1,
   seedInfected: 1e-3,
   mu: 2.4,
+  dispersion: 0.1,
   serialInterval: 4,
   reproductionNumber: 2.3,
 });
