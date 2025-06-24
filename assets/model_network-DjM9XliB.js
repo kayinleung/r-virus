@@ -2,7 +2,9 @@ const e=`library(PBSddesolve)
 library(escape2024)
 
 tryCatch({
-  degree = list(degree_distribution = "poisson", lambda = 3)
+  lambda = 1 / \`\${mu}\`
+
+  degree = list(degree_distribution = "poisson", lambda = lambda)
   var = var_degree(degree)
   avg = mean_degree(degree)
   c_degree = (var + avg^2 - avg) / avg
@@ -21,7 +23,7 @@ tryCatch({
     seed_infected = \`\${seed_infected}\`,
     degree_distribution = "poisson",
     infection = "SEIR",
-    lambda = 1
+    lambda = lambda
   )
   flush.console()
 }, finally = {
