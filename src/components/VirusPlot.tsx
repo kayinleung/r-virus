@@ -4,12 +4,12 @@ import { useRef } from 'react';
 import styles from './VirusPlot.module.css';
 import { useEffect } from 'preact/hooks';
 import { useMediaQuery, useTheme } from '@mui/material';
-import { infectionStates, StateKey } from '@state/chart';
+import { infectionStates } from '@state/chart';
+import type { ModelType, StateKey } from '@state/chart';
 import { simulationRun } from '@state/simulation-runs';
-// import { useSignal } from '@preact/signals-react';
 
 type VirusPlotProps = {
-  modelType: 'model_reference' | 'model_network';
+  modelType: ModelType;
   title?: string;
 };
 
@@ -68,7 +68,8 @@ const VirusPlot = ({ title, modelType }: VirusPlotProps) => {
       S: state.S,
       E: state.E,
       I: state.I,
-      R: state.R
+      R: state.R,
+      incidence : state.incidence
     }))
     const y = d3.scaleLinear()
       .domain([

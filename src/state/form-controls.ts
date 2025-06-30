@@ -1,17 +1,18 @@
 import { signal } from "@preact/signals-react";
+import type { ModelType } from "./chart";
 
 export type FormValues = {
   populationSize: number;
-  modelType: string;
+  modelType: ModelType;
   degreeDistribution: string;
   infection: string;
-  transmissionRate: number;
-  infectiousnessRate: number;
-  recoveryRate: number;
   timeEnd: number;
   increment: number;
   seedInfected: number;
-  lambda: number;
+  mu: number;
+  dispersion: number;
+  serialInterval: number;
+  reproductionNumber: number;
 };
 
 export type DataElement = {
@@ -21,6 +22,7 @@ export type DataElement = {
     E: number;
     I: number;
     R: number;
+    incidence: number;
   };
 };
 export const currentForm = signal<FormValues>({
@@ -28,11 +30,11 @@ export const currentForm = signal<FormValues>({
   modelType: 'model_reference',
   degreeDistribution: 'poisson',
   infection: 'SEIR',
-  transmissionRate: 0.4,
-  infectiousnessRate: 0.3,
-  recoveryRate: 0.2,
-  timeEnd: 25,
+  timeEnd: 250,
   increment: 1,
-  seedInfected: 1e-2,
-  lambda: 3,
+  seedInfected: 1e-3,
+  mu: 2.4,
+  dispersion: 0.1,
+  serialInterval: 4,
+  reproductionNumber: 2.3,
 });

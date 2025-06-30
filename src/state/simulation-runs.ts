@@ -7,6 +7,7 @@ export type SimulationRun = {
   results?: {
     model_network: DataElement[];
     model_reference: DataElement[];
+    model_network_nb: DataElement[];
   };
   runNumber: number;
 };
@@ -22,7 +23,8 @@ export const simulationRuns = signal<Record<string, SimulationRun>>({
     },
     results: {
       'model_network': [],
-      'model_reference': []
+      'model_reference': [],
+      'model_network_nb': [],
     },
     runNumber: 1,
   },
@@ -40,7 +42,8 @@ export const SimulaitonRunStates = {
 
 export const simulationRun = computed(() => simulationRuns.value[plottedSimulationId.value].results ?? {
       'model_network': [],
-      'model_reference': []
+      'model_reference': [],
+      'model_network_nb': [],
     });
 export const simulationRunNumber = computed(() => simulationRuns.value[simulationId.value].runNumber);
 

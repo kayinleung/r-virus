@@ -6,7 +6,8 @@ import styles from "./InputControls.module.css";
 import { ModelTypes } from '@state/chart';
 
 const degreeDistributions = [
-  'poisson'
+  'poisson',
+  'negative_binomial'
 ];
 
 
@@ -56,7 +57,43 @@ const InputControls = () => {
           ))}
         </Select>
       </FormControl>
-            <FormControl hiddenLabel={matches}>
+      <FormControl hiddenLabel={matches}>
+        <TextField
+          className={styles.textField}
+          label="Basic reproduction number"
+          name="reproductionNumber"
+          type="number"
+          value={currentForm.value.reproductionNumber}
+          onChange={handleTextChange}
+          slotProps={{
+            htmlInput: {
+              min: 0,
+              max: 1,
+              step: 0.01,
+            },
+          }}
+          required
+        />
+      </FormControl>
+      <FormControl hiddenLabel={matches}>
+        <TextField
+          className={styles.textField}
+          label="Serial Interval"
+          name="serialInterval"
+          type="number"
+          value={currentForm.value.serialInterval}
+          onChange={handleTextChange}
+          slotProps={{
+            htmlInput: {
+              min: 3.08,
+              max: 10,
+              step: 0.1,
+            },
+          }}
+          required
+        />
+      </FormControl>
+      <FormControl hiddenLabel={matches}>
         <InputLabel id="degree-distribution-label">Degree distribution</InputLabel>
         <Select
           name="degreeDistribution"
@@ -74,52 +111,34 @@ const InputControls = () => {
       <FormControl hiddenLabel={matches}>
         <TextField
           className={styles.textField}
-          label="Transmission Rate"
-          name="transmissionRate"
+          label="Mean degree"
+          name="mu"
           type="number"
-          value={currentForm.value.transmissionRate}
+          value={currentForm.value.mu}
           onChange={handleTextChange}
           slotProps={{
             htmlInput: {
               min: 0,
-              max: 1,
-              step: 0.01,
+              max: 100,
+              step: 1,
             },
           }}
           required
         />
       </FormControl>
-      <FormControl hiddenLabel={matches}>
+            <FormControl hiddenLabel={matches}>
         <TextField
           className={styles.textField}
-          label="Infectiousness Rate"
-          name="infectiousnessRate"
+          label="Dispersion"
+          name="dispersion"
           type="number"
-          value={currentForm.value.infectiousnessRate}
+          value={currentForm.value.dispersion}
           onChange={handleTextChange}
           slotProps={{
             htmlInput: {
               min: 0,
-              max: 1,
-              step: 0.01,
-            },
-          }}
-          required
-        />
-      </FormControl>
-      <FormControl hiddenLabel={matches}>
-        <TextField
-          className={styles.textField}
-          label="Recovery Rate"
-          name="recoveryRate"
-          type="number"
-          value={currentForm.value.recoveryRate}
-          onChange={handleTextChange}
-          slotProps={{
-            htmlInput: {
-              min: 0,
-              max: 1,
-              step: 0.01,
+              max: 10,
+              step: 0.1,
             },
           }}
           required
@@ -190,24 +209,6 @@ const InputControls = () => {
               min: 0,
               max: currentForm.value.timeEnd,
               step: 0.01,
-            },
-          }}
-          required
-        />
-      </FormControl>
-      <FormControl hiddenLabel={matches}>
-        <TextField
-          className={styles.textField}
-          label="1/mean degree (λ)"
-          name="lambda"
-          type="number"
-          value={currentForm.value.lambda}
-          onChange={handleTextChange}
-          slotProps={{
-            htmlInput: {
-              min: 0,
-              max: 100,
-              step: 1,
             },
           }}
           required

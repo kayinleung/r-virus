@@ -48,8 +48,9 @@ const MultiVirusPlot = ({ webR }: VirusPlotContainerProps) => {
   return (
     <>
       <div className={styles.multiVirusPlotContainer}>
-        <VirusPlot modelType={ModelReferences.model_reference.value} title={'Reference'} />
-        <VirusPlot modelType={ModelReferences.model_network.value} title={'Network'} />
+        <VirusPlot modelType={ModelReferences.model_reference.value}  title={ModelReferences.model_reference.label} />
+        <VirusPlot modelType={ModelReferences.model_network.value} title={ModelReferences.model_network.label} />
+        <VirusPlot modelType={ModelReferences.model_network_nb.value} title={ModelReferences.model_network_nb.label} />
       </div>
       <Legend/>
     </>
