@@ -47,7 +47,8 @@ const MultiVirusPlot = ({ webR }: VirusPlotContainerProps) => {
     <>
       <div className={styles.multiVirusPlotContainer}>
         <VirusPlot title={'Reference'} />
-        <VirusPlot title={'Network'} />
+        <VirusPlot title={'Network: Poisson'} />
+        <VirusPlot title={'Network: Negative Binomial'} />
       </div>
       <Legend/>
     </>

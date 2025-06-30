@@ -2,9 +2,10 @@ library(PBSddesolve)
 library(escape2024)
 
 tryCatch({
-  lambda = 1 / `${mu}`
+  prob = 1 / `${dispersion}`
+  size = `${mu}` / (`${dispersion}` - 1) 
 
-  degree = list(degree_distribution = "poisson", lambda = lambda)
+  degree = list(degree_distribution = "negative_binomial", size = size, prob = prob)
   var = var_degree(degree)
   avg = mean_degree(degree)
   c_degree = (var + avg^2 - avg) / avg
@@ -21,9 +22,10 @@ tryCatch({
     increment = `${increment}`,
     population_size = `${population_size}`,
     seed_infected = `${seed_infected}`,
-    degree_distribution = "poisson",
+    degree_distribution = "negative_binomial",
     infection = "SEIR",
-    lambda = lambda
+    size = size,
+    prob = prob
   )
   flush.console()
 }, finally = {
