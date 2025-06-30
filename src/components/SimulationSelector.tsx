@@ -1,18 +1,13 @@
-import { MenuItem, Select, FormControl, InputLabel, SelectChangeEvent } from '@mui/material';
-import { plottedSimulationId, SimulationRun, simulationRuns } from '@state/simulation-runs';
+import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material';
+import { displayedRunId, simulationRuns } from '@state/simulation-runs';
 
 const SimulationSelector = () => {
-  // const runs = simulationRun.value; // Assuming simulationRun contains an array of runs
-  const selectedRunUuid = plottedSimulationId.value;
-  const plottedSimulation = simulationRuns.value[selectedRunUuid];
-  const selectedRunNumber = String(plottedSimulation?.runNumber);
-
+  const selectedRunNumber = String(displayedRunId.value);
   const runs = Object.entries(simulationRuns.value);
 
   const handleSelectChange = (event: SelectChangeEvent) => {
     const { value: runNumber } = event.target;
-    const [plottedSimulationUuid, _] = runs.find(([_, run]) => run.runNumber === Number(runNumber)) as [string, SimulationRun];
-    plottedSimulationId.value = plottedSimulationUuid;
+    displayedRunId.value = Number(runNumber);
   };
 
   return (
@@ -26,9 +21,9 @@ const SimulationSelector = () => {
         label="Model Type"
         onChange={handleSelectChange}
       >
-        {runs.map(([runUuid, simulation]) => (
-          <MenuItem key={runUuid} value={simulation.runNumber}>
-            {`Run #${simulation.runNumber}: serial interval=${simulation.formValues.serialInterval}, reproduction number=${simulation.formValues.reproductionNumber}, mean degree=${simulation.formValues.mu}, dispersion=${simulation.formValues.dispersion}, population size=${simulation.formValues.populationSize}`}
+        {runs.map(([runId, simulation]) => (
+          <MenuItem key={runId} value={runId}>
+            {`Run #${runId}: serial interval=${simulation.formValues.serialInterval}, reproduction number=${simulation.formValues.reproductionNumber}, mean degree=${simulation.formValues.mu}, dispersion=${simulation.formValues.dispersion}, population size=${simulation.formValues.populationSize}`}
           </MenuItem>
         ))}
       </Select>

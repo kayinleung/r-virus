@@ -2,6 +2,12 @@
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
+  & > div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+  }
 }
 
 .virusPlotContainerRoot {

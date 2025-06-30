@@ -3,7 +3,6 @@ import { Box, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, Text
 import { useSignals } from "@preact/signals-react/runtime";
 import { currentForm } from "@state/form-controls";
 import styles from "./InputControls.module.css";
-import { ModelTypes } from '@state/chart';
 
 const degreeDistributions = [
   'poisson',
@@ -42,21 +41,6 @@ const InputControls = () => {
       }}
       className={styles.inputControlRoot}
       component="form">
-      <FormControl hiddenLabel={matches}>
-        <InputLabel id="model-type-label">Model Type</InputLabel>
-        <Select
-          name="modelType"
-          labelId="model-type-label"
-          id="demo-simple-select"
-          value={currentForm.value.modelType}
-          label="Model Type"
-          onChange={handleSelectChange}
-        >
-          {ModelTypes.map((model) => (
-            <MenuItem key={model} value={model}>{model}</MenuItem>
-          ))}
-        </Select>
-      </FormControl>
       <FormControl hiddenLabel={matches}>
         <TextField
           className={styles.textField}

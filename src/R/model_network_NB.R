@@ -15,6 +15,7 @@ tryCatch({
   transmission_rate = `${reproduction_number}` * recovery_rate / c_degree
 
   `${model_type}`(
+    simulation_id = "`${simulation_id}`",
     transmission_rate = transmission_rate,
     infectiousness_rate = infectiousness_rate,
     recovery_rate = recovery_rate,

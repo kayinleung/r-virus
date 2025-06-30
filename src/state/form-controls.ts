@@ -16,6 +16,7 @@ export type FormValues = {
 };
 
 export type DataElement = {
+  simulation_id: string;
   time: number;
   state: {
     S: number;

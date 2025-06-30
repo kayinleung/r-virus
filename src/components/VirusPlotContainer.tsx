@@ -3,7 +3,7 @@ import type { WebR } from 'webr';
 import { LoadingSpinner } from '@components/LoadingSpinner';
 import { VirusPlot } from '@components/VirusPlot';
 import { useSignals } from '@preact/signals-react/runtime';
-import { simulationRun } from '@state/simulation-runs';
+import { displayedSimulationRun } from '@state/simulation-runs';
 import { MetricSelector } from './MetricSelector';
 import { SimulationSelector } from './SimulationSelector';
 import styles from './VirusPlotContainer.module.css';
@@ -19,7 +19,7 @@ const VirusPlotContainer = ({ webR }: VirusPlotContainerProps) => {
   // useSignals();
   // const showSimulationSelector = [
   //   SimulaitonRunStates.COMPLETED,
-  // ].includes(currentSimulationRunState.value as SimulationRunState);
+  // ].includes(currentSimulationRunStatus.value as SimulationRunState);
 
   return (
     <div className={styles.virusPlotContainerRoot}>
@@ -40,17 +40,12 @@ const MultiVirusPlot = ({ webR }: VirusPlotContainerProps) => {
     return <LoadingSpinner text='Loading project...' />;
   };
 
-  /** TODO: Fix hacky solution */
-  if (simulationRun.value['model_network'].length === 0) {
-    return <LoadingSpinner text='Starting simulation...' />;
-  }
-
   return (
     <>
       <div className={styles.multiVirusPlotContainer}>
-        <VirusPlot modelType={ModelReferences.model_reference.value}  title={ModelReferences.model_reference.label} />
-        <VirusPlot modelType={ModelReferences.model_network.value} title={ModelReferences.model_network.label} />
-        <VirusPlot modelType={ModelReferences.model_network_nb.value} title={ModelReferences.model_network_nb.label} />
+        {Object.entries(displayedSimulationRun.value.results).map(([simulationId, result]) => {
+          return <VirusPlot simulationId={simulationId} title={ModelReferences[result.modelType].label} />
+        })}
       </div>
       <Legend/>
     </>

@@ -1,10 +1,6 @@
-import { ModelType } from '@state/chart';
 import type { DataElement } from '@state/form-controls';
-import { simulationId, simulationRuns } from '@state/simulation-runs';
+import { executingSimulationRunNumber, simulationRuns } from '@state/simulation-runs';
 import type { WebR as WebRType } from 'webr';
-
-type BufferMap = Record<string, string>;
-
 
 type ParsedMessage = {
   dataElement: DataElement;
@@ -34,55 +30,40 @@ export const extractJsonObject = (inputString: string): ParsedMessage | null => 
   };
 };
 
-export const readWebRDataElementsEvents = async (r: WebRType, modelType: ModelType) => {
-  const bufferMap: BufferMap = {};
+export const readWebRDataElementsEvents = async (r: WebRType) => {
 
-  const bufferKey = `${simulationId.value}-${modelType}`;
-  // Ensure bufferMap[bufferKey] is initialized as an empty string if undefined
-  if (typeof bufferMap[bufferKey] !== 'string') {
-    bufferMap[bufferKey] = '';
-  }
   r.flush();
   for await (const item of r.stream()) {
     if (item.type !== 'stdout') {
+      console.log('webREventReader - item=', item);
       continue;
     }
-    bufferMap[bufferKey] += item.data ?? '';
     try {
-      const parsedResult = extractJsonObject(bufferMap[bufferKey]);
-      console.log('webREventReader - parsedResult=', parsedResult);
+      const parsedResult = extractJsonObject(item.data);
       if (!parsedResult) {
         continue;
       }
-      const { dataElement, remainingString } = parsedResult;
-      bufferMap[bufferKey] = remainingString;
+      const { dataElement } = parsedResult;
       r.flush();
       
-      const resultKey = simulationId.value;
-      console.log('webREventReader - dataElement, modelType=', dataElement, modelType);
-      const prevResults = simulationRuns.value[resultKey].results ?? {
-        model_network: [],
-        model_reference: []
-      };
+      const resultKey = dataElement.simulation_id;
+      const prevResults = simulationRuns.value[executingSimulationRunNumber.value].results[resultKey].data || [];
       simulationRuns.value = {
         ...simulationRuns.value,
-        [resultKey]: {
-          ...simulationRuns.value[resultKey],
+        [executingSimulationRunNumber.value]: {
+          ...simulationRuns.value[executingSimulationRunNumber.value],
           results: {
-            ...prevResults,
-            [modelType]: [
-              ...(prevResults[modelType] ?? []),
-              dataElement
-            ],
+            ...simulationRuns.value[executingSimulationRunNumber.value].results,
+            [resultKey]: {
+              ...simulationRuns.value[executingSimulationRunNumber.value].results[resultKey],
+              data: [...prevResults, dataElement],
+            }
           }
         },
-      }
-      // console.log('webREventReader - Updated simulationRuns:', simulationRuns.value);
-    } catch (e) {
-      console.error('webREventReader - e=', e);
-      bufferMap[bufferKey] = ""; // Reset bufferMap on error
-      console.error('webREventReader - Error parsing data element. Buffer has been reset');
-      continue;
+      };
+    } catch (error) {
+      console.error('webREventReader - Error parsing data element - error=', error);
+      // continue;
     }
   }
 };

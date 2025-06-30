@@ -5,15 +5,16 @@ import styles from './VirusPlot.module.css';
 import { useEffect } from 'preact/hooks';
 import { useMediaQuery, useTheme } from '@mui/material';
 import { infectionStates } from '@state/chart';
-import type { ModelType, StateKey } from '@state/chart';
-import { simulationRun } from '@state/simulation-runs';
+import type { StateKey } from '@state/chart';
+import { displayedSimulationRun } from '@state/simulation-runs';
+import { LoadingSpinner } from './LoadingSpinner';
 
 type VirusPlotProps = {
-  modelType: ModelType;
+  simulationId: string;
   title?: string;
 };
 
-const VirusPlot = ({ title, modelType }: VirusPlotProps) => {
+const VirusPlot = ({ title, simulationId }: VirusPlotProps) => {
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.down('sm'));
   const area = {
@@ -34,19 +35,19 @@ const VirusPlot = ({ title, modelType }: VirusPlotProps) => {
 
   const svgRef = useRef<SVGSVGElement | null>(null);
 
-  const data = simulationRun.value[modelType];
-  console.log('VirusPlot - simulationRun.value=', simulationRun.value);
-  console.log('VirusPlot - data=', data);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const data = displayedSimulationRun.value.results[simulationId]?.data.filter((d: DataElement) => !!d.state) || [];
   useEffect(() => {
+    const currentSvg = svgRef.current;
     if (!data || data.length === 0) return;
 
     const plotWidth = area.plot.width - area.plot.margin.left - area.plot.margin.right;
     const plotHeight = area.plot.height - area.plot.margin.top - area.plot.margin.bottom;
 
     // Clear previous SVG content
-    d3.select(svgRef.current).selectAll('*').remove();
+    d3.select(currentSvg).selectAll('*').remove();
 
-    const svg = d3.select(svgRef.current)
+    const svg = d3.select(currentSvg)
       .attr('width', area.plot.width)
       .attr('height', area.plot.height);
 
@@ -102,13 +103,25 @@ const VirusPlot = ({ title, modelType }: VirusPlotProps) => {
       });
 
     return () => {
-      d3.select(svgRef.current).selectAll('*').remove();
+      d3.select(currentSvg).selectAll('*').remove();
     };
-  }, [data, modelType]);
+  }, [
+    data, simulationId,
+    area.plot.height,
+    area.plot.width,
+    area.plot.margin.top,
+    area.plot.margin.right,
+    area.plot.margin.bottom,
+    area.plot.margin.left,
+  ]);
+
   return (
     <div className={styles.virusPlotRoot}>
       <h2>{title}</h2>
-      <svg ref={svgRef}></svg>
+      {displayedSimulationRun.value.results[simulationId]?.data.length === 0 ? 
+        <LoadingSpinner text='Loading simulation data...' /> :
+        <svg ref={svgRef}></svg>
+      }
     </div>
   );
 };

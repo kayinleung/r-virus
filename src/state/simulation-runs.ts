@@ -1,61 +1,67 @@
 import { computed, signal } from "@preact/signals-react";
-import { v4 as uuidv4 } from "uuid";
 import { currentForm, DataElement, FormValues } from "@state/form-controls";
+import { ModelType } from "./chart";
+
+const INITIAL_RUN_ID = 1;
 
 export type SimulationRun = {
   formValues: FormValues;
-  results?: {
-    model_network: DataElement[];
-    model_reference: DataElement[];
-    model_network_nb: DataElement[];
+  status: SimulationRunState
+  results: {
+    [simulationId: string]: {
+      modelType: ModelType
+      data: DataElement[];
+    };
   };
-  runNumber: number;
 };
 
-export type SimulationRunState = typeof SimulaitonRunStates[keyof typeof SimulaitonRunStates];
-
-const initialUuid = uuidv4();
-export const simulationId = signal<string>(initialUuid);
-export const simulationRuns = signal<Record<string, SimulationRun>>({
-  [initialUuid]: {
-    formValues: {
-      ...currentForm.value,
-    },
-    results: {
-      'model_network': [],
-      'model_reference': [],
-      'model_network_nb': [],
-    },
-    runNumber: 1,
-  },
-});
-
-export const plottedSimulationId = signal<string>(initialUuid);
+export type MultiSimulationRun = {
+  [runId: number]: SimulationRun;
+};
 
 export const SimulaitonRunStates = {
   LOADING_R: 'LOADING_R',
   IN_PROGRESS: 'IN_PROGRESS',
   COMPLETED: 'COMPLETED',
   ERROR: 'ERROR',
+} as const;
+
+export type SimulationRunState = keyof typeof SimulaitonRunStates;
+
+export const displayedRunId = signal<number>(INITIAL_RUN_ID);
+
+export const simulationRuns = signal<MultiSimulationRun>({
+  [INITIAL_RUN_ID]: {
+    formValues: {
+      ...currentForm.value,
+    },
+    status: SimulaitonRunStates.LOADING_R,
+    results: {
+    },
+  },
+});
+
+
+export const createNewRun = () => {
+  simulationRuns.value = {
+    ...simulationRuns.value,
+    [(maxRunId?.value ?? INITIAL_RUN_ID) + 1]: {
+      formValues: {
+        ...currentForm.value,
+      },
+      status: SimulaitonRunStates.LOADING_R,
+      results: {
+      },
+    },
+  };
 };
 
+export const maxRunId = computed(() => {
+  return Math.max(...Object.keys(simulationRuns.value).map(Number));
+});
 
-export const simulationRun = computed(() => simulationRuns.value[plottedSimulationId.value].results ?? {
-      'model_network': [],
-      'model_reference': [],
-      'model_network_nb': [],
-    });
-export const simulationRunNumber = computed(() => simulationRuns.value[simulationId.value].runNumber);
+export const executingSimulationRunNumber = signal<number>(1);
 
+export const displayedSimulationRun = computed(() => simulationRuns.value[displayedRunId.value]);
 
-/** TODO: Hacky solution... just looks at model_network */
-export const currentSimulationRunState = computed(() => {
-  const currentRun = simulationRuns.value[simulationId.value].results?.model_network ?? [];
-  if (currentRun?.length === 0) {
-    return SimulaitonRunStates.LOADING_R;
-  }
-
-  if (currentRun?.length > 0 && currentRun?.[currentRun.length - 1].time >= currentForm.value.timeEnd) {
-    return SimulaitonRunStates.COMPLETED;
-  }
-})
+export const currentSimulationRunStatus = computed(() => simulationRuns.value[maxRunId.value].status);
