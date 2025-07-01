@@ -34,8 +34,6 @@ const MultiVirusPlot = ({ webR }: VirusPlotContainerProps) => {
     return <LoadingSpinner text='Loading project...' />;
   };
 
-  console.log('VirusPlotContainer - displayedSimulationRun.value=', displayedSimulationRun.value);
-
   return (
     <>
       <div className={styles.multiVirusPlotContainer}>

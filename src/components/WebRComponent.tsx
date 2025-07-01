@@ -58,7 +58,6 @@ export const WebRComponent = () => {
           .replace(/`\${serial_interval}`/g, String(currentForm.value.serialInterval))
           .replace(/`\${degree_distribution}`/g, currentForm.value.degreeDistribution);
         webR.flush();
-        // console.log('WebRComponent - parameterizedRCode=', parameterizedRCode);
         webR.evalRVoid(parameterizedRCode, { captureStreams: false });
         simulationRuns.value = {
           ...simulationRuns.value,

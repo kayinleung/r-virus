@@ -62,7 +62,6 @@ export const readWebRDataElementsEvents = async (r: WebRType) => {
   r.flush();
 
   for await (const item of r.stream()) {
-    // console.log('webREventReader - item=', item);
     if (item.type === 'stderr') {
       const parsedMessage = extractJsonObject(item.data) as ParsedErrorMessage;
       const resultKey = parsedMessage?.error.simulation_id;

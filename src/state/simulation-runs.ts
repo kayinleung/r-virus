@@ -52,9 +52,6 @@ export const simulationRuns = signal<MultiSimulationRun>({
 
 
 export const createNewRun = () => {
-  console.log('simulation-runs (before) - simulationRuns.value=', simulationRuns.value);
-  // const maxRunId = Math.max(...Object.keys(simulationRuns.value).map(Number));
-  console.log('simulation-runs - maxRunId=', maxRunId);
   simulationRuns.value = {
     ...simulationRuns.value,
     [(maxRunId.value ?? INITIAL_RUN_ID) + 1]: {
@@ -66,7 +63,6 @@ export const createNewRun = () => {
       },
     },
   };
-  console.log('simulation-runs (after) - simulationRuns.value=', simulationRuns.value);
 };
 
 export const maxRunId = computed(() => {
