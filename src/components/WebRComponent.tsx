@@ -36,13 +36,13 @@ export const WebRComponent = () => {
       ModelTypes
         .forEach((modelType) => {
 
-        const rCode = modelType === 'model_reference' ?
-          rCodeModelReference :
-          (modelType === 'model_network' ?
-            rCodeModelNetwork :
-            rCodeModelNetworkNB
-          );
-        // const rCode = rCodeModelNetworkNB;
+        // const rCode = modelType === 'model_reference' ?
+        //   rCodeModelReference :
+        //   (modelType === 'model_network' ?
+        //     rCodeModelNetwork :
+        //     rCodeModelNetworkNB
+        //   );
+        const rCode = rCodeModelReference;
         const simulationId = uuidv4();
         const parameterizedRCode = rCode
           .replace(/`\${simulation_id}`/g, simulationId)
@@ -58,7 +58,7 @@ export const WebRComponent = () => {
           .replace(/`\${serial_interval}`/g, String(currentForm.value.serialInterval))
           .replace(/`\${degree_distribution}`/g, currentForm.value.degreeDistribution);
         webR.flush();
-        console.log('WebRComponent - parameterizedRCode=', parameterizedRCode);
+        // console.log('WebRComponent - parameterizedRCode=', parameterizedRCode);
         webR.evalRVoid(parameterizedRCode, { captureStreams: false });
         simulationRuns.value = {
           ...simulationRuns.value,

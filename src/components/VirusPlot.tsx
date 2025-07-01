@@ -124,7 +124,7 @@ const VirusPlotSvg = ({ simulationId }: VirusPlotProps) => {
 
 const VirusPlot = ({ title, simulationId }: VirusPlotProps) => {
   useSignals();
-  console.log(`VirusPlot - displayedSimulationRun.value.results[${simulationId}]?.status=`, displayedSimulationRun.value.results[simulationId]?.status);
+  // console.log(`VirusPlot - displayedSimulationRun.value.results[${simulationId}]?.status=`, displayedSimulationRun.value.results[simulationId]?.status);
 
 
   if (displayedSimulationRun.value.results[simulationId]?.status === SimulationRunStatuses.ERROR) {

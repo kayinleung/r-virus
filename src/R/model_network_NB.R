@@ -28,6 +28,7 @@ tryCatch({
     size = size,
     prob = prob
   )
+  flush.console()
 }, error = function(e) {
   write(jsonlite::toJSON(
     list(error = list(simulation_id = "`${simulation_id}`"), 

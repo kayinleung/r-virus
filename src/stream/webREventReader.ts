@@ -2,11 +2,11 @@ import type { DataElement, ErrorMessage } from '@state/form-controls';
 import { executingSimulationRunNumber, setSimulationRunStatus, simulationRuns, SimulationRunStatuses } from '@state/simulation-runs';
 import type { WebR as WebRType } from 'webr';
 
-type ParsedDataMessage = {
+export type ParsedDataMessage = {
   dataElement: DataElement;
   remainingString: string;
 }
-type ParsedErrorMessage = {
+export type ParsedErrorMessage = {
   error: ErrorMessage;
   isError: true;
 };
@@ -59,9 +59,10 @@ export const extractJsonObject = (inputString: string): ParsedMessage | null => 
 };
 
 export const readWebRDataElementsEvents = async (r: WebRType) => {
+  r.flush();
 
   for await (const item of r.stream()) {
-    console.log('webREventReader - item=', item);
+    // console.log('webREventReader - item=', item);
     if (item.type === 'stderr') {
       const parsedMessage = extractJsonObject(item.data) as ParsedErrorMessage;
       const resultKey = parsedMessage?.error.simulation_id;
