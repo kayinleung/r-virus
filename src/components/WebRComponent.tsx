@@ -11,8 +11,8 @@ import { ModelTypes } from '@state/chart';
 import { maxRunId, MultiRunStatuses, simulationRuns } from '@state/simulation-runs';
 
 const rCodeModelReference = (await import(`../R/model_reference.R?raw`)).default;
-const rCodeModelNetwork = (await import(`../R/model_network.R?raw`)).default;
-const rCodeModelNetworkNB = (await import(`../R/model_network_NB.R?raw`)).default;
+// const rCodeModelNetwork = (await import(`../R/model_network.R?raw`)).default;
+// const rCodeModelNetworkNB = (await import(`../R/model_network_NB.R?raw`)).default;
 
 
 export const WebRComponent = () => {
