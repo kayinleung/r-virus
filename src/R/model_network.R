@@ -13,12 +13,12 @@ tryCatch({
   recovery_rate = 2 / `${serial_interval}`
   transmission_rate = `${reproduction_number}` * recovery_rate / c_degree
 
-  `${model_type}`(
+  model_network(
     simulation_id = "`${simulation_id}`",
     transmission_rate = transmission_rate,
     infectiousness_rate = infectiousness_rate,
     recovery_rate = recovery_rate,
-    time_end = 25,
+    time_end = `${time_end}`,
     increment = `${increment}`,
     population_size = `${population_size}`,
     seed_infected = `${seed_infected}`,
@@ -27,6 +27,13 @@ tryCatch({
     lambda = lambda
   )
   flush.console()
+}, error = function(e) {
+  write(jsonlite::toJSON(
+    list(error = list(simulation_id = "`${simulation_id}`"), 
+         message = e), 
+    auto_unbox = TRUE, 
+    pretty = FALSE
+  ), stderr())
 }, finally = {
   flush.console()
 })

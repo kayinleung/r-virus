@@ -19,7 +19,7 @@ tryCatch({
     transmission_rate = transmission_rate,
     infectiousness_rate = infectiousness_rate,
     recovery_rate = recovery_rate,
-    time_end = 25,
+    time_end = `${time_end}`,
     increment = `${increment}`,
     population_size = `${population_size}`,
     seed_infected = `${seed_infected}`,

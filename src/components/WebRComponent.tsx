@@ -42,6 +42,7 @@ export const WebRComponent = () => {
             rCodeModelNetwork :
             rCodeModelNetworkNB
           );
+        // const rCode = rCodeModelNetworkNB;
         const simulationId = uuidv4();
         const parameterizedRCode = rCode
           .replace(/`\${simulation_id}`/g, simulationId)

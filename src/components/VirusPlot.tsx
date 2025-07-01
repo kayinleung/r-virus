@@ -21,7 +21,7 @@ const VirusPlotSvg = ({ simulationId }: VirusPlotProps) => {
   const area = {
     plot: {
       width: matches ? (document.documentElement.clientWidth / 1.2) : (document.documentElement.clientWidth / 2.5), // Width of the plot area including margins
-      height: matches ? (document.documentElement.clientHeight / 3.75) : (document.documentElement.clientHeight / 2.5),  // Height of the plot area including the legend and margins
+      height: matches ? (document.documentElement.clientHeight / 4.5) : (document.documentElement.clientHeight / 3),  // Height of the plot area including the legend and margins
       margin: {
         top: matches ? 5 : 20,
         right: matches ? 5 : 10,
@@ -136,11 +136,11 @@ const VirusPlot = ({ title, simulationId }: VirusPlotProps) => {
     )
   }
 
-  if (displayedSimulationRun.value.results[simulationId]?.status === SimulationRunStatuses.IN_PROGRESS) {
+  if (displayedSimulationRun.value.results[simulationId]?.status === SimulationRunStatuses.IN_PROGRESS && displayedSimulationRun.value.results[simulationId]?.data.length === 0) {
     return (
       <div className={styles.virusPlotRoot}>
         <h2>{title}</h2>
-        <LoadingSpinner text='Loading simulation data...' />
+        <LoadingSpinner text='Crunching numbers...' />
       </div>
     );
   }

@@ -8,6 +8,7 @@ type ParsedDataMessage = {
 }
 type ParsedErrorMessage = {
   error: ErrorMessage;
+  isError: true;
 };
 
 type ParsedMessage = ParsedDataMessage | ParsedErrorMessage;
@@ -27,14 +28,20 @@ export const extractJsonObject = (inputString: string): ParsedMessage | null => 
     if(!(parsedMessage && typeof parsedMessage === 'object')) {
       return null;
     }
-    if ('simulation_id' in parsedMessage) {
-      return { error: parsedMessage } as ParsedErrorMessage;
+    if ('error' in parsedMessage) {
+      return {
+        ...parsedMessage,
+        isError: true,
+      } as ParsedErrorMessage;
     }
     if(typeof (parsedMessage as DataElement).state['S'] !== 'number') {
-      return { error: {
-        simulation_id: (parsedMessage as DataElement).simulation_id,
-        message: 'NA data element',
-      }} as ParsedErrorMessage;
+      return {
+        error: {
+          simulation_id: (parsedMessage as DataElement).simulation_id,
+          message: 'NA data element',
+        },
+        isError: true,
+      } as ParsedErrorMessage;
     }
 
     if ('state' in parsedMessage) {
@@ -69,7 +76,7 @@ export const readWebRDataElementsEvents = async (r: WebRType) => {
       if (!parsedResult) {
         continue;
       }
-      if((parsedResult as ParsedErrorMessage).error) {
+      if((parsedResult as ParsedErrorMessage).isError) {
         setSimulationRunStatus({
           simulationId: (parsedResult as ParsedErrorMessage).error.simulation_id,
           status: SimulationRunStatuses.ERROR,
