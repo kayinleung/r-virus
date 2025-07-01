@@ -38,6 +38,7 @@ export type MultiRunStatus = keyof typeof MultiRunStatuses;
 export type SimulationRunStatus = keyof typeof SimulationRunStatuses;
 
 export const displayedRunId = signal<number>(INITIAL_RUN_ID);
+export const maxRunId = signal<number>(INITIAL_RUN_ID);
 
 export const simulationRuns = signal<MultiSimulationRun>({
   [INITIAL_RUN_ID]: {
@@ -52,9 +53,10 @@ export const simulationRuns = signal<MultiSimulationRun>({
 
 
 export const createNewRun = () => {
+  maxRunId.value += 1;
   simulationRuns.value = {
     ...simulationRuns.value,
-    [(maxRunId.value ?? INITIAL_RUN_ID) + 1]: {
+    [maxRunId.value]: {
       formValues: {
         ...currentForm.value,
       },
@@ -64,10 +66,6 @@ export const createNewRun = () => {
     },
   };
 };
-
-export const maxRunId = computed(() => {
-  return Math.max(...Object.keys(simulationRuns.value).map(Number));
-});
 
 export const executingSimulationRunNumber = computed(() => {
   return Math.max(...Object.keys(simulationRuns.value).map(Number));
