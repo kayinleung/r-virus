@@ -18,8 +18,8 @@ const VirusPlotContainer = ({ webR }: VirusPlotContainerProps) => {
 
   // useSignals();
   // const showSimulationSelector = [
-  //   SimulaitonRunStates.COMPLETED,
-  // ].includes(currentSimulationRunStatus.value as SimulationRunState);
+  //   MultiRunStatuses.COMPLETED,
+  // ].includes(currentSimulationRunStatus.value as MultiRunStatus);
 
   return (
     <div className={styles.virusPlotContainerRoot}>

@@ -6,11 +6,12 @@ const INITIAL_RUN_ID = 1;
 
 export type SimulationRun = {
   formValues: FormValues;
-  status: SimulationRunState
+  status: MultiRunStatus
   results: {
     [simulationId: string]: {
       modelType: ModelType
       data: DataElement[];
+      status: SimulationRunStatus;
     };
   };
 };
@@ -19,14 +20,22 @@ export type MultiSimulationRun = {
   [runId: number]: SimulationRun;
 };
 
-export const SimulaitonRunStates = {
+export const MultiRunStatuses = {
   LOADING_R: 'LOADING_R',
   IN_PROGRESS: 'IN_PROGRESS',
   COMPLETED: 'COMPLETED',
   ERROR: 'ERROR',
 } as const;
 
-export type SimulationRunState = keyof typeof SimulaitonRunStates;
+
+export const SimulationRunStatuses = {
+  IN_PROGRESS: 'IN_PROGRESS',
+  COMPLETED: 'COMPLETED',
+  ERROR: 'ERROR',
+} as const;
+
+export type MultiRunStatus = keyof typeof MultiRunStatuses;
+export type SimulationRunStatus = keyof typeof SimulationRunStatuses;
 
 export const displayedRunId = signal<number>(INITIAL_RUN_ID);
 
@@ -35,7 +44,7 @@ export const simulationRuns = signal<MultiSimulationRun>({
     formValues: {
       ...currentForm.value,
     },
-    status: SimulaitonRunStates.LOADING_R,
+    status: MultiRunStatuses.LOADING_R,
     results: {
     },
   },
@@ -49,7 +58,7 @@ export const createNewRun = () => {
       formValues: {
         ...currentForm.value,
       },
-      status: SimulaitonRunStates.LOADING_R,
+      status: MultiRunStatuses.LOADING_R,
       results: {
       },
     },
@@ -65,3 +74,24 @@ export const executingSimulationRunNumber = signal<number>(1);
 export const displayedSimulationRun = computed(() => simulationRuns.value[displayedRunId.value]);
 
 export const currentSimulationRunStatus = computed(() => simulationRuns.value[maxRunId.value].status);
+
+type SetSimulationStatusProps = {
+  simulationId: string;
+  status: SimulationRunStatus;
+};
+export const setSimulationRunStatus = ({simulationId, status}: SetSimulationStatusProps) => {
+
+        simulationRuns.value = {
+          ...simulationRuns.value,
+          [executingSimulationRunNumber.value]: {
+            ...simulationRuns.value[executingSimulationRunNumber.value],
+            results: {
+              ...simulationRuns.value[executingSimulationRunNumber.value].results,
+              [simulationId]: {
+                ...simulationRuns.value[executingSimulationRunNumber.value].results[simulationId],
+                status,
+              }
+            }
+          },
+        };
+};

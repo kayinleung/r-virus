@@ -8,7 +8,7 @@ import { useSignals } from '@preact/signals-react/runtime';
 import { currentForm } from '@state/form-controls';
 import { getWebR } from 'utils/R';
 import { ModelTypes } from '@state/chart';
-import { SimulaitonRunStates, simulationRuns } from '@state/simulation-runs';
+import { MultiRunStatuses, simulationRuns } from '@state/simulation-runs';
 
 const rCodeModelReference = (await import(`../R/model_reference.R?raw`)).default;
 const rCodeModelNetwork = (await import(`../R/model_network.R?raw`)).default;
@@ -33,7 +33,8 @@ export const WebRComponent = () => {
     if (!webR) return;
 
     const compute = async () => {
-      ModelTypes.forEach((modelType) => {
+      ModelTypes
+        .forEach((modelType) => {
 
         const rCode = modelType === 'model_reference' ?
           rCodeModelReference :
@@ -63,12 +64,13 @@ export const WebRComponent = () => {
           [1]: {
             ...simulationRuns.value[1],
             formValues: currentForm.value,
-            status: SimulaitonRunStates.IN_PROGRESS,
+            status: MultiRunStatuses.IN_PROGRESS,
             results: {
               ...simulationRuns.value[1].results,
               [simulationId]: {
                 modelType,
-                data: []
+                data: [],
+                status: MultiRunStatuses.IN_PROGRESS,
               }
             }
           },

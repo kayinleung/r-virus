@@ -1,7 +1,7 @@
 import { Autorenew } from "@mui/icons-material";
 import { Box, Fab } from "@mui/material";
 import { useSignals } from "@preact/signals-react/runtime";
-import { createNewRun, currentSimulationRunStatus, SimulaitonRunStates } from "@state/simulation-runs";
+import { createNewRun, currentSimulationRunStatus, MultiRunStatuses } from "@state/simulation-runs";
 
 
 
@@ -12,7 +12,7 @@ const Refresh = () => {
     createNewRun();
   };
 
-  const disableRerun = currentSimulationRunStatus.value !== SimulaitonRunStates.COMPLETED;
+  const disableRerun = currentSimulationRunStatus.value !== MultiRunStatuses.COMPLETED;
   return (
     <Box component="form" sx={{
       display: 'flex',

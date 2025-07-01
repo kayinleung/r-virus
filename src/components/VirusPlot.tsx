@@ -6,15 +6,16 @@ import { useEffect } from 'preact/hooks';
 import { useMediaQuery, useTheme } from '@mui/material';
 import { infectionStates } from '@state/chart';
 import type { StateKey } from '@state/chart';
-import { displayedSimulationRun } from '@state/simulation-runs';
+import { displayedSimulationRun, SimulationRunStatuses } from '@state/simulation-runs';
 import { LoadingSpinner } from './LoadingSpinner';
+import { useSignals } from '@preact/signals-react/runtime';
 
 type VirusPlotProps = {
   simulationId: string;
   title?: string;
 };
 
-const VirusPlot = ({ title, simulationId }: VirusPlotProps) => {
+const VirusPlotSvg = ({ simulationId }: VirusPlotProps) => {
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.down('sm'));
   const area = {
@@ -116,14 +117,40 @@ const VirusPlot = ({ title, simulationId }: VirusPlotProps) => {
   ]);
 
   return (
+    <svg ref={svgRef}></svg>
+  );
+};
+
+
+const VirusPlot = ({ title, simulationId }: VirusPlotProps) => {
+  useSignals();
+  console.log(`VirusPlot - displayedSimulationRun.value.results[${simulationId}]?.status=`, displayedSimulationRun.value.results[simulationId]?.status);
+
+
+  if (displayedSimulationRun.value.results[simulationId]?.status === SimulationRunStatuses.ERROR) {
+    return (
     <div className={styles.virusPlotRoot}>
       <h2>{title}</h2>
-      {displayedSimulationRun.value.results[simulationId]?.data.length === 0 ? 
-        <LoadingSpinner text='Loading simulation data...' /> :
-        <svg ref={svgRef}></svg>
-      }
+      <div>An error occurred</div>
     </div>
-  );
+    )
+  }
+
+  if (displayedSimulationRun.value.results[simulationId]?.status === SimulationRunStatuses.IN_PROGRESS) {
+    return (
+      <div className={styles.virusPlotRoot}>
+        <h2>{title}</h2>
+        <LoadingSpinner text='Loading simulation data...' />
+      </div>
+    );
+  }
+
+  return (
+    <div className={styles.virusPlotRoot}>
+      <h2>{title}</h2>
+      <VirusPlotSvg simulationId={simulationId} />
+    </div>
+  )
 };
 
 export { VirusPlot };

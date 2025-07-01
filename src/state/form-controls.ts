@@ -26,6 +26,10 @@ export type DataElement = {
     incidence: number;
   };
 };
+export type ErrorMessage = {
+  simulation_id: string;
+  message?: string;
+}
 export const currentForm = signal<FormValues>({
   populationSize: 1e2,
   modelType: 'model_reference',

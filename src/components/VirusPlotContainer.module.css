@@ -2,12 +2,9 @@
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  & > div {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 1rem;
-  }
+  align-items: stretch;
+  width: 100%;
+  height: 100%;
 }
 
 .virusPlotContainerRoot {
@@ -18,6 +15,8 @@
   flex-direction: column;
   flex-grow: 1;
   justify-content: center;
+  width: 100%;
+  height: 100%;
 }
 
 .virusPlotDisplayOptions {
@@ -31,9 +30,10 @@
   max-width: 100%;
 }
 
-@media (100px <= width <= 700px) {
-  .virusPlotContainerRoot {
-    height: 100%;
-    justify-content: space-evenly;
-  }
+/* Ensure all direct children (VirusPlot containers) grow equally */
+.multiVirusPlotContainer > * {
+  flex: 1 1 25%;
+  min-width: max(25%, 300px); /* Ensure a minimum width for usability */
+  max-width: 100%;
+  display: flex;
 }

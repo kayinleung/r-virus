@@ -1,11 +1,16 @@
-import type { DataElement } from '@state/form-controls';
-import { executingSimulationRunNumber, simulationRuns } from '@state/simulation-runs';
+import type { DataElement, ErrorMessage } from '@state/form-controls';
+import { executingSimulationRunNumber, setSimulationRunStatus, simulationRuns, SimulationRunStatuses } from '@state/simulation-runs';
 import type { WebR as WebRType } from 'webr';
 
-type ParsedMessage = {
+type ParsedDataMessage = {
   dataElement: DataElement;
   remainingString: string;
 }
+type ParsedErrorMessage = {
+  error: ErrorMessage;
+};
+
+type ParsedMessage = ParsedDataMessage | ParsedErrorMessage;
 
 export const extractJsonObject = (inputString: string): ParsedMessage | null => {
   // Regex to match a 2-level deep JSON object: { ... { ... } ... }
@@ -17,25 +22,46 @@ export const extractJsonObject = (inputString: string): ParsedMessage | null => 
   const jsonString = match[0];
   const startIndex = inputString.indexOf(jsonString);
   const endIndex = startIndex + jsonString.length;
-  let dataElement: DataElement;
   try {
-    dataElement = JSON.parse(jsonString) as DataElement;
+    const parsedMessage = JSON.parse(jsonString) as unknown;
+    if(!(parsedMessage && typeof parsedMessage === 'object')) {
+      return null;
+    }
+    if ('simulation_id' in parsedMessage) {
+      return { error: parsedMessage } as ParsedErrorMessage;
+    }
+    if(typeof (parsedMessage as DataElement).state['S'] !== 'number') {
+      return { error: {
+        simulation_id: (parsedMessage as DataElement).simulation_id,
+        message: 'NA data element',
+      }} as ParsedErrorMessage;
+    }
+
+    if ('state' in parsedMessage) {
+      return {
+        dataElement: parsedMessage as DataElement,
+        remainingString: inputString.substring(endIndex),
+      } as ParsedDataMessage;
+    }
+
+    return null;
   } catch (e) {
     console.error('webREventReader - Error parsing JSON:', e);
     return null;
   }
-  return {
-    dataElement,
-    remainingString: inputString.substring(endIndex),
-  };
 };
 
 export const readWebRDataElementsEvents = async (r: WebRType) => {
 
-  r.flush();
   for await (const item of r.stream()) {
-    if (item.type !== 'stdout') {
-      console.log('webREventReader - item=', item);
+    console.log('webREventReader - item=', item);
+    if (item.type === 'stderr') {
+      const parsedMessage = extractJsonObject(item.data) as ParsedErrorMessage;
+      const resultKey = parsedMessage?.error.simulation_id;
+      setSimulationRunStatus({
+        simulationId: resultKey,
+        status: SimulationRunStatuses.ERROR,
+      });
       continue;
     }
     try {
@@ -43,7 +69,14 @@ export const readWebRDataElementsEvents = async (r: WebRType) => {
       if (!parsedResult) {
         continue;
       }
-      const { dataElement } = parsedResult;
+      if((parsedResult as ParsedErrorMessage).error) {
+        setSimulationRunStatus({
+          simulationId: (parsedResult as ParsedErrorMessage).error.simulation_id,
+          status: SimulationRunStatuses.ERROR,
+        });
+        continue;
+      }
+      const { dataElement } = parsedResult as ParsedDataMessage;
       r.flush();
       
       const resultKey = dataElement.simulation_id;
@@ -57,6 +90,9 @@ export const readWebRDataElementsEvents = async (r: WebRType) => {
             [resultKey]: {
               ...simulationRuns.value[executingSimulationRunNumber.value].results[resultKey],
               data: [...prevResults, dataElement],
+              status: dataElement.time < simulationRuns.value[executingSimulationRunNumber.value].formValues.timeEnd ?
+                SimulationRunStatuses.IN_PROGRESS :
+                SimulationRunStatuses.COMPLETED,
             }
           }
         },
