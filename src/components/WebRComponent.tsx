@@ -8,7 +8,7 @@ import { useSignals } from '@preact/signals-react/runtime';
 import { currentForm } from '@state/form-controls';
 import { getWebR } from 'utils/R';
 import { ModelTypes } from '@state/chart';
-import { MultiRunStatuses, simulationRuns } from '@state/simulation-runs';
+import { maxRunId, MultiRunStatuses, simulationRuns } from '@state/simulation-runs';
 
 const rCodeModelReference = (await import(`../R/model_reference.R?raw`)).default;
 const rCodeModelNetwork = (await import(`../R/model_network.R?raw`)).default;
@@ -62,12 +62,12 @@ export const WebRComponent = () => {
         webR.evalRVoid(parameterizedRCode, { captureStreams: false });
         simulationRuns.value = {
           ...simulationRuns.value,
-          [1]: {
+          [maxRunId.value]: {
             ...simulationRuns.value[1],
             formValues: currentForm.value,
             status: MultiRunStatuses.IN_PROGRESS,
             results: {
-              ...simulationRuns.value[1].results,
+              ...simulationRuns.value[maxRunId.value].results,
               [simulationId]: {
                 modelType,
                 data: [],
@@ -80,7 +80,7 @@ export const WebRComponent = () => {
       });
     };
     compute();
-  }, [webR]);
+  }, [webR, maxRunId.value]);
 
   return <VirusPlotContainer webR={webR} />
 };

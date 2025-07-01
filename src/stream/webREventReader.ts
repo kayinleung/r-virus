@@ -88,7 +88,7 @@ export const readWebRDataElementsEvents = async (r: WebRType) => {
       r.flush();
       
       const resultKey = dataElement.simulation_id;
-      const prevResults = simulationRuns.value[executingSimulationRunNumber.value].results[resultKey].data || [];
+      const prevResults = simulationRuns.value[executingSimulationRunNumber.value].results[resultKey]?.data || [];
       simulationRuns.value = {
         ...simulationRuns.value,
         [executingSimulationRunNumber.value]: {

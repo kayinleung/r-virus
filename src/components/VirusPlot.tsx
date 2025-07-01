@@ -4,7 +4,7 @@ import { useRef } from 'react';
 import styles from './VirusPlot.module.css';
 import { useEffect } from 'preact/hooks';
 import { useMediaQuery, useTheme } from '@mui/material';
-import { infectionStates } from '@state/chart';
+import { infectionStates, ModelReferences } from '@state/chart';
 import type { StateKey } from '@state/chart';
 import { displayedSimulationRun, SimulationRunStatuses } from '@state/simulation-runs';
 import { LoadingSpinner } from './LoadingSpinner';
@@ -122,12 +122,14 @@ const VirusPlotSvg = ({ simulationId }: VirusPlotProps) => {
 };
 
 
-const VirusPlot = ({ title, simulationId }: VirusPlotProps) => {
+const VirusPlot = ({ simulationId }: VirusPlotProps) => {
   useSignals();
-  // console.log(`VirusPlot - displayedSimulationRun.value.results[${simulationId}]?.status=`, displayedSimulationRun.value.results[simulationId]?.status);
 
+  const result = displayedSimulationRun.value.results[simulationId];
 
-  if (displayedSimulationRun.value.results[simulationId]?.status === SimulationRunStatuses.ERROR) {
+  const title = ModelReferences[result?.modelType]?.label ?? '';
+
+  if (result?.status === SimulationRunStatuses.ERROR) {
     return (
     <div className={styles.virusPlotRoot}>
       <h2>{title}</h2>
@@ -136,7 +138,7 @@ const VirusPlot = ({ title, simulationId }: VirusPlotProps) => {
     )
   }
 
-  if (displayedSimulationRun.value.results[simulationId]?.status === SimulationRunStatuses.IN_PROGRESS && displayedSimulationRun.value.results[simulationId]?.data.length === 0) {
+  if (result?.status === SimulationRunStatuses.IN_PROGRESS && result?.data.length === 0) {
     return (
       <div className={styles.virusPlotRoot}>
         <h2>{title}</h2>
