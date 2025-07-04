@@ -3,7 +3,7 @@ import type { WebR } from 'webr';
 import { LoadingSpinner } from '@components/LoadingSpinner';
 import { VirusPlot } from '@components/VirusPlot';
 import { useSignals } from '@preact/signals-react/runtime';
-import { simulationRun } from '@state/simulation-runs';
+import { displayedSimulationRun } from '@state/simulation-runs';
 import { MetricSelector } from './MetricSelector';
 import { SimulationSelector } from './SimulationSelector';
 import styles from './VirusPlotContainer.module.css';
@@ -14,11 +14,6 @@ type VirusPlotContainerProps = {
 };
 
 const VirusPlotContainer = ({ webR }: VirusPlotContainerProps) => {
-
-  // useSignals();
-  // const showSimulationSelector = [
-  //   SimulaitonRunStates.COMPLETED,
-  // ].includes(currentSimulationRunState.value as SimulationRunState);
 
   return (
     <div className={styles.virusPlotContainerRoot}>
@@ -39,16 +34,12 @@ const MultiVirusPlot = ({ webR }: VirusPlotContainerProps) => {
     return <LoadingSpinner text='Loading project...' />;
   };
 
-  if (simulationRun.value.length === 0) {
-    return <LoadingSpinner text='Starting simulation...' />;
-  }
-
   return (
     <>
       <div className={styles.multiVirusPlotContainer}>
-        <VirusPlot title={'Reference'} />
-        <VirusPlot title={'Network: Poisson'} />
-        <VirusPlot title={'Network: Negative Binomial'} />
+        {Object.entries(displayedSimulationRun.value.results).map(([simulationId]) => {
+          return <VirusPlot simulationId={simulationId} />
+        })}
       </div>
       <Legend/>
     </>

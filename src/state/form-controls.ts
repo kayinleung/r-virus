@@ -1,8 +1,9 @@
 import { signal } from "@preact/signals-react";
+import type { ModelType } from "./chart";
 
 export type FormValues = {
   populationSize: number;
-  modelType: string;
+  modelType: ModelType;
   degreeDistribution: string;
   infection: string;
   timeEnd: number;
@@ -15,6 +16,7 @@ export type FormValues = {
 };
 
 export type DataElement = {
+  simulation_id: string;
   time: number;
   state: {
     S: number;
@@ -24,8 +26,12 @@ export type DataElement = {
     incidence: number;
   };
 };
+export type ErrorMessage = {
+  simulation_id: string;
+  message?: string;
+}
 export const currentForm = signal<FormValues>({
-  populationSize: 1e7,
+  populationSize: 1e2,
   modelType: 'model_reference',
   degreeDistribution: 'poisson',
   infection: 'SEIR',

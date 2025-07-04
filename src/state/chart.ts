@@ -1,5 +1,14 @@
 import { signal } from "@preact/signals-react";
 
+export const ModelReferences = {
+  model_reference: { value: 'model_reference', label: 'Reference' },
+  model_network: { value: 'model_network', label: 'Network: Poisson' },
+  // model_network_nb: { value: 'model_network_nb', label: 'Network: Negative Binomial' },
+ } as const;
+export const ModelTypes = Object.values(ModelReferences).map(model => model.value);
+export type ModelType = keyof typeof ModelReferences;
+
+
 export const StateKeys = {
   S: { value: 'S', label: 'Susceptible' },
   E: { value: 'E', label: 'Exposed' },
