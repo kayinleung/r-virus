@@ -4,9 +4,10 @@ library(escape2024)
 tryCatch({
   infectiousness_rate = 2 / `${serial_interval}`
   recovery_rate = 2 / `${serial_interval}`
-  transmission_rate =  `${reproduction_number}` / `${serial_interval}`
+  transmission_rate = `${reproduction_number}` * recovery_rate
 
   `${model_type}`(
+    simulation_id = "test",
     transmission_rate = transmission_rate,
     infectiousness_rate = infectiousness_rate,
     recovery_rate = recovery_rate,
