@@ -123,7 +123,7 @@ const VirusPlotSvg = ({ chart }: { chart: LoadedChart}) => {
 const VirusPlot = ({ chart }: VirusPlotProps) => {
   useSignals();
 
-  if (!chart.webR) {
+  if (!((chart as LoadedChart).webR)) {
     return (
       <div className={styles.virusPlotRoot}>
         <h2>{ModelReferences[chart.modelType].label}</h2>
