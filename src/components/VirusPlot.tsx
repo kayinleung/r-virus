@@ -6,16 +6,15 @@ import { useEffect } from 'preact/hooks';
 import { useMediaQuery, useTheme } from '@mui/material';
 import { infectionStates, ModelReferences } from '@state/chart';
 import type { StateKey } from '@state/chart';
-import { displayedSimulationRun, SimulationRunStatuses } from '@state/simulation-runs';
+import { Chart, LoadedChart, SimulationRunStatuses } from '@state/simulation-runs';
 import { LoadingSpinner } from './LoadingSpinner';
 import { useSignals } from '@preact/signals-react/runtime';
 
 type VirusPlotProps = {
-  simulationId: string;
-  title?: string;
+  chart: Chart;
 };
 
-const VirusPlotSvg = ({ simulationId }: VirusPlotProps) => {
+const VirusPlotSvg = ({ chart }: { chart: LoadedChart}) => {
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.down('sm'));
   const area = {
@@ -36,8 +35,7 @@ const VirusPlotSvg = ({ simulationId }: VirusPlotProps) => {
 
   const svgRef = useRef<SVGSVGElement | null>(null);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const data = displayedSimulationRun.value.results[simulationId]?.data.filter((d: DataElement) => !!d.state) || [];
+  const data = chart.data;
   useEffect(() => {
     const currentSvg = svgRef.current;
     if (!data || data.length === 0) return;
@@ -107,7 +105,7 @@ const VirusPlotSvg = ({ simulationId }: VirusPlotProps) => {
       d3.select(currentSvg).selectAll('*').remove();
     };
   }, [
-    data, simulationId,
+    data, chart.simulationId,
     area.plot.height,
     area.plot.width,
     area.plot.margin.top,
@@ -122,26 +120,31 @@ const VirusPlotSvg = ({ simulationId }: VirusPlotProps) => {
 };
 
 
-const VirusPlot = ({ simulationId }: VirusPlotProps) => {
+const VirusPlot = ({ chart }: VirusPlotProps) => {
   useSignals();
 
-  const result = displayedSimulationRun.value.results[simulationId];
+  if (!chart.webR) {
+    return (
+      <div className={styles.virusPlotRoot}>
+        <h2>{ModelReferences[chart.modelType].label}</h2>
+        <LoadingSpinner text='Loading project...' />
+      </div>
+    );
+  }
 
-  const title = ModelReferences[result?.modelType]?.label ?? '';
-
-  if (result?.status === SimulationRunStatuses.ERROR) {
+  if (chart.status === SimulationRunStatuses.ERROR) {
     return (
     <div className={styles.virusPlotRoot}>
-      <h2>{title}</h2>
+      <h2>{ModelReferences[chart.modelType].label}</h2>
       <div>An error occurred</div>
     </div>
     )
   }
 
-  if (result?.status === SimulationRunStatuses.IN_PROGRESS && result?.data.length === 0) {
+  if (chart?.status === SimulationRunStatuses.IN_PROGRESS && (chart as LoadedChart)?.data.length === 0) {
     return (
       <div className={styles.virusPlotRoot}>
-        <h2>{title}</h2>
+        <h2>{ModelReferences[chart.modelType].label}</h2>
         <LoadingSpinner text='Crunching numbers...' />
       </div>
     );
@@ -149,8 +152,8 @@ const VirusPlot = ({ simulationId }: VirusPlotProps) => {
 
   return (
     <div className={styles.virusPlotRoot}>
-      <h2>{title}</h2>
-      <VirusPlotSvg simulationId={simulationId} />
+      <h2>{ModelReferences[chart.modelType].label}</h2>
+      <VirusPlotSvg chart={(chart as LoadedChart)} />
     </div>
   )
 };
