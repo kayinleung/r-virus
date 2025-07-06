@@ -4,20 +4,23 @@ import { useRef } from 'react';
 import styles from './VirusPlot.module.css';
 import { useEffect } from 'preact/hooks';
 import { useMediaQuery, useTheme } from '@mui/material';
-import { infectionStates, StateKey } from '@state/chart';
-import { simulationRun } from '@state/simulation-runs';
+import { infectionStates, ModelReferences } from '@state/chart';
+import type { StateKey } from '@state/chart';
+import { Chart, LoadedChart, SimulationRunStatuses } from '@state/simulation-runs';
+import { LoadingSpinner } from './LoadingSpinner';
+import { useSignals } from '@preact/signals-react/runtime';
 
 type VirusPlotProps = {
-  title?: string;
+  chart: Chart;
 };
 
-const VirusPlot = ({ title }: VirusPlotProps) => {
+const VirusPlotSvg = ({ chart }: { chart: LoadedChart}) => {
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.down('sm'));
   const area = {
     plot: {
       width: matches ? (document.documentElement.clientWidth / 1.2) : (document.documentElement.clientWidth / 2.5), // Width of the plot area including margins
-      height: matches ? (document.documentElement.clientHeight / 3.75) : (document.documentElement.clientHeight / 2.5),  // Height of the plot area including the legend and margins
+      height: matches ? (document.documentElement.clientHeight / 4.5) : (document.documentElement.clientHeight / 3),  // Height of the plot area including the legend and margins
       margin: {
         top: matches ? 5 : 20,
         right: matches ? 5 : 10,
@@ -32,17 +35,18 @@ const VirusPlot = ({ title }: VirusPlotProps) => {
 
   const svgRef = useRef<SVGSVGElement | null>(null);
 
-  const data = simulationRun.value;
+  const data = chart.data;
   useEffect(() => {
+    const currentSvg = svgRef.current;
     if (!data || data.length === 0) return;
 
     const plotWidth = area.plot.width - area.plot.margin.left - area.plot.margin.right;
     const plotHeight = area.plot.height - area.plot.margin.top - area.plot.margin.bottom;
 
     // Clear previous SVG content
-    d3.select(svgRef.current).selectAll('*').remove();
+    d3.select(currentSvg).selectAll('*').remove();
 
-    const svg = d3.select(svgRef.current)
+    const svg = d3.select(currentSvg)
       .attr('width', area.plot.width)
       .attr('height', area.plot.height);
 
@@ -98,15 +102,60 @@ const VirusPlot = ({ title }: VirusPlotProps) => {
       });
 
     return () => {
-      d3.select(svgRef.current).selectAll('*').remove();
+      d3.select(currentSvg).selectAll('*').remove();
     };
-  }, [data]);
+  }, [
+    data, chart.simulationId,
+    area.plot.height,
+    area.plot.width,
+    area.plot.margin.top,
+    area.plot.margin.right,
+    area.plot.margin.bottom,
+    area.plot.margin.left,
+  ]);
+
+  return (
+    <svg ref={svgRef}></svg>
+  );
+};
+
+
+const VirusPlot = ({ chart }: VirusPlotProps) => {
+  useSignals();
+
+  if (!((chart as LoadedChart).webR)) {
+    return (
+      <div className={styles.virusPlotRoot}>
+        <h2>{ModelReferences[chart.modelType].label}</h2>
+        <LoadingSpinner text='Loading project...' />
+      </div>
+    );
+  }
+
+  if (chart.status === SimulationRunStatuses.ERROR) {
+    return (
+    <div className={styles.virusPlotRoot}>
+      <h2>{ModelReferences[chart.modelType].label}</h2>
+      <div>An error occurred</div>
+    </div>
+    )
+  }
+
+  if (chart?.status === SimulationRunStatuses.IN_PROGRESS && (chart as LoadedChart)?.data.length === 0) {
+    return (
+      <div className={styles.virusPlotRoot}>
+        <h2>{ModelReferences[chart.modelType].label}</h2>
+        <LoadingSpinner text='Crunching numbers...' />
+      </div>
+    );
+  }
+
   return (
     <div className={styles.virusPlotRoot}>
-      <h2>{title}</h2>
-      <svg ref={svgRef}></svg>
+      <h2>{ModelReferences[chart.modelType].label}</h2>
+      <VirusPlotSvg chart={(chart as LoadedChart)} />
     </div>
-  );
+  )
 };
 
 export { VirusPlot };
