@@ -4,7 +4,7 @@ library(escape2024)
 tryCatch({
   infectiousness_rate = 2 / `${serial_interval}`
   recovery_rate = 2 / `${serial_interval}`
-  transmission_rate =  `${reproduction_number}` / `${serial_interval}`
+  transmission_rate = `${reproduction_number}` * recovery_rate
 
   model_reference(
     simulation_id = "`${simulation_id}`",

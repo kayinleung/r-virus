@@ -2,17 +2,20 @@ library(PBSddesolve)
 library(escape2024)
 
 tryCatch({
-  prob = 1 / `${dispersion}`
-  size = `${mu}` / (`${dispersion}` - 1) 
+  size = 1 / `${dispersion}`
+  prob = size / (size + `${mu}`)
 
   degree = list(degree_distribution = "negative_binomial", size = size, prob = prob)
   var = var_degree(degree)
   avg = mean_degree(degree)
   c_degree = (var + avg^2 - avg) / avg
 
+  stopifnot(c_degree - `${reproduction_number}` > 0)
+
+
   infectiousness_rate = 2 / `${serial_interval}`
   recovery_rate = 2 / `${serial_interval}`
-  transmission_rate = `${reproduction_number}` * recovery_rate / c_degree
+  transmission_rate = `${reproduction_number}` * recovery_rate / (c_degree - `${reproduction_number}`)
 
   model_network(
     simulation_id = "`${simulation_id}`",
