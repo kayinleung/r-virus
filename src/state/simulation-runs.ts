@@ -1,19 +1,30 @@
 import { computed, signal } from "@preact/signals-react";
 import { currentForm, DataElement, FormValues } from "@state/form-controls";
 import { ModelType } from "./chart";
+import { WebR } from "webr";
 
 const INITIAL_RUN_ID = 1;
 
+export type LoadingChart = {
+  status: SimulationRunStatus;
+  modelType: ModelType;
+};
+
+export type LoadedChart = {
+  webR: WebR;
+  simulationId: string;
+  modelType: ModelType;
+  data: DataElement[];
+  status: SimulationRunStatus;
+};
+
+export type Chart = LoadingChart | LoadedChart;
+
+
 export type SimulationRun = {
   formValues: FormValues;
-  status: MultiRunStatus
-  results: {
-    [simulationId: string]: {
-      modelType: ModelType
-      data: DataElement[];
-      status: SimulationRunStatus;
-    };
-  };
+  status: MultiRunStatus;
+  charts: Chart[];
 };
 
 export type MultiSimulationRun = {
@@ -29,6 +40,7 @@ export const MultiRunStatuses = {
 
 
 export const SimulationRunStatuses = {
+  LOADING_R: 'LOADING_R',
   IN_PROGRESS: 'IN_PROGRESS',
   COMPLETED: 'COMPLETED',
   ERROR: 'ERROR',
@@ -46,8 +58,7 @@ export const simulationRuns = signal<MultiSimulationRun>({
       ...currentForm.value,
     },
     status: MultiRunStatuses.LOADING_R,
-    results: {
-    },
+    charts: [],
   },
 });
 
@@ -61,8 +72,7 @@ export const createNewRun = () => {
         ...currentForm.value,
       },
       status: MultiRunStatuses.IN_PROGRESS,
-      results: {
-      },
+      charts: [],
     },
   };
 };
@@ -74,7 +84,7 @@ export const executingSimulationRunNumber = computed(() => {
 export const displayedSimulationRun = computed(() => simulationRuns.value[displayedRunId.value]);
 
 export const currentSimulationRunStatus = computed(() => {
-  const hasSimulationStillRunning = Object.entries(simulationRuns.value[maxRunId.value].results).some(([_, result]) => {
+  const hasSimulationStillRunning = Object.entries(simulationRuns.value[maxRunId.value].charts).some(([_, result]) => {
     return result.status === SimulationRunStatuses.IN_PROGRESS;
   });
   if (hasSimulationStillRunning) {
@@ -84,22 +94,31 @@ export const currentSimulationRunStatus = computed(() => {
 });
 
 type SetSimulationStatusProps = {
-  simulationId: string;
+  modelType: ModelType;
   status: SimulationRunStatus;
 };
-export const setSimulationRunStatus = ({simulationId, status}: SetSimulationStatusProps) => {
+export const setSimulationRunStatus = ({modelType, status}: SetSimulationStatusProps) => {
 
-        simulationRuns.value = {
-          ...simulationRuns.value,
-          [executingSimulationRunNumber.value]: {
-            ...simulationRuns.value[executingSimulationRunNumber.value],
-            results: {
-              ...simulationRuns.value[executingSimulationRunNumber.value].results,
-              [simulationId]: {
-                ...simulationRuns.value[executingSimulationRunNumber.value].results[simulationId],
-                status,
-              }
+  const existingCharts = simulationRuns.value[executingSimulationRunNumber.value].charts;
+
+  const updatedChart = existingCharts.find((chart) => chart.modelType === modelType);
+
+  if( !updatedChart ) {
+    console.error(`Simulation of type ${modelType} in run ${executingSimulationRunNumber.value} not found.`);
+    return;
+  }
+  simulationRuns.value = {
+    ...simulationRuns.value,
+    [executingSimulationRunNumber.value]: {
+      ...simulationRuns.value[executingSimulationRunNumber.value],
+      charts: existingCharts.map((chart) =>
+        chart.modelType === modelType
+          ? {
+              ...updatedChart,
+              status,
             }
-          },
-        };
+          : chart
+      ),
+    },
+  };
 };

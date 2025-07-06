@@ -1,5 +1,6 @@
+import { ModelType } from '@state/chart';
 import type { DataElement, ErrorMessage } from '@state/form-controls';
-import { executingSimulationRunNumber, setSimulationRunStatus, simulationRuns, SimulationRunStatuses } from '@state/simulation-runs';
+import { executingSimulationRunNumber, LoadedChart, setSimulationRunStatus, simulationRuns, SimulationRunStatuses } from '@state/simulation-runs';
 import type { WebR as WebRType } from 'webr';
 
 export type ParsedDataMessage = {
@@ -58,50 +59,62 @@ export const extractJsonObject = (inputString: string): ParsedMessage | null => 
   }
 };
 
-export const readWebRDataElementsEvents = async (r: WebRType) => {
-  r.flush();
+type EventReaderProps = {
+  modelType: ModelType;
+  webR: WebRType;
+}
 
-  for await (const item of r.stream()) {
+export const readWebRDataElementsEvents = async ({webR, modelType}: EventReaderProps) => {
+  webR.flush();
+
+  for await (const item of webR.stream()) {
     if (item.type === 'stderr') {
-      const parsedMessage = extractJsonObject(item.data) as ParsedErrorMessage;
-      const resultKey = parsedMessage?.error.simulation_id;
       setSimulationRunStatus({
-        simulationId: resultKey,
+        modelType,
         status: SimulationRunStatuses.ERROR,
       });
       continue;
     }
     try {
+      webR.flush();
       const parsedResult = extractJsonObject(item.data);
+      console.log('webREventReader - item=', item);
       if (!parsedResult) {
         continue;
       }
       if((parsedResult as ParsedErrorMessage).isError) {
         setSimulationRunStatus({
-          simulationId: (parsedResult as ParsedErrorMessage).error.simulation_id,
+          modelType,
           status: SimulationRunStatuses.ERROR,
         });
         continue;
       }
       const { dataElement } = parsedResult as ParsedDataMessage;
-      r.flush();
-      
-      const resultKey = dataElement.simulation_id;
-      const prevResults = simulationRuns.value[executingSimulationRunNumber.value].results[resultKey]?.data || [];
+
+
+      const existingCharts = (simulationRuns.value[executingSimulationRunNumber.value].charts as LoadedChart[]);//.filter((chart) => Boolean(chart.simulationId));
+
+      const simulationId = dataElement.simulation_id;
+      const updatingChart = existingCharts.find((chart) => chart.simulationId === simulationId);
+      if( !updatingChart ) {
+        console.error(`Simulation with ID ${simulationId} not found in current run.`);
+        return;
+      }
       simulationRuns.value = {
         ...simulationRuns.value,
         [executingSimulationRunNumber.value]: {
           ...simulationRuns.value[executingSimulationRunNumber.value],
-          results: {
-            ...simulationRuns.value[executingSimulationRunNumber.value].results,
-            [resultKey]: {
-              ...simulationRuns.value[executingSimulationRunNumber.value].results[resultKey],
-              data: [...prevResults, dataElement],
-              status: dataElement.time < simulationRuns.value[executingSimulationRunNumber.value].formValues.timeEnd ?
-                SimulationRunStatuses.IN_PROGRESS :
-                SimulationRunStatuses.COMPLETED,
-            }
-          }
+          charts: existingCharts.map((chart) =>
+            chart.simulationId === simulationId
+              ? {
+                  ...updatingChart,
+                  data: [...updatingChart.data, dataElement],
+                  status: dataElement.time < simulationRuns.value[executingSimulationRunNumber.value].formValues.timeEnd
+                    ? SimulationRunStatuses.IN_PROGRESS
+                    : SimulationRunStatuses.COMPLETED,
+                }
+              : chart
+          ),
         },
       };
     } catch (error) {
