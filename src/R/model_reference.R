@@ -1,95 +1,72 @@
 library(PBSddesolve)
 library(escape2024)
-library(parallel)
+library(jsonlite)
 
 tryCatch({
-  parallel_models <- function(model) {
-    if (model == "model_reference") {
-      infectiousness_rate = 2 / `${serial_interval}`
-      recovery_rate = 2 / `${serial_interval}`
-      transmission_rate = `${reproduction_number}` * recovery_rate
-      model_reference(
-        simulation_id = "`${simulation_id}`",
-        transmission_rate = transmission_rate,
-        infectiousness_rate = infectiousness_rate,
-        recovery_rate = recovery_rate,
-        time_end = `${time_end}`,
-        increment = `${increment}`,
-        population_size = `${population_size}`,
-        seed_infected = `${seed_infected}`
-      )
-      flush.console()
-    } else if (model == "model_network_poisson") {
-      lambda = `${mu}`
+  # negative binomial network model
+  size = `${dispersion}`
+  prob = size / (size + `${mu}`)
 
-      degree = list(degree_distribution = "poisson", lambda = lambda)
-      var = var_degree(degree)
-      avg = mean_degree(degree)
-      c_degree = (var + avg^2 - avg) / avg
+  degree_nb = list(degree_distribution = "negative_binomial", size = size, prob = prob)
+  c_degree_nb = mean_excess_degree(degree_nb)
 
-      stopifnot(c_degree - `${reproduction_number}` > 0)
-
-      infectiousness_rate = 2 / `${serial_interval}`
-      recovery_rate = 2 / `${serial_interval}`
-      transmission_rate = `${reproduction_number}` * recovery_rate / (c_degree - `${reproduction_number}`)
-
-      model_network(
-        simulation_id = "`${simulation_id}`",
-        transmission_rate = transmission_rate,
-        infectiousness_rate = infectiousness_rate,
-        recovery_rate = recovery_rate,
-        time_end = `${time_end}`,
-        increment = `${increment}`,
-        population_size = `${population_size}`,
-        seed_infected = `${seed_infected}`,
-        degree_distribution = "poisson",
-        infection = "SEIR",
-        lambda = lambda
-      )
-      flush.console()
-    } else {
-    size = 1 / `${dispersion}`
-    prob = size / (size + `${mu}`)
-
-    degree = list(degree_distribution = "negative_binomial", size = size, prob = prob)
-    var = var_degree(degree)
-    avg = mean_degree(degree)
-    c_degree = (var + avg^2 - avg) / avg
-
-    stopifnot(c_degree - `${reproduction_number}` > 0)
+  stopifnot(c_degree_nb - `${reproduction_number}` > 0)
 
 
-    infectiousness_rate = 2 / `${serial_interval}`
-    recovery_rate = 2 / `${serial_interval}`
-    transmission_rate = `${reproduction_number}` * recovery_rate / (c_degree - `${reproduction_number}`)
+  infectiousness_rate_nb = 2 / `${serial_interval}`
+  recovery_rate_nb = 2 / `${serial_interval}`
+  transmission_rate_nb = `${reproduction_number}` * recovery_rate_nb / (c_degree_nb - `${reproduction_number}`)
 
-    model_network(
-      simulation_id = "`${simulation_id}`",
-      transmission_rate = transmission_rate,
-      infectiousness_rate = infectiousness_rate,
-      recovery_rate = recovery_rate,
-      time_end = `${time_end}`,
-      increment = `${increment}`,
-      population_size = `${population_size}`,
-      seed_infected = `${seed_infected}`,
-      degree_distribution = "negative_binomial",
-      infection = "SEIR",
-      size = size,
-      prob = prob
-    )
-    flush.console()
-    }
-    }
+  params_nb <- c(
+    list(
+    transmission_rate = transmission_rate_nb,
+    infectiousness_rate = infectiousness_rate_nb,
+    recovery_rate = recovery_rate_nb,
+    population_size = `${population_size}`,
+    seed_infected = `${seed_infected}`
+  ),
+    degree_nb
+  ) 
 
+  #poisson network model
+  lambda = `${mu}`
 
-  output <- mclapply(c("model_reference", "model_network_poisson", "model_network_negative_binomial"),
-          FUN = parallel_models,
-          mc.cores = 3)
+  degree_poisson = list(degree_distribution = "poisson", lambda = lambda)
+  c_degree_poisson = mean_excess_degree(degree_poisson)
 
+  stopifnot(c_degree_poisson - `${reproduction_number}` > 0)
+
+  infectiousness_rate_poisson = 2 / `${serial_interval}`
+  recovery_rate_poisson = 2 / `${serial_interval}`
+  transmission_rate_poisson = `${reproduction_number}` * recovery_rate_poisson / (c_degree_poisson - `${reproduction_number}`)
+
+  params_p <- c(list(
+    transmission_rate = transmission_rate_poisson,
+    infectiousness_rate = infectiousness_rate_poisson,
+    recovery_rate = recovery_rate_poisson,
+    population_size = `${population_size}`,
+    seed_infected = `${seed_infected}`
+  ), degree_poisson)
+
+  # reference model
+  infectiousness_rate_reference = 2 / `${serial_interval}`
+  recovery_rate_reference = 2 / `${serial_interval}`
+  transmission_rate_reference = `${reproduction_number}` * recovery_rate_reference
+  params_reference <- list(
+          transmission_rate = transmission_rate_reference,
+          infectiousness_rate = infectiousness_rate_reference,
+          recovery_rate = recovery_rate_reference,
+          population_size = `${population_size}`,
+          seed_infected = `${seed_infected}`
+  )
+
+  models_combined(simulation_id = "`${simulation_id}`", time_end = `${time_end}`, increment = `${increment}`, params_p, params_nb, params_reference)
+
+  flush.console()
 }, error = function(e) {
   print(jsonlite::toJSON(
     list(error = list(simulation_id = "`${simulation_id}`"), 
-         message = e), 
+        message = conditionMessage(e)), 
     auto_unbox = TRUE, 
     pretty = FALSE
   ), stderr())
