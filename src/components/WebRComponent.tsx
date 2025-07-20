@@ -1,14 +1,14 @@
-import type { WebR as WebRType } from 'webr';
-import { useEffect, useMemo, useState } from 'preact/hooks'
-import { readWebRDataElementsEvents } from '../stream/webREventReader';
 import { VirusPlotContainer } from '@components/VirusPlotContainer';
+import { useEffect, useMemo, useState } from 'preact/hooks';
 import { v4 as uuidv4 } from 'uuid';
+import type { WebR as WebRType } from 'webr';
+import { readWebRDataElementsEvents } from '../stream/webREventReader';
 
 import { useSignals } from '@preact/signals-react/runtime';
-import { currentForm } from '@state/form-controls';
-import { getWebR } from 'utils/R';
 import { ModelTypes } from '@state/chart';
-import { LoadingChart, maxRunId, MultiRunStatuses, simulationRuns, SimulationRunStatuses } from '@state/simulation-runs';
+import { currentForm } from '@state/form-controls';
+import { maxRunId, MultiRunStatuses, simulationRuns } from '@state/simulation-runs';
+import { getWebR } from 'utils/R';
 
 const rCode = (await import(`../R/model_reference.R?raw`)).default;
 

@@ -67,8 +67,6 @@ export const readWebRDataElementsEvents = async ({webR}: EventReaderProps) => {
   webR.flush();
 
   for await (const item of webR.stream()) {
-    // item: {type: 'stdout', data: '{"state":{"E":0.1292,"I":0.0853,"R":0.1653,"S":99.…0.0977},"time":0,"model_type":"model_reference"} '}
-    // console.log('webREventReader  before parsing - item=', item);
     if (item.type === 'stderr') {
       // setSimulationRunStatus({
       //   modelType,
@@ -79,7 +77,6 @@ export const readWebRDataElementsEvents = async ({webR}: EventReaderProps) => {
     try {
       webR.flush();
       const parsedResult = extractJsonObject(item.data);
-      // console.log('webREventReader - parsedResult=', JSON.stringify(parsedResult));
       if (!parsedResult) {
         continue;
       }
@@ -93,27 +90,9 @@ export const readWebRDataElementsEvents = async ({webR}: EventReaderProps) => {
       
       if( !updatingChart ) {
         console.error(`Simulation of type ${dataElement.model_type} not found in current run - creating entry...`);
-
-        // simulationRuns.value = {
-        //   ...simulationRuns.value,
-        //   [executingSimulationRunNumber.value]: {
-        //     ...simulationRuns.value[executingSimulationRunNumber.value],
-        //     charts: [
-        //       ...existingCharts, {
-        //         modelType: dataElement.model_type,
-        //         data: [dataElement],
-        //         status: dataElement.time < simulationRuns.value[executingSimulationRunNumber.value].formValues.timeEnd
-        //           ? SimulationRunStatuses.IN_PROGRESS
-        //           : SimulationRunStatuses.COMPLETED,
-        //       },
-        //     ],
-        //   },
-        // };
-        // return;
       }
 
       // The chart already exists, so we update it
-      console.log('webREventReader - existingCharts', existingCharts);
       simulationRuns.value = {
         ...simulationRuns.value,
         [executingSimulationRunNumber.value]: {
@@ -133,7 +112,6 @@ export const readWebRDataElementsEvents = async ({webR}: EventReaderProps) => {
       };
     } catch (error) {
       console.error('webREventReader - Error parsing data element - error=', error);
-      // continue;
     }
   }
 };

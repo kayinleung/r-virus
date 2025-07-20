@@ -1,13 +1,8 @@
 
-import { Box, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, TextField, useMediaQuery, useTheme } from '@mui/material';
+import { Box, FormControl, TextField, useMediaQuery, useTheme } from '@mui/material';
 import { useSignals } from "@preact/signals-react/runtime";
 import { currentForm } from "@state/form-controls";
 import styles from "./InputControls.module.css";
-
-const degreeDistributions = [
-  'poisson',
-  'negative_binomial'
-];
 
 
 const InputControls = () => {
@@ -16,13 +11,6 @@ const InputControls = () => {
 
   const handleTextChange: React.ChangeEventHandler<HTMLTextAreaElement | HTMLInputElement> = (event) => {
     const { name, value } = event.currentTarget;
-    currentForm.value = {
-      ...currentForm.value,
-      [name]: value,
-    };
-  };
-  const handleSelectChange = (event: SelectChangeEvent) => {
-    const { name, value } = event.target;
     currentForm.value = {
       ...currentForm.value,
       [name]: value,
