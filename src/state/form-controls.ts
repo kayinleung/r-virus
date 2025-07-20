@@ -17,6 +17,7 @@ export type FormValues = {
 
 export type DataElement = {
   simulation_id: string;
+  model_type: ModelType;
   time: number;
   state: {
     S: number;
@@ -25,6 +26,7 @@ export type DataElement = {
     R: number;
     incidence: number;
   };
+
 };
 export type ErrorMessage = {
   simulation_id: string;
@@ -35,11 +37,11 @@ export const currentForm = signal<FormValues>({
   modelType: 'model_reference',
   degreeDistribution: 'poisson',
   infection: 'SEIR',
-  timeEnd: 75,
+  timeEnd: 10,
   increment: 1,
   seedInfected: 1e-3,
   mu: 5.4,
   dispersion: 10,
   serialInterval: 4,
-  reproductionNumber: 2.3,
+  reproductionNumber: 5.3,
 });

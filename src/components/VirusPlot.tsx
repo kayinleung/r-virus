@@ -14,6 +14,8 @@ type VirusPlotProps = {
   chart: Chart;
 };
 
+
+// TODO: Only show the selected metric
 const VirusPlotSvg = ({ chart }: { chart: LoadedChart}) => {
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.down('sm'));
@@ -105,7 +107,7 @@ const VirusPlotSvg = ({ chart }: { chart: LoadedChart}) => {
       d3.select(currentSvg).selectAll('*').remove();
     };
   }, [
-    data, chart.simulationId,
+    data, 
     area.plot.height,
     area.plot.width,
     area.plot.margin.top,
@@ -123,7 +125,7 @@ const VirusPlotSvg = ({ chart }: { chart: LoadedChart}) => {
 const VirusPlot = ({ chart }: VirusPlotProps) => {
   useSignals();
 
-  if (!((chart as LoadedChart).webR)) {
+  if (chart.status === SimulationRunStatuses.LOADING_R) {
     return (
       <div className={styles.virusPlotRoot}>
         <h2>{ModelReferences[chart.modelType].label}</h2>

@@ -29,6 +29,7 @@ const MultiVirusPlot = () => {
         {displayedSimulationRun.value.charts.map((chart) => {
           return <VirusPlot key={`${displayedRunId.value}-${chart.modelType}`} chart={chart} />
         })}
+        { /* TODO: Add a fourth "all charts" plot */ }
       </div>
       <Legend/>
     </>

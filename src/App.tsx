@@ -35,6 +35,7 @@ function App() {
           <InputControls />
           <Refresh />
         </div>
+        { /* TODO: Add another page "Info" */}
         <WebRComponent />
       </ThemeProvider>
     </div>
