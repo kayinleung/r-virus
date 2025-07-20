@@ -21,7 +21,6 @@ export const extractJsonObject = (inputString: string): ParsedMessage | null => 
     return null;
   }
   const jsonString = match[0];
-  // console.log('webREventReader - jsonString=', jsonString);
   const startIndex = inputString.indexOf(jsonString);
   const endIndex = startIndex + jsonString.length;
   try {
@@ -44,7 +43,6 @@ export const extractJsonObject = (inputString: string): ParsedMessage | null => 
         isError: true,
       } as ParsedErrorMessage;
     }
-    // console.log('webREventReader successful parse - parsedMessage=', parsedMessage);
     if ('state' in parsedMessage) {
       return {
         dataElement: parsedMessage as DataElement,
