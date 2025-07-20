@@ -40,7 +40,7 @@ export const currentForm = signal<FormValues>({
   timeEnd: 75,
   increment: 1,
   seedInfected: 1e-3,
-  mu: .4,
+  mu: 5.4,
   dispersion: 10,
   serialInterval: 4,
   reproductionNumber: 2.3,
