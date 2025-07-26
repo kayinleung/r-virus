@@ -3,7 +3,6 @@ import * as d3 from 'd3';
 import { useRef } from 'react';
 import styles from './VirusPlot.module.css';
 import { useEffect } from 'preact/hooks';
-import { useMediaQuery, useTheme } from '@mui/material';
 import { infectionStates, ModelReferences, selectedMetric } from '@state/chart';
 import { Chart, LoadedChart, SimulationRunStatuses } from '@state/simulation-runs';
 import { LoadingSpinner } from './LoadingSpinner';
@@ -18,9 +17,7 @@ type VirusPlotProps = {
 const VirusPlotSvg = ({ chart }: { chart: LoadedChart}) => {
   // Use useSignals to react to selectedMetric changes
   useSignals();
-  
-  const theme = useTheme();
-  const matches = useMediaQuery(theme.breakpoints.down('sm'));
+  const matches = true; // TODO: Implement a media query
   const area = {
     plot: {
       width: matches ? (document.documentElement.clientWidth / 1.2) : (document.documentElement.clientWidth / 2.5), // Width of the plot area including margins

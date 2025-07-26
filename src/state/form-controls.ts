@@ -36,6 +36,8 @@ export const archetypeOptions = Object.values(archetypes).map(model => model.lab
 
 export type ArchetypeOption = typeof archetypeOptions[number];
 
+export type NumberKeys = 'populationSize' | 'seedInfected' | 'mu' | 'dispersion' | 'serialInterval' | 'reproductionNumber';
+
 export type FormValues = {
   archetype: ArchetypeOption;
   populationSize: number;

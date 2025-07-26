@@ -1,19 +1,8 @@
-import { PlayArrow } from "@mui/icons-material";
-import { Box, Fab } from "@mui/material";
+import { ActionIcon } from "@mantine/core";
 import { useSignals } from "@preact/signals-react/runtime";
 import { createNewRun, currentSimulationRunStatus, displayedRunId, maxRunId, MultiRunStatuses } from "@state/simulation-runs";
 
-import { passiveSupport } from 'passive-events-support/src/utils';
-
-passiveSupport({
-  debug: true,
-  listeners: [
-    {
-      element: 'form.MuiBox-root > button',
-      event: 'touchstart'
-    }
-  ]
-});
+import { IconPlayerPlay } from '@tabler/icons-react';
 
 const Refresh = () => {
   useSignals();
@@ -25,20 +14,9 @@ const Refresh = () => {
 
   const disableRerun = currentSimulationRunStatus.value !== MultiRunStatuses.COMPLETED;
   return (
-    <Box component="form" sx={{
-      display: 'flex',
-      flexGrow: 1,
-      justifyContent: 'flex-end',
-      alignContent: 'flex-start',
-      flexWrap: 'wrap',
-      paddingX: '1rem'
-    }}>
-      <Fab disabled={disableRerun} color="primary" aria-label="rerun simulation with current parameters"
-      onClick={handleOnClick}
-      sx={{ alignSelf: 'center' }}>
-        <PlayArrow />
-      </Fab>
-    </Box>
+    <ActionIcon disabled={disableRerun} variant="filled" aria-label="Settings" onClick={handleOnClick}>
+      <IconPlayerPlay style={{ width: '70%', height: '70%' }} stroke={1.5} />
+    </ActionIcon>
   );
 };
 
