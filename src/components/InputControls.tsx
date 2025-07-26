@@ -1,7 +1,7 @@
 
-import { Box, FormControl, TextField, useMediaQuery, useTheme } from '@mui/material';
+import { Box, FormControl, InputLabel, MenuItem, Select, TextField, useMediaQuery, useTheme, type SelectChangeEvent } from '@mui/material';
 import { useSignals } from "@preact/signals-react/runtime";
-import { currentForm } from "@state/form-controls";
+import { archetypeCorollaries, archetypeOptions, currentForm, MAX_INDEX, MIN_INDEX, updateArchetypeCorollaries } from "@state/form-controls";
 import styles from "./InputControls.module.css";
 
 
@@ -17,10 +17,30 @@ const InputControls = () => {
     };
   };
 
+  const handleSelectChange = (event: SelectChangeEvent) => {
+    const { name, value } = event.target;
+    
+    if (name === "archetype") {
+      // Use the specialized function for archetype changes
+      // The value must be one of the options in archetypeOptions
+      updateArchetypeCorollaries(value as typeof archetypeOptions[number]);
+      return;
+    }
+    // Handle other select changes normally
+    currentForm.value = {
+      ...currentForm.value,
+      [name]: value,
+    };
+  };
+
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.down('md'));
 
-  // TODO: Add architype dropdown inputs for reproduction number and serial interval
+  const hasReproductionNumberError = !!currentForm.value.reproductionNumber && (!Number(currentForm.value.reproductionNumber) || currentForm.value.reproductionNumber < archetypeCorollaries.value.reproductionNumber.range[MIN_INDEX] ||
+    currentForm.value.reproductionNumber > archetypeCorollaries.value.reproductionNumber.range[MAX_INDEX]);
+  const hasSerialIntervalError = !!currentForm.value.serialInterval && (!Number(currentForm.value.serialInterval) || currentForm.value.serialInterval < archetypeCorollaries.value.serialInterval.range[MIN_INDEX] ||
+    currentForm.value.serialInterval > archetypeCorollaries.value.serialInterval.range[MAX_INDEX]);
+
   return (
     <Box
       sx={{
@@ -31,7 +51,23 @@ const InputControls = () => {
       className={styles.inputControlRoot}
       component="form">
       <FormControl hiddenLabel={matches}>
+        <InputLabel id="archetype-label">Archetype</InputLabel>
+        <Select
+          name="archetype"
+          labelId="archetype-label"
+          value={currentForm.value.archetype}
+          label="Archetype"
+          onChange={handleSelectChange}
+        >
+          {archetypeOptions.map((archetype) => (
+            <MenuItem key={archetype} value={archetype}>{archetype}</MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+      <FormControl hiddenLabel={matches}>
         <TextField
+          error={hasReproductionNumberError}
+          helperText={hasReproductionNumberError ? `Must be between ${archetypeCorollaries.value.reproductionNumber.range[MIN_INDEX]} and ${archetypeCorollaries.value.reproductionNumber.range[MAX_INDEX]}` : ''}
           className={styles.textField}
           label="Basic reproduction number"
           name="reproductionNumber"
@@ -40,8 +76,8 @@ const InputControls = () => {
           onChange={handleTextChange}
           slotProps={{
             htmlInput: {
-              min: 0,
-              max: 1,
+              min: archetypeCorollaries.value.reproductionNumber.range[MIN_INDEX],
+              max: archetypeCorollaries.value.reproductionNumber.range[MAX_INDEX],
               step: 0.01,
             },
           }}
@@ -50,6 +86,8 @@ const InputControls = () => {
       </FormControl>
       <FormControl hiddenLabel={matches}>
         <TextField
+          error={hasSerialIntervalError}
+          helperText={hasSerialIntervalError ? `Must be between ${archetypeCorollaries.value.serialInterval.range[MIN_INDEX]} and ${archetypeCorollaries.value.serialInterval.range[MAX_INDEX]}` : ''}
           className={styles.textField}
           label="Serial Interval"
           name="serialInterval"
@@ -58,8 +96,8 @@ const InputControls = () => {
           onChange={handleTextChange}
           slotProps={{
             htmlInput: {
-              min: 3.08,
-              max: 10,
+              min: archetypeCorollaries.value.serialInterval.range[MIN_INDEX],
+              max: archetypeCorollaries.value.serialInterval.range[MAX_INDEX],
               step: 0.1,
             },
           }}
@@ -102,24 +140,6 @@ const InputControls = () => {
           required
         />
       </FormControl>
-      { /* TODO: Hide these */ }
-      <FormControl hiddenLabel={matches}>
-        <TextField
-          className={styles.textField}
-          label="Time End"
-          name="timeEnd"
-          type="number"
-          value={currentForm.value.timeEnd}
-          onChange={handleTextChange}
-          slotProps={{
-            htmlInput: {
-              min: 10,
-              max: 1000
-            },
-          }}
-          required
-        />
-      </FormControl>
       <FormControl hiddenLabel={matches}>
         <TextField
           className={styles.textField}
@@ -132,24 +152,6 @@ const InputControls = () => {
             htmlInput: {
               min: 10,
               max: 1e10
-            },
-          }}
-          required
-        />
-      </FormControl>
-      <FormControl hiddenLabel={matches}>
-        <TextField
-          className={styles.textField}
-          label="Seed Infected"
-          name="seedInfected"
-          type="number"
-          value={currentForm.value.seedInfected}
-          onChange={handleTextChange}
-          slotProps={{
-            htmlInput: {
-              min: 0,
-              max: 1,
-              step: 1e-3,
             },
           }}
           required

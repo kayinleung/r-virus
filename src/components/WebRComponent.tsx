@@ -48,7 +48,6 @@ export const WebRComponent = () => {
         return;
       }
       const simulationId = uuidv4();
-      // const rCode = rCodeModelReference; // Default to model_reference for now
       const parameterizedRCode = rCode
         .replace(/`\${simulation_id}`/g, simulationId)
         .replace(/`\${population_size}`/g, String(currentForm.value.populationSize))

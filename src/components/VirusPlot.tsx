@@ -4,8 +4,7 @@ import { useRef } from 'react';
 import styles from './VirusPlot.module.css';
 import { useEffect } from 'preact/hooks';
 import { useMediaQuery, useTheme } from '@mui/material';
-import { infectionStates, ModelReferences } from '@state/chart';
-import type { StateKey } from '@state/chart';
+import { infectionStates, ModelReferences, selectedMetric } from '@state/chart';
 import { Chart, LoadedChart, SimulationRunStatuses } from '@state/simulation-runs';
 import { LoadingSpinner } from './LoadingSpinner';
 import { useSignals } from '@preact/signals-react/runtime';
@@ -17,6 +16,9 @@ type VirusPlotProps = {
 
 // TODO: Only show the selected metric
 const VirusPlotSvg = ({ chart }: { chart: LoadedChart}) => {
+  // Use useSignals to react to selectedMetric changes
+  useSignals();
+  
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.down('sm'));
   const area = {
@@ -58,50 +60,44 @@ const VirusPlotSvg = ({ chart }: { chart: LoadedChart}) => {
 
     const time = data.map((d) => d.time);
 
-    const color = d3.scaleOrdinal<string>()
-      .domain(Object.keys(infectionStates))
-      .range(Object.values(infectionStates).map((state) => state.color));
-
+    // Get the currently selected metric
+    const currentMetric = selectedMetric.value;
+    const metricState = infectionStates[currentMetric];
+    
     const x = d3.scaleLinear()
       .domain(d3.extent(time) as [number, number])
       .range([0, plotWidth]);
 
-    const yData = data.map(({state}) => ({
-      S: state.S,
-      E: state.E,
-      I: state.I,
-      R: state.R,
-      incidence : state.incidence
-    }))
+    // Only extract data for the selected metric
+    const yData = data.map(({state}) => state[currentMetric]);
+    
     const y = d3.scaleLinear()
       .domain([
-        d3.min(yData, (d) => Math.min(...Object.values(d).flat())) || 0,
-        d3.max(yData, (d) => Math.max(...Object.values(d).flat())) || 0
+        Math.min(0, d3.min(yData) || 0), // Ensure 0 is included in domain
+        d3.max(yData) || 1
       ])
       .nice()
       .range([plotHeight, 0]);
 
+    // X-axis
     plotGroup.append('g')
       .attr('transform', `translate(0, ${plotHeight})`)
       .call(d3.axisBottom(x));
 
+    // Y-axis
     plotGroup.append('g')
       .call(d3.axisLeft(y));
 
-    Object.entries(infectionStates)
-      .filter(([key]) => key !== 'time')
-      .forEach(([key, state]) => {
-        const line = d3.line<DataElement>()
-          .x((d) => x(d.time))
-          .y(({ state }) => Math.max(y(state[key as StateKey]), 0));
+    const line = d3.line<DataElement>()
+      .x((d) => x(d.time))
+      .y(({ state }) => Math.max(y(state[currentMetric]), 0));
 
-        plotGroup.append('path')
-          .datum(data)
-          .attr('fill', 'none')
-          .attr('stroke', color(state.color))
-          .attr('stroke-width', 1.5)
-          .attr('d', line);
-      });
+    plotGroup.append('path')
+      .datum(data)
+      .attr('fill', 'none')
+      .attr('stroke', metricState.color)
+      .attr('stroke-width', 2) // Increased stroke width for better visibility
+      .attr('d', line);
 
     return () => {
       d3.select(currentSvg).selectAll('*').remove();

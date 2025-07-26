@@ -1,9 +1,19 @@
-import { Autorenew } from "@mui/icons-material";
+import { PlayArrow } from "@mui/icons-material";
 import { Box, Fab } from "@mui/material";
 import { useSignals } from "@preact/signals-react/runtime";
 import { createNewRun, currentSimulationRunStatus, displayedRunId, maxRunId, MultiRunStatuses } from "@state/simulation-runs";
 
+import { passiveSupport } from 'passive-events-support/src/utils';
 
+passiveSupport({
+  debug: true,
+  listeners: [
+    {
+      element: 'form.MuiBox-root > button',
+      event: 'touchstart'
+    }
+  ]
+});
 
 const Refresh = () => {
   useSignals();
@@ -26,7 +36,7 @@ const Refresh = () => {
       <Fab disabled={disableRerun} color="primary" aria-label="rerun simulation with current parameters"
       onClick={handleOnClick}
       sx={{ alignSelf: 'center' }}>
-        <Autorenew />
+        <PlayArrow />
       </Fab>
     </Box>
   );
