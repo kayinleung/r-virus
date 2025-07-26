@@ -1,6 +1,5 @@
-import { ModelType } from '@state/chart';
 import type { DataElement, ErrorMessage } from '@state/form-controls';
-import { executingSimulationRunNumber, LoadedChart, setSimulationRunStatus, simulationRuns, SimulationRunStatuses } from '@state/simulation-runs';
+import { executingSimulationRunNumber, LoadedChart, simulationRuns, SimulationRunStatuses } from '@state/simulation-runs';
 import type { WebR as WebRType } from 'webr';
 
 export type ParsedDataMessage = {
@@ -44,7 +43,6 @@ export const extractJsonObject = (inputString: string): ParsedMessage | null => 
         isError: true,
       } as ParsedErrorMessage;
     }
-
     if ('state' in parsedMessage) {
       return {
         dataElement: parsedMessage as DataElement,
@@ -60,55 +58,48 @@ export const extractJsonObject = (inputString: string): ParsedMessage | null => 
 };
 
 type EventReaderProps = {
-  modelType: ModelType;
   webR: WebRType;
 }
 
-export const readWebRDataElementsEvents = async ({webR, modelType}: EventReaderProps) => {
+export const readWebRDataElementsEvents = async ({webR}: EventReaderProps) => {
   webR.flush();
 
   for await (const item of webR.stream()) {
     if (item.type === 'stderr') {
-      setSimulationRunStatus({
-        modelType,
-        status: SimulationRunStatuses.ERROR,
-      });
+      // setSimulationRunStatus({
+      //   modelType,
+      //   status: SimulationRunStatuses.ERROR,
+      // });
       continue;
     }
     try {
       webR.flush();
       const parsedResult = extractJsonObject(item.data);
-      console.log('webREventReader - item=', item);
       if (!parsedResult) {
         continue;
       }
       if((parsedResult as ParsedErrorMessage).isError) {
-        setSimulationRunStatus({
-          modelType,
-          status: SimulationRunStatuses.ERROR,
-        });
         continue;
       }
       const { dataElement } = parsedResult as ParsedDataMessage;
-
-
-      const existingCharts = (simulationRuns.value[executingSimulationRunNumber.value].charts as LoadedChart[]);//.filter((chart) => Boolean(chart.simulationId));
-
-      const simulationId = dataElement.simulation_id;
-      const updatingChart = existingCharts.find((chart) => chart.simulationId === simulationId);
+      const existingCharts = (simulationRuns.value[executingSimulationRunNumber.value].charts as LoadedChart[]);
+      const updatingChart = existingCharts.find((chart) => chart.modelType === dataElement.model_type);
+      
+      
       if( !updatingChart ) {
-        console.error(`Simulation with ID ${simulationId} not found in current run.`);
-        return;
+        console.error(`Simulation of type ${dataElement.model_type} not found in current run - creating entry...`);
       }
+
+      // The chart already exists, so we update it
       simulationRuns.value = {
         ...simulationRuns.value,
         [executingSimulationRunNumber.value]: {
           ...simulationRuns.value[executingSimulationRunNumber.value],
           charts: existingCharts.map((chart) =>
-            chart.simulationId === simulationId
+            chart.modelType === dataElement.model_type
               ? {
-                  ...updatingChart,
-                  data: [...updatingChart.data, dataElement],
+                  ...chart,
+                  data: [...(chart.data ?? []), dataElement],
                   status: dataElement.time < simulationRuns.value[executingSimulationRunNumber.value].formValues.timeEnd
                     ? SimulationRunStatuses.IN_PROGRESS
                     : SimulationRunStatuses.COMPLETED,
@@ -119,7 +110,6 @@ export const readWebRDataElementsEvents = async ({webR, modelType}: EventReaderP
       };
     } catch (error) {
       console.error('webREventReader - Error parsing data element - error=', error);
-      // continue;
     }
   }
 };

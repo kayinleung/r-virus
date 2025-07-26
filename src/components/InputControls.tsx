@@ -1,13 +1,8 @@
 
-import { Box, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, TextField, useMediaQuery, useTheme } from '@mui/material';
+import { Box, FormControl, TextField, useMediaQuery, useTheme } from '@mui/material';
 import { useSignals } from "@preact/signals-react/runtime";
 import { currentForm } from "@state/form-controls";
 import styles from "./InputControls.module.css";
-
-const degreeDistributions = [
-  'poisson',
-  'negative_binomial'
-];
 
 
 const InputControls = () => {
@@ -21,17 +16,11 @@ const InputControls = () => {
       [name]: value,
     };
   };
-  const handleSelectChange = (event: SelectChangeEvent) => {
-    const { name, value } = event.target;
-    currentForm.value = {
-      ...currentForm.value,
-      [name]: value,
-    };
-  };
 
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.down('md'));
 
+  // TODO: Add architype dropdown inputs for reproduction number and serial interval
   return (
     <Box
       sx={{
@@ -78,21 +67,6 @@ const InputControls = () => {
         />
       </FormControl>
       <FormControl hiddenLabel={matches}>
-        <InputLabel id="degree-distribution-label">Degree distribution</InputLabel>
-        <Select
-          name="degreeDistribution"
-          labelId="degree-distribution-label"
-          id="demo-simple-select"
-          value={currentForm.value.degreeDistribution}
-          label="Degree Distribution"
-          onChange={handleSelectChange}
-        >
-          {degreeDistributions.map((distribution) => (
-            <MenuItem key={distribution} value={distribution}>{distribution}</MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-      <FormControl hiddenLabel={matches}>
         <TextField
           className={styles.textField}
           label="Mean degree"
@@ -110,7 +84,7 @@ const InputControls = () => {
           required
         />
       </FormControl>
-            <FormControl hiddenLabel={matches}>
+      <FormControl hiddenLabel={matches}>
         <TextField
           className={styles.textField}
           label="Dispersion"
@@ -128,6 +102,7 @@ const InputControls = () => {
           required
         />
       </FormControl>
+      { /* TODO: Hide these */ }
       <FormControl hiddenLabel={matches}>
         <TextField
           className={styles.textField}
@@ -175,24 +150,6 @@ const InputControls = () => {
               min: 0,
               max: 1,
               step: 1e-3,
-            },
-          }}
-          required
-        />
-      </FormControl>
-      <FormControl hiddenLabel={matches}>
-        <TextField
-          className={styles.textField}
-          label="Time Increment"
-          name="increment"
-          type="number"
-          value={currentForm.value.increment}
-          onChange={handleTextChange}
-          slotProps={{
-            htmlInput: {
-              min: 0,
-              max: currentForm.value.timeEnd,
-              step: 0.01,
             },
           }}
           required

@@ -17,6 +17,7 @@ export type FormValues = {
 
 export type DataElement = {
   simulation_id: string;
+  model_type: ModelType;
   time: number;
   state: {
     S: number;
@@ -25,6 +26,7 @@ export type DataElement = {
     R: number;
     incidence: number;
   };
+
 };
 export type ErrorMessage = {
   simulation_id: string;

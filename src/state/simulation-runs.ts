@@ -1,7 +1,6 @@
 import { computed, signal } from "@preact/signals-react";
 import { currentForm, DataElement, FormValues } from "@state/form-controls";
 import { ModelType } from "./chart";
-import { WebR } from "webr";
 
 const INITIAL_RUN_ID = 1;
 
@@ -11,8 +10,6 @@ export type LoadingChart = {
 };
 
 export type LoadedChart = {
-  webR: WebR;
-  simulationId: string;
   modelType: ModelType;
   data: DataElement[];
   status: SimulationRunStatus;
