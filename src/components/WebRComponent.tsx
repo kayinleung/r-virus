@@ -74,6 +74,9 @@ export const WebRComponent = () => {
           }, {
             modelType: ModelReferences.model_network_negative_binomial.value,
             status: MultiRunStatuses.IN_PROGRESS,
+          }, {
+            modelType: ModelReferences.all.value,
+            status: MultiRunStatuses.IN_PROGRESS,
           }],
           formValues: currentForm.value,
           status: MultiRunStatuses.IN_PROGRESS,

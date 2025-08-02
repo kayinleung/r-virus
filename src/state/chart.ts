@@ -4,6 +4,7 @@ export const ModelReferences = {
   model_reference: { value: 'model_reference', label: 'Reference' },
   model_network_poisson: { value: 'model_network_poisson', label: 'Network: Poisson' },
   model_network_negative_binomial: { value: 'model_network_negative_binomial', label: 'Network: Negative Binomial' },
+  all: { value: 'all', label: 'All Models' },
  } as const;
 export const ModelTypes = Object.values(ModelReferences).map(model => model.value);
 export type ModelType = keyof typeof ModelReferences;
@@ -32,3 +33,12 @@ export const infectionStates: InfectionStateMap = {
 };
 
 export const selectedMetric = signal<StateKey>(StateKeys.I.value);
+
+export const mouseX = signal<number | null>(null);
+export type MouseMetricKeys = Exclude<keyof typeof ModelReferences, 'all'>;
+type MouseMetric = Record<MouseMetricKeys, {
+  metric: StateKey;
+  x: number;
+  y: number;
+}>;
+export const mouseMetrics = signal<MouseMetric|null>(null);

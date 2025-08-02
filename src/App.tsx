@@ -26,7 +26,6 @@ const theme = createTheme({
 function App() {
   const [search] = useSearchParams();
   const tab = search.get('tab') || 'simulations';
-  console.log('App - tab=', tab);
 
   return (
     <div className={styles.appRoot}>

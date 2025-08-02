@@ -96,7 +96,7 @@ export const readWebRDataElementsEvents = async ({webR}: EventReaderProps) => {
         [executingSimulationRunNumber.value]: {
           ...simulationRuns.value[executingSimulationRunNumber.value],
           charts: existingCharts.map((chart) =>
-            chart.modelType === dataElement.model_type
+          (chart.modelType === dataElement.model_type || chart.modelType === 'all')
               ? {
                   ...chart,
                   data: [...(chart.data ?? []), dataElement],

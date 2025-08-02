@@ -7,7 +7,6 @@ const MetricSelector = () => {
   useSignal();
 
   const handleSelectChange = (value: string | null) => {
-    console.log('MetricSelector - value=', value);
     selectedMetric.value = value as StateKey;
   };
 
