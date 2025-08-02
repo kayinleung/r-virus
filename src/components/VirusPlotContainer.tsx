@@ -11,7 +11,7 @@ const VirusPlotContainer = () => {
   return (
     <div className={styles.virusPlotContainerRoot}>
       <div className={styles.virusPlotDisplayOptions}>
-        <SimulationSelector />
+        <SimulationSelector className={styles.simulationSelector}/>
         <MetricSelector />
       </div>
       <MultiVirusPlot />

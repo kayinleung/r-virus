@@ -21,13 +21,13 @@ const VirusPlotSvg = ({ chart }: { chart: LoadedChart}) => {
   console.log('VirusPlot - matchesMediumAndUp=', matchesMediumAndUp);
   const area = {
     plot: {
-      width: matchesMediumAndUp ? ((document.documentElement.clientWidth * 0.7) - (2 * 20)) : (document.documentElement.clientWidth / 2.5), // Width of the plot area including margins
+      width: matchesMediumAndUp ? ((document.documentElement.clientWidth * 0.7) - (2 * 50)) : (document.documentElement.clientWidth / 2.5), // Width of the plot area including margins
       height: matchesMediumAndUp ? ((document.documentElement.clientHeight * 0.33) - 125) : (document.documentElement.clientHeight / 3),  // Height of the plot area including the legend and margins
       margin: {
         top: matchesMediumAndUp ? 20 : 20,
         right: matchesMediumAndUp ? 50 : 10,
         bottom: 50,
-        left: matchesMediumAndUp ? 80 : 100,
+        left: matchesMediumAndUp ? 60 : 100,
       },
     },
     legend: {

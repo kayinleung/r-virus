@@ -1,0 +1,14 @@
+.aboutImages {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.aboutImage {
+  width: 20rem;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  overflow: hidden;
+}

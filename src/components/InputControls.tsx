@@ -24,7 +24,7 @@ const InputControls = () => {
   }
 
   return (
-    <Paper className={styles.inputControls}>
+    <Paper p="sm" className={styles.inputControls}>
       <Refresh />
       <Select
         label="Archetype"
