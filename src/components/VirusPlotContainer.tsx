@@ -1,11 +1,10 @@
 import { VirusPlot } from '@components/VirusPlot';
 import { useSignals } from '@preact/signals-react/runtime';
-import { displayedRunId, displayedSimulationRun, type Chart } from '@state/simulation-runs';
-import { Legend } from './Legend';
+import { ModelReferences } from '@state/chart';
+import { displayedRunId, displayedSimulationRun } from '@state/simulation-runs';
 import { MetricSelector } from './MetricSelector';
 import { SimulationSelector } from './SimulationSelector';
 import styles from './VirusPlotContainer.module.css';
-import { ModelReferences } from '@state/chart';
 
 const VirusPlotContainer = () => {
 

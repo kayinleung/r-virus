@@ -4,7 +4,7 @@ import * as d3 from 'd3';
 import { Paper, Title } from '@mantine/core';
 import { useColorScheme, useMediaQuery } from '@mantine/hooks';
 import { useSignals } from '@preact/signals-react/runtime';
-import { lineStyles, ModelReferences, mouseMetrics, mouseX, selectedMetric, type ModelType, type MouseMetricKeys } from '@state/chart';
+import { lineStyles, ModelReferences, mouseMetrics, mouseX, selectedMetric, type MouseMetricKeys } from '@state/chart';
 import { Chart, LoadedChart, SimulationRunStatuses } from '@state/simulation-runs';
 import { useRef } from 'preact/hooks';
 import { LoadingSpinner } from './LoadingSpinner';
