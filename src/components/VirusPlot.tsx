@@ -1,38 +1,33 @@
 import { DataElement } from '@state/form-controls';
 import * as d3 from 'd3';
-import { useRef } from 'react';
-import styles from './VirusPlot.module.css';
-import { infectionStates, ModelReferences, mouseMetrics, mouseX, selectedMetric, type MouseMetricKeys } from '@state/chart';
-import { Chart, LoadedChart, SimulationRunStatuses } from '@state/simulation-runs';
-import { LoadingSpinner } from './LoadingSpinner';
-import { useSignals } from '@preact/signals-react/runtime';
+// import { useRef } from 'react';
 import { Paper, Title } from '@mantine/core';
 import { useColorScheme, useMediaQuery } from '@mantine/hooks';
+import { useSignals } from '@preact/signals-react/runtime';
+import { lineStyles, ModelReferences, mouseMetrics, mouseX, selectedMetric, type ModelType, type MouseMetricKeys } from '@state/chart';
+import { Chart, LoadedChart, SimulationRunStatuses } from '@state/simulation-runs';
+import { useRef } from 'preact/hooks';
+import { LoadingSpinner } from './LoadingSpinner';
+import styles from './VirusPlot.module.css';
 
 type VirusPlotProps = {
   chart: Chart;
 };
 
-const lineStyles = {
-  [ModelReferences.model_reference.value]: {
-    style: 'solid',
-    dashArray: '1, 1',
-    color: '#1f77b4'
-  },
-  [ModelReferences.model_network_poisson.value]: {
-    style: 'stroke-dasharray',
-    dashArray: '2, 2',
-    color: '#ff7f0e'
-  },
-  [ModelReferences.model_network_negative_binomial.value]: {
-    style: 'stroke-dasharray',
-    dashArray: '5 10 15 5 10 15',
-    color: '#2ca02c'
-  },
-};
-
 const VirusPlotSvg = ({ chart }: { chart: LoadedChart}) => {
   useSignals();
+
+  const handleMouseLeave = () => {
+    mouseX.value = null;
+  };
+
+  const handleMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {
+    const svgRect = svgRef.current?.getBoundingClientRect();
+    if(!svgRect) return;
+
+    mouseX.value = e.clientX - svgRect.left - area.plot.margin.left;
+  };
+
   const matchesMediumAndUp = useMediaQuery('(min-width: 800px)');
   const colorScheme = useColorScheme();
   const area = {
@@ -47,15 +42,15 @@ const VirusPlotSvg = ({ chart }: { chart: LoadedChart}) => {
       },
     },
     legend: { height: 0 },
-  };
+  } as const;
 
   const svgRef = useRef<SVGSVGElement | null>(null);  
 
-  const data = chart.data ?? [];
-  if (!data || data.length === 0) return;
-
   const plotWidth = area.plot.width - area.plot.margin.left - area.plot.margin.right;
   const plotHeight = area.plot.height - area.plot.margin.top - area.plot.margin.bottom;
+
+  const data = chart.data ?? [];
+  if (!data || data.length === 0) return;
 
   /* gather plot information */
   const time = data.map((d) => d.time);
@@ -118,11 +113,6 @@ const VirusPlotSvg = ({ chart }: { chart: LoadedChart}) => {
     // Get the closest x value (time) for each line
     const mouseTime = x.invert(mouseX.value);
     // Build a MouseMetric object with all required keys
-    const metrics: typeof mouseMetrics.value = {
-      model_reference: { metric: currentMetric, x: NaN, y: NaN },
-      model_network_poisson: { metric: currentMetric, x: NaN, y: NaN },
-      model_network_negative_binomial: { metric: currentMetric, x: NaN, y: NaN },
-    };
     Object.entries(grouped).forEach(([modelType, group]) => {
       // Find closest data point in this group
       const closest = group.reduce((prev, curr) =>
@@ -130,13 +120,11 @@ const VirusPlotSvg = ({ chart }: { chart: LoadedChart}) => {
       );
       const closestX = x(closest.time);
       const closestY = y(closest.state[currentMetric]);
-      metrics[modelType as MouseMetricKeys] = {
-        x: closestX,
-        y: closestY,
-        metric: currentMetric
-      };
+      if (isNaN(closestX) || isNaN(closestY)) {
+        return; // Skip if closestY is NaN
+      }
+      mouseMetrics.value[modelType as MouseMetricKeys] = closestY;
     });
-    mouseMetrics.value = metrics;
 
     plotGroup.append('line')
       .attr('x1', mouseX.value)
@@ -181,20 +169,6 @@ const VirusPlotSvg = ({ chart }: { chart: LoadedChart}) => {
       }
     });
   }
-
-  /* mouse event handlers */
-  const handleMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {
-    const rect = (svgRef.current as SVGSVGElement).getBoundingClientRect();
-    const xPos = e.clientX - rect.left - area.plot.margin.left;
-    if (xPos >= 0 && xPos <= plotWidth) {
-      mouseX.value = xPos;
-    } else {
-      mouseX.value = null;
-    }
-  };
-  const handleMouseLeave = () => {
-    mouseX.value = null;
-  };
 
   return (
     <svg

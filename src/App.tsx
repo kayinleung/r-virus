@@ -1,5 +1,5 @@
 import styles from './App.module.css';
-import { createTheme, Input, MantineProvider } from '@mantine/core';
+import { createTheme, MantineProvider } from '@mantine/core';
 import '@mantine/core/styles.css';
 
 // https://mantine.dev/styles/global-styles/#add-global-styles-in-your-application
@@ -9,6 +9,7 @@ import { WebRComponent } from '@components/WebRComponent';
 import { useSearchParams } from 'react-router-dom';
 import { InputControls } from '@components/InputControls';
 import { About } from '@components/About';
+import { Legend } from '@components/Legend';
 
 const theme = createTheme({
   headings: {
@@ -34,9 +35,12 @@ function App() {
         theme={theme}>
 
           <div className={styles.navBar} >
-            <LeftNavigation />
-            {tab === 'simulations' && <InputControls />}
-            {tab === 'about' && <About />}
+            <div>
+              <LeftNavigation />
+              {tab === 'simulations' && <InputControls />}
+              {tab === 'about' && <About />}
+            </div>
+            <Legend />
           </div>
 
           <WebRComponent />
