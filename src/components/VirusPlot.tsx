@@ -32,11 +32,11 @@ const VirusPlotSvg = ({ chart }: { chart: LoadedChart}) => {
   const colorScheme = useColorScheme();
   const area = {
     plot: {
-      width: matchesMediumAndUp ? ((document.documentElement.clientWidth * 0.7) - (2 * 50)) : (document.documentElement.clientWidth / 2.5),
-      height: matchesMediumAndUp ? ((document.documentElement.clientHeight * 0.33) - 125) : (document.documentElement.clientHeight / 3),
+      width: matchesMediumAndUp ? ((document.documentElement.clientWidth * (0.7 / 2)) - (2 * 20)) : ((document.documentElement.clientWidth * 0.7) - (2 * 20)),
+      height: matchesMediumAndUp ? ((document.documentElement.clientHeight * 0.5) - 125) : ((document.documentElement.clientHeight * 0.33) - 125),
       margin: {
         top: matchesMediumAndUp ? 20 : 20,
-        right: matchesMediumAndUp ? 50 : 10,
+        right: matchesMediumAndUp ? 20 : 10,
         bottom: 50,
         left: matchesMediumAndUp ? 60 : 100,
       },
@@ -110,20 +110,28 @@ const VirusPlotSvg = ({ chart }: { chart: LoadedChart}) => {
 
   /* Draw vertical bar if mouseX is set - i.e. if the mouse is within the plot area */
   if (mouseX.value !== null) {
-    // Get the closest x value (time) for each line
+    // Get the interpolated y value at mouseTime for each line
     const mouseTime = x.invert(mouseX.value);
-    // Build a MouseMetric object with all required keys
     Object.entries(grouped).forEach(([modelType, group]) => {
-      // Find closest data point in this group
-      const closest = group.reduce((prev, curr) =>
-        Math.abs(curr.time - mouseTime) < Math.abs(prev.time - mouseTime) ? curr : prev
-      );
-      const closestX = x(closest.time);
-      const closestY = y(closest.state[currentMetric]);
-      if (isNaN(closestX) || isNaN(closestY)) {
-        return; // Skip if closestY is NaN
+      // Find the two data points surrounding mouseTime
+      let left = group[0], right = group[group.length - 1];
+      for (let i = 1; i < group.length; i++) {
+        if (group[i].time >= mouseTime) {
+          left = group[i - 1];
+          right = group[i];
+          break;
+        }
       }
-      mouseMetrics.value[modelType as MouseMetricKeys] = closestY;
+      let interpY = NaN;
+      if (left && right && left !== right) {
+        const t = (mouseTime - left.time) / (right.time - left.time);
+        interpY = left.state[currentMetric] * (1 - t) + right.state[currentMetric] * t;
+      } else if (left) {
+        interpY = left.state[currentMetric];
+      }
+      if (!isNaN(interpY)) {
+        mouseMetrics.value[modelType as MouseMetricKeys] = interpY;
+      }
     });
 
     plotGroup.append('line')
@@ -163,7 +171,7 @@ const VirusPlotSvg = ({ chart }: { chart: LoadedChart}) => {
           .attr('cy', interpY)
           .attr('r', 6)
           .attr('fill', styleConfig.color)
-          .attr('stroke', '#fff')
+          .attr('stroke', colorScheme === 'dark' ? '#fff' : '#000')
           .attr('stroke-width', 2)
           .attr('pointer-events', 'none');
       }

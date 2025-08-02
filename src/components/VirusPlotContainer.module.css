@@ -9,10 +9,21 @@
 
 .multiVirusPlotContainer {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   flex-wrap: wrap;
   align-items: stretch;
-  width: calc(100% - 4rem);
+  /* width: 100%; */
+}
+
+
+@media (100px <= width <= 700px) {
+  .multiVirusPlotContainer {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-items: stretch;
+    width: calc(100% - 4rem);
+  }
 }
 
 .virusPlotDisplayOptions {
@@ -34,7 +45,7 @@
 /* Ensure all direct children (VirusPlot containers) grow equally */
 .multiVirusPlotContainer > * {
   flex: min-content;
-  min-width: max(30%, 300px); /* Ensure a minimum width for usability */
+  min-width: clamp(20rem, 40%, 100%); /* Ensure a minimum width for usability */
   max-width: 100%;
   display: flex;
 }

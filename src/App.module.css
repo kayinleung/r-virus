@@ -10,7 +10,8 @@
 }
 
 .navBar {
-  width: clamp(20rem, 30%, 30%);
+  min-width: 20vw;
+  max-width: 20vw;
   display: flex;
   flex-direction: column;
   align-self: flex-start;

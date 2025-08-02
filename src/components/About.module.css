@@ -7,9 +7,9 @@
 }
 
 .aboutImage {
-  width: 20rem;
+  width: 8rem;
   aspect-ratio: 1 / 1;
   border-radius: 50%;
-  overflow: hidden;
-  cursor:pointer
+  /* overflow: hidden; */
+  cursor: pointer
 }
