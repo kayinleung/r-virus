@@ -1,10 +1,10 @@
 /* Light and dark themes */
 :root {
   --background-color-light: rgba(255, 255, 255, 0.75);
-  --background-color-dark: rgba(45, 45, 45, 0.75);
+  --background-color-dark: rgba(30, 30, 30, 0.75);
 
-  --content-background-color-light: rgba(255, 255, 255, 0.9);
-  --content-background-color-dark: rgba(20, 50, 50, 0.9);
+  /* --content-background-color-light: rgba(255, 255, 255, 0.9);
+  --content-background-color-dark: rgba(20, 50, 50, 0.9); */
 
   --font-color-light: rgba(60, 60, 60, 1);
   --font-color-dark: rgba(255, 255, 255, 1);
@@ -47,4 +47,11 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  background-color: var(--background-color-light);
+}
+
+@media(prefers-color-scheme: dark) {
+  body {
+    background-color: var(--background-color-dark);
+  }
 }

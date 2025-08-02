@@ -1,19 +1,20 @@
+.virusPlotContainerRoot {
+  margin-top: 2rem;
+  min-width: 50%;
+  max-width: 100%;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  flex-grow: 1;
+  align-self: flex-start;
+  width: 100%;
+}
+
 .multiVirusPlotContainer {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   align-items: stretch;
-  width: 100%;
-}
-
-.virusPlotContainerRoot {
-  max-width: 100%;
-  min-width: 50%;
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-  flex-grow: 1;
-  justify-content: center;
   width: 100%;
 }
 

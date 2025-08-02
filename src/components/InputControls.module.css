@@ -1,7 +1,8 @@
-.inputControlRoot {
+.inputControls {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 1rem;
+	padding: 1rem;
 
 	> div {
 		flex-direction: column;
@@ -10,7 +11,7 @@
 
 
 @media (100px <= width <= 700px) {
-	.inputControlRoot {
+	.inputControls {
 		gap: 1rem;
 	}
 }

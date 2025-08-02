@@ -1,24 +1,46 @@
 import styles from './App.module.css';
-import { InputControls } from './components/InputControls';
+import { createTheme, Input, MantineProvider } from '@mantine/core';
+import '@mantine/core/styles.css';
 
+// https://mantine.dev/styles/global-styles/#add-global-styles-in-your-application
+import './global.css';
+import { LeftNavigation } from '@components/Navigation';
 import { WebRComponent } from '@components/WebRComponent';
-import { Refresh } from '@components/Refresh';
-import { createTheme, MantineProvider } from '@mantine/core';
+import { useSearchParams } from 'react-router-dom';
+import { InputControls } from '@components/InputControls';
+import { About } from '@components/About';
 
+const theme = createTheme({
+  headings: {
+    // properties for all headings
+    fontWeight: '400',
+    fontFamily: 'Roboto',
 
-const theme = createTheme({});
+    // properties for individual headings, all of them are optional
+    sizes: {
+      h2: { lineHeight: '1.2' },
+    },
+  },
+});
 
 function App() {
+  const [search] = useSearchParams();
+  const tab = search.get('tab') || 'simulations';
+  console.log('App - tab=', tab);
 
   return (
     <div className={styles.appRoot}>
-      <MantineProvider theme={theme}>
-        <div className={styles.simulationControls}>
-          <InputControls />
-          <Refresh />
-        </div>
-        { /* TODO: Add another page "Info" */}
-        <WebRComponent />
+      <MantineProvider
+        defaultColorScheme="auto"
+        theme={theme}>
+
+          <div className={styles.navBar} >
+            <LeftNavigation />
+            {tab === 'simulations' && <InputControls />}
+            {tab === 'about' && <About />}
+          </div>
+
+          <WebRComponent />
       </MantineProvider>
     </div>
   )

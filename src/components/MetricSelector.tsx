@@ -1,10 +1,13 @@
 import { Select } from '@mantine/core';
+import { useSignal } from '@preact/signals-react';
 import { StateKey, StateKeys, selectedMetric } from '@state/chart';
-import { currentForm } from '@state/form-controls';
 
 const MetricSelector = () => {
 
+  useSignal();
+
   const handleSelectChange = (value: string | null) => {
+    console.log('MetricSelector - value=', value);
     selectedMetric.value = value as StateKey;
   };
 
@@ -12,7 +15,7 @@ const MetricSelector = () => {
 
     <Select
       label="Metric"
-      value={currentForm.value.archetype}
+      value={selectedMetric.value}
       onChange={handleSelectChange}
       data={Object.entries(StateKeys).map(([key, { label }]) => ({ value: key, label }))}
     />

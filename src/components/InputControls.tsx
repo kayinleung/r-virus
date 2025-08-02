@@ -2,8 +2,9 @@
 import { useSignals } from "@preact/signals-react/runtime";
 import { archetypeCorollaries, archetypeOptions, currentForm, MAX_INDEX, MIN_INDEX, updateArchetypeCorollaries, type NumberKeys } from "@state/form-controls";
 
-import { NumberInput, Select } from '@mantine/core';
-
+import { NumberInput, Paper, Select } from '@mantine/core';
+import styles from './InputControls.module.css';
+import { Refresh } from "./Refresh";
 
 const InputControls = () => {
 
@@ -23,7 +24,8 @@ const InputControls = () => {
   }
 
   return (
-    <div>
+    <Paper className={styles.inputControls}>
+      <Refresh />
       <Select
         label="Archetype"
         value={currentForm.value.archetype}
@@ -65,7 +67,7 @@ const InputControls = () => {
         max={1e10}
         onChange={(value) => handleNumberChange({ field: "populationSize", value: Number(value) }) }
       />
-    </div>
+    </Paper>
   )
 };
 

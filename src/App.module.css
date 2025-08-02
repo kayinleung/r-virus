@@ -1,23 +1,25 @@
 .appRoot {
-  margin: 2rem;
-  width: calc(100% - 4rem);
-  height: calc(100% - 4rem);
+  margin: 0rem 2rem 2rem 2rem;
+  /* width: 100%; */
+  height: 100%;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   gap: 1rem;
+}
 
-  .simulationControls {
-    display: flex;
-    flex-direction: row;
-  }
+.navBar {
+  width: clamp(20rem, 30%, 30%);
+  display: flex;
+  flex-direction: column;
+  align-self: flex-start;
 }
 
 
 @media (100px <= width <= 700px) {
   .appRoot {
     margin: 1rem;
-    width: calc(100% - 3rem);
+    width: 100vw;
     flex-direction: column;
     justify-content: space-between;
   }
