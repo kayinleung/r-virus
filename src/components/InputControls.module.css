@@ -1,16 +1,9 @@
-.inputControlRoot {
+.inputControls {
 	display: flex;
-	flex-wrap: wrap;
 	gap: 1rem;
-
-	> div {
-		flex-direction: column;
-	}
+	flex-direction: column;
 }
 
-
-@media (100px <= width <= 700px) {
-	.inputControlRoot {
-		gap: 1rem;
-	}
+.refresh {
+	align-self: flex-end;
 }

@@ -1,43 +1,50 @@
 import styles from './App.module.css';
-import { InputControls } from './components/InputControls';
-import { theme as browserTheme } from '@utils/browser';
+import { createTheme, MantineProvider } from '@mantine/core';
+import '@mantine/core/styles.css';
 
-import { ThemeProvider, createTheme } from '@mui/material/styles';
+// https://mantine.dev/styles/global-styles/#add-global-styles-in-your-application
+import './global.css';
+import { LeftNavigation } from '@components/Navigation';
 import { WebRComponent } from '@components/WebRComponent';
-import { Refresh } from '@components/Refresh';
+import { useSearchParams } from 'react-router-dom';
+import { InputControls } from '@components/InputControls';
+import { About } from '@components/About';
+import { Legend } from '@components/Legend';
 
 const theme = createTheme({
-  palette: {
-    mode: browserTheme,
-    text: {
-      primary: browserTheme === 'dark' ? '#ffffff' : '#000000',
-    },
-  },
-  components: {
-    MuiTextField: {
-      styleOverrides: {
-        root: {
-          '& .MuiInputBase-input': {
-            minWidth: '6rem',
-          },
-        },
-      },
+  headings: {
+    // properties for all headings
+    fontWeight: '400',
+    fontFamily: 'Roboto',
+
+    // properties for individual headings, all of them are optional
+    sizes: {
+      h2: { lineHeight: '1.2' },
     },
   },
 });
 
 function App() {
+  const [search] = useSearchParams();
+  const tab = search.get('tab') || 'simulations';
 
   return (
     <div className={styles.appRoot}>
-      <ThemeProvider theme={theme}>
-        <div className={styles.simulationControls}>
-          <InputControls />
-          <Refresh />
-        </div>
-        { /* TODO: Add another page "Info" */}
-        <WebRComponent />
-      </ThemeProvider>
+      <MantineProvider
+        defaultColorScheme="auto"
+        theme={theme}>
+
+          <div className={styles.navBar} >
+            <div>
+              <LeftNavigation />
+              {tab === 'simulations' && <InputControls />}
+              {tab === 'about' && <About />}
+            </div>
+            <Legend />
+          </div>
+
+          <WebRComponent />
+      </MantineProvider>
     </div>
   )
 }

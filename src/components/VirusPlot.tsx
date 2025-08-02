@@ -1,123 +1,192 @@
 import { DataElement } from '@state/form-controls';
 import * as d3 from 'd3';
-import { useRef } from 'react';
-import styles from './VirusPlot.module.css';
-import { useEffect } from 'preact/hooks';
-import { useMediaQuery, useTheme } from '@mui/material';
-import { infectionStates, ModelReferences } from '@state/chart';
-import type { StateKey } from '@state/chart';
-import { Chart, LoadedChart, SimulationRunStatuses } from '@state/simulation-runs';
-import { LoadingSpinner } from './LoadingSpinner';
+// import { useRef } from 'react';
+import { Paper, Title } from '@mantine/core';
+import { useColorScheme, useMediaQuery } from '@mantine/hooks';
 import { useSignals } from '@preact/signals-react/runtime';
+import { lineStyles, ModelReferences, mouseMetrics, mouseX, selectedMetric, type MouseMetricKeys } from '@state/chart';
+import { Chart, LoadedChart, SimulationRunStatuses } from '@state/simulation-runs';
+import { useRef } from 'preact/hooks';
+import { LoadingSpinner } from './LoadingSpinner';
+import styles from './VirusPlot.module.css';
 
 type VirusPlotProps = {
   chart: Chart;
 };
 
-
-// TODO: Only show the selected metric
 const VirusPlotSvg = ({ chart }: { chart: LoadedChart}) => {
-  const theme = useTheme();
-  const matches = useMediaQuery(theme.breakpoints.down('sm'));
-  const area = {
-    plot: {
-      width: matches ? (document.documentElement.clientWidth / 1.2) : (document.documentElement.clientWidth / 2.5), // Width of the plot area including margins
-      height: matches ? (document.documentElement.clientHeight / 4.5) : (document.documentElement.clientHeight / 3),  // Height of the plot area including the legend and margins
-      margin: {
-        top: matches ? 5 : 20,
-        right: matches ? 5 : 10,
-        bottom: 50,
-        left: matches ? 80 : 100,
-      },
-    },
-    legend: {
-      height: 0,
-    },
+  useSignals();
+
+  const handleMouseLeave = () => {
+    mouseX.value = null;
   };
 
-  const svgRef = useRef<SVGSVGElement | null>(null);
+  const handleMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {
+    const svgRect = svgRef.current?.getBoundingClientRect();
+    if(!svgRect) return;
 
-  const data = chart.data;
-  useEffect(() => {
-    const currentSvg = svgRef.current;
-    if (!data || data.length === 0) return;
+    mouseX.value = e.clientX - svgRect.left - area.plot.margin.left;
+  };
 
-    const plotWidth = area.plot.width - area.plot.margin.left - area.plot.margin.right;
-    const plotHeight = area.plot.height - area.plot.margin.top - area.plot.margin.bottom;
+  const matchesMediumAndUp = useMediaQuery('(min-width: 800px)');
+  const colorScheme = useColorScheme();
+  const area = {
+    plot: {
+      width: matchesMediumAndUp ? ((document.documentElement.clientWidth * (0.7 / 2)) - (2 * 20)) : ((document.documentElement.clientWidth * 0.7) - (2 * 20)),
+      height: matchesMediumAndUp ? ((document.documentElement.clientHeight * 0.5) - 125) : ((document.documentElement.clientHeight * 0.33) - 125),
+      margin: {
+        top: matchesMediumAndUp ? 20 : 20,
+        right: matchesMediumAndUp ? 20 : 10,
+        bottom: 50,
+        left: matchesMediumAndUp ? 60 : 100,
+      },
+    },
+    legend: { height: 0 },
+  } as const;
 
-    // Clear previous SVG content
-    d3.select(currentSvg).selectAll('*').remove();
+  const svgRef = useRef<SVGSVGElement | null>(null);  
 
-    const svg = d3.select(currentSvg)
-      .attr('width', area.plot.width)
-      .attr('height', area.plot.height);
+  const plotWidth = area.plot.width - area.plot.margin.left - area.plot.margin.right;
+  const plotHeight = area.plot.height - area.plot.margin.top - area.plot.margin.bottom;
 
-    // Add a group for the plot area with correct margins
-    const plotGroup = svg.append('g')
-      .attr('transform', `translate(${area.plot.margin.left},${area.plot.margin.top})`);
+  const data = chart.data ?? [];
+  if (!data || data.length === 0) return;
 
-    const time = data.map((d) => d.time);
+  /* gather plot information */
+  const time = data.map((d) => d.time);
+  const currentMetric = selectedMetric.value;
+  const x = d3.scaleLinear()
+    .domain(d3.extent(time) as [number, number])
+    .range([0, plotWidth]);
+  const yData = data.map(({state}) => state[currentMetric]);
+  const y = d3.scaleLinear()
+    .domain([
+      Math.min(0, d3.min(yData) || 0),
+      d3.max(yData) || 1
+    ])
+    .nice()
+    .range([plotHeight, 0]);
 
-    const color = d3.scaleOrdinal<string>()
-      .domain(Object.keys(infectionStates))
-      .range(Object.values(infectionStates).map((state) => state.color));
+  /* draw the plot area and axes */
+  d3.select(svgRef.current).selectAll('*').remove();
+  const svg = d3.select(svgRef.current)
+    .attr('width', area.plot.width)
+    .attr('height', area.plot.height);
+  const plotGroup = svg.append('g')
+    .attr('transform', `translate(${area.plot.margin.left},${area.plot.margin.top})`);
+  plotGroup.append('g')
+    .attr('transform', `translate(0, ${plotHeight})`)
+    .call(d3.axisBottom(x));
+  plotGroup.append('g')
+    .call(d3.axisLeft(y));
 
-    const x = d3.scaleLinear()
-      .domain(d3.extent(time) as [number, number])
-      .range([0, plotWidth]);
+  /* Draw lines for each model_type (multiple lines for "all" model_type) */
+  type GroupedType = Record<MouseMetricKeys, DataElement[]>;
+  const grouped: GroupedType = data.reduce((acc, d) => {
+    const modelType = d.model_type || chart.modelType;
+    if (modelType === 'all') return acc; // skip 'all'
+    if (!acc[modelType]) acc[modelType] = [];
+    acc[modelType].push(d);
+    return acc;
+  }, {} as GroupedType);
 
-    const yData = data.map(({state}) => ({
-      S: state.S,
-      E: state.E,
-      I: state.I,
-      R: state.R,
-      incidence : state.incidence
-    }))
-    const y = d3.scaleLinear()
-      .domain([
-        d3.min(yData, (d) => Math.min(...Object.values(d).flat())) || 0,
-        d3.max(yData, (d) => Math.max(...Object.values(d).flat())) || 0
-      ])
-      .nice()
-      .range([plotHeight, 0]);
+  Object.entries(grouped).forEach(([modelType, group]) => {
+    const styleConfig = lineStyles[modelType as keyof typeof lineStyles];
+    const line = d3.line<DataElement>()
+      .x((d) => x(d.time))
+      .y(({ state }) => Math.max(y(state[currentMetric]), 0));
+    const path = plotGroup.append('path')
+      .datum(group)
+      .attr('fill', 'none')
+      .attr('stroke', styleConfig.color)
+      .attr('stroke-width', 2)
+      .attr('d', line);
+    if (styleConfig.style === 'stroke-dasharray') {
+      path.attr('stroke-dasharray', styleConfig.dashArray);
+    } else {
+      path.attr('stroke-dasharray', null);
+    }
+  });
 
-    plotGroup.append('g')
-      .attr('transform', `translate(0, ${plotHeight})`)
-      .call(d3.axisBottom(x));
+  /* Draw vertical bar if mouseX is set - i.e. if the mouse is within the plot area */
+  if (mouseX.value !== null) {
+    // Get the interpolated y value at mouseTime for each line
+    const mouseTime = x.invert(mouseX.value);
+    Object.entries(grouped).forEach(([modelType, group]) => {
+      // Find the two data points surrounding mouseTime
+      let left = group[0], right = group[group.length - 1];
+      for (let i = 1; i < group.length; i++) {
+        if (group[i].time >= mouseTime) {
+          left = group[i - 1];
+          right = group[i];
+          break;
+        }
+      }
+      let interpY = NaN;
+      if (left && right && left !== right) {
+        const t = (mouseTime - left.time) / (right.time - left.time);
+        interpY = left.state[currentMetric] * (1 - t) + right.state[currentMetric] * t;
+      } else if (left) {
+        interpY = left.state[currentMetric];
+      }
+      if (!isNaN(interpY)) {
+        mouseMetrics.value[modelType as MouseMetricKeys] = interpY;
+      }
+    });
 
-    plotGroup.append('g')
-      .call(d3.axisLeft(y));
+    plotGroup.append('line')
+      .attr('x1', mouseX.value)
+      .attr('x2', mouseX.value)
+      .attr('y1', 0)
+      .attr('y2', plotHeight)
+      .attr('stroke', colorScheme === 'dark' ? '#fff' : '#000')
+      .attr('stroke-width', 1)
+      .attr('stroke-dasharray', '1, 1')
+      .attr('pointer-events', 'none');
 
-    Object.entries(infectionStates)
-      .filter(([key]) => key !== 'time')
-      .forEach(([key, state]) => {
-        const line = d3.line<DataElement>()
-          .x((d) => x(d.time))
-          .y(({ state }) => Math.max(y(state[key as StateKey]), 0));
-
-        plotGroup.append('path')
-          .datum(data)
-          .attr('fill', 'none')
-          .attr('stroke', color(state.color))
-          .attr('stroke-width', 1.5)
-          .attr('d', line);
-      });
-
-    return () => {
-      d3.select(currentSvg).selectAll('*').remove();
-    };
-  }, [
-    data, 
-    area.plot.height,
-    area.plot.width,
-    area.plot.margin.top,
-    area.plot.margin.right,
-    area.plot.margin.bottom,
-    area.plot.margin.left,
-  ]);
+    // Draw a small circle for each line at the closest point
+    Object.entries(grouped).forEach(([modelType, group]) => {
+      // Interpolate y value at mouseTime using d3 line interpolation
+      const styleConfig = lineStyles[modelType as keyof typeof lineStyles];
+      const mouseTime = x.invert(mouseX.value ?? 0);
+      // Find the two data points surrounding mouseTime
+      let left = group[0], right = group[group.length - 1];
+      for (let i = 1; i < group.length; i++) {
+        if (group[i].time >= mouseTime) {
+          left = group[i - 1];
+          right = group[i];
+          break;
+        }
+      }
+      let interpY = NaN;
+      if (left && right && left !== right) {
+        const t = (mouseTime - left.time) / (right.time - left.time);
+        interpY = y(left.state[currentMetric]) * (1 - t) + y(right.state[currentMetric]) * t;
+      } else if (left) {
+        interpY = y(left.state[currentMetric]);
+      }
+      if (!isNaN(interpY)) {
+        plotGroup.append('circle')
+          .attr('cx', mouseX.value)
+          .attr('cy', interpY)
+          .attr('r', 6)
+          .attr('fill', styleConfig.color)
+          .attr('stroke', colorScheme === 'dark' ? '#fff' : '#000')
+          .attr('stroke-width', 2)
+          .attr('pointer-events', 'none');
+      }
+    });
+  }
 
   return (
-    <svg ref={svgRef}></svg>
+    <svg
+      ref={svgRef}
+      width={area.plot.width}
+      height={area.plot.height}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{ cursor: 'crosshair' }}
+    />
   );
 };
 
@@ -127,36 +196,38 @@ const VirusPlot = ({ chart }: VirusPlotProps) => {
 
   if (chart.status === SimulationRunStatuses.LOADING_R) {
     return (
-      <div className={styles.virusPlotRoot}>
-        <h2>{ModelReferences[chart.modelType].label}</h2>
+      <Paper shadow="xs" p="xl" className={styles.virusPlotRoot}>
+
+        <Title order={2}>{ModelReferences[chart.modelType].label}</Title>
+        {/* <h2 className={styles.virusPlotTitle}></h2> */}
         <LoadingSpinner text='Loading project...' />
-      </div>
+      </Paper>
     );
   }
 
   if (chart.status === SimulationRunStatuses.ERROR) {
     return (
-    <div className={styles.virusPlotRoot}>
-      <h2>{ModelReferences[chart.modelType].label}</h2>
-      <div>An error occurred</div>
-    </div>
+      <Paper shadow="xs" p="xl" className={styles.virusPlotRoot}>
+        <Title order={2}>{ModelReferences[chart.modelType].label}</Title>
+        <div>An error occurred</div>
+      </Paper>
     )
   }
 
-  if (chart?.status === SimulationRunStatuses.IN_PROGRESS && (chart as LoadedChart)?.data.length === 0) {
+  if (chart?.status === SimulationRunStatuses.IN_PROGRESS && (chart as LoadedChart)?.data?.length === 0) {
     return (
-      <div className={styles.virusPlotRoot}>
-        <h2>{ModelReferences[chart.modelType].label}</h2>
+      <Paper shadow="xs" p="xl" className={styles.virusPlotRoot}>
+        <Title order={2}>{ModelReferences[chart.modelType].label}</Title>
         <LoadingSpinner text='Crunching numbers...' />
-      </div>
+      </Paper>
     );
   }
 
   return (
-    <div className={styles.virusPlotRoot}>
-      <h2>{ModelReferences[chart.modelType].label}</h2>
+    <Paper shadow="xs" p="sm" className={styles.virusPlotRoot}>
+      <Title order={2}>{ModelReferences[chart.modelType].label}</Title>
       <VirusPlotSvg chart={(chart as LoadedChart)} />
-    </div>
+    </Paper>
   )
 };
 

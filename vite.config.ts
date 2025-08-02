@@ -37,5 +37,5 @@ export default defineConfig({
       },
     },
   },
-  base: process.env.BASE_URL ?? '/r-virus/',
+  base: process.env.BASE_URL || '/',
 })

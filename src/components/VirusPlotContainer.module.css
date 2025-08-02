@@ -1,37 +1,51 @@
+.virusPlotContainerRoot {
+  margin-top: 2rem;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  flex-grow: 1;
+  align-self: flex-start;
+}
+
 .multiVirusPlotContainer {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   align-items: stretch;
-  width: 100%;
+  /* width: 100%; */
 }
 
-.virusPlotContainerRoot {
-  max-width: 100%;
-  min-width: 50%;
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-  flex-grow: 1;
-  justify-content: center;
-  width: 100%;
+
+@media (100px <= width <= 700px) {
+  .multiVirusPlotContainer {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-items: stretch;
+    width: calc(100% - 4rem);
+  }
 }
 
 .virusPlotDisplayOptions {
-  max-width: 100%;
   display: flex;
   flex-direction: row;
+  width: 100%;
   justify-content: center;
   align-items: center;
   gap: 1rem;
-  margin-bottom: 1rem;
-  max-width: 100%;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+.simulationSelector {
+  flex-grow: 1;
+  min-width: 10rem; /* Ensure a minimum width for usability */
 }
 
 /* Ensure all direct children (VirusPlot containers) grow equally */
 .multiVirusPlotContainer > * {
   flex: min-content;
-  min-width: max(30%, 300px); /* Ensure a minimum width for usability */
+  min-width: clamp(20rem, 40%, 100%); /* Ensure a minimum width for usability */
   max-width: 100%;
   display: flex;
 }

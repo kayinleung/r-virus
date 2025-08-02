@@ -5,7 +5,7 @@ import type { WebR as WebRType } from 'webr';
 import { readWebRDataElementsEvents } from '../stream/webREventReader';
 
 import { useSignals } from '@preact/signals-react/runtime';
-import { ModelTypes } from '@state/chart';
+import { ModelReferences, ModelTypes } from '@state/chart';
 import { currentForm } from '@state/form-controls';
 import { maxRunId, MultiRunStatuses, simulationRuns } from '@state/simulation-runs';
 import { getWebR } from 'utils/R';
@@ -26,7 +26,7 @@ export const WebRComponent = () => {
           ...simulationRuns.value,
           [maxRunId.value]: {
             ...simulationRuns.value[maxRunId.value],
-            charts: [...simulationRuns.value[maxRunId.value].charts, {
+            charts: [...simulationRuns.value[1].charts, {
               modelType,
               status: MultiRunStatuses.LOADING_R,
             },
@@ -43,12 +43,11 @@ export const WebRComponent = () => {
 
   useEffect(() => {
 
-    const compute = async () => {
+    const compute = async ({webR, runId}: {webR?: WebRType, runId: number}) => {
       if( !webR ) {
         return;
       }
       const simulationId = uuidv4();
-      // const rCode = rCodeModelReference; // Default to model_reference for now
       const parameterizedRCode = rCode
         .replace(/`\${simulation_id}`/g, simulationId)
         .replace(/`\${population_size}`/g, String(currentForm.value.populationSize))
@@ -65,8 +64,20 @@ export const WebRComponent = () => {
       
       simulationRuns.value = {
         ...simulationRuns.value,
-        [maxRunId.value]: {
-          ...simulationRuns.value[1],
+        [runId]: {
+          charts: [{
+            modelType: ModelReferences.model_reference.value,
+            status: MultiRunStatuses.IN_PROGRESS,
+          }, {
+            modelType: ModelReferences.model_network_poisson.value,
+            status: MultiRunStatuses.IN_PROGRESS,
+          }, {
+            modelType: ModelReferences.model_network_negative_binomial.value,
+            status: MultiRunStatuses.IN_PROGRESS,
+          }, {
+            modelType: ModelReferences.all.value,
+            status: MultiRunStatuses.IN_PROGRESS,
+          }],
           formValues: currentForm.value,
           status: MultiRunStatuses.IN_PROGRESS,
         }
@@ -74,7 +85,7 @@ export const WebRComponent = () => {
       webR.evalRVoid(parameterizedRCode, { captureStreams: false });
       readWebRDataElementsEvents({ webR });
     };
-    compute();
+    compute({ webR, runId: maxRunId.value });
   }, [webR, maxRunId.value]);
 
   return <VirusPlotContainer />

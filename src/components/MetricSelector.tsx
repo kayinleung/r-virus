@@ -1,28 +1,23 @@
-import { MenuItem, Select, FormControl, InputLabel, SelectChangeEvent } from '@mui/material';
+import { Select } from '@mantine/core';
+import { useSignal } from '@preact/signals-react';
 import { StateKey, StateKeys, selectedMetric } from '@state/chart';
 
 const MetricSelector = () => {
 
-  const handleSelectChange = (event: SelectChangeEvent) => {
-    selectedMetric.value = event.target.value as StateKey;
+  useSignal();
+
+  const handleSelectChange = (value: string | null) => {
+    selectedMetric.value = value as StateKey;
   };
 
   return (
-    <FormControl>
-      <InputLabel id="simulation-selector-label">Metric</InputLabel>
-      
-      <Select
-        name="selectedMetric"
-        labelId="metric-selector-label"
-        value={selectedMetric.value}
-        label="Metric"
-        onChange={handleSelectChange}
-      >
-        {Object.entries(StateKeys).map(([key, { value, label }]) => (
-          <MenuItem key={key} value={value}>{label}</MenuItem>
-        ))}
-      </Select>
-    </FormControl>
+
+    <Select
+      label="Metric"
+      value={selectedMetric.value}
+      onChange={handleSelectChange}
+      data={Object.entries(StateKeys).map(([key, { label }]) => ({ value: key, label }))}
+    />
   );
 };
 
