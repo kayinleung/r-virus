@@ -90,32 +90,32 @@ export const currentSimulationRunStatus = computed(() => {
   return MultiRunStatuses.COMPLETED;
 });
 
-type SetSimulationStatusProps = {
-  modelType: ModelType;
-  status: SimulationRunStatus;
-};
-export const setSimulationRunStatus = ({modelType, status}: SetSimulationStatusProps) => {
+// type SetSimulationStatusProps = {
+//   modelType: ModelType;
+//   status: SimulationRunStatus;
+// };
+// export const setSimulationRunStatus = ({modelType, status}: SetSimulationStatusProps) => {
 
-  const existingCharts = simulationRuns.value[executingSimulationRunNumber.value].charts;
+//   const existingCharts = simulationRuns.value[executingSimulationRunNumber.value].charts;
 
-  const updatedChart = existingCharts.find((chart) => chart.modelType === modelType);
+//   const updatedChart = existingCharts.find((chart) => chart.modelType === modelType);
 
-  if( !updatedChart ) {
-    console.error(`Simulation of type ${modelType} in run ${executingSimulationRunNumber.value} not found.`);
-    return;
-  }
-  simulationRuns.value = {
-    ...simulationRuns.value,
-    [executingSimulationRunNumber.value]: {
-      ...simulationRuns.value[executingSimulationRunNumber.value],
-      charts: existingCharts.map((chart) =>
-        chart.modelType === modelType
-          ? {
-              ...updatedChart,
-              status,
-            }
-          : chart
-      ),
-    },
-  };
-};
+//   if( !updatedChart ) {
+//     console.error(`Simulation of type ${modelType} in run ${executingSimulationRunNumber.value} not found.`);
+//     return;
+//   }
+//   simulationRuns.value = {
+//     ...simulationRuns.value,
+//     [executingSimulationRunNumber.value]: {
+//       ...simulationRuns.value[executingSimulationRunNumber.value],
+//       charts: existingCharts.map((chart) =>
+//         chart.modelType === modelType
+//           ? {
+//               ...updatedChart,
+//               status,
+//             }
+//           : chart
+//       ),
+//     },
+//   };
+// };

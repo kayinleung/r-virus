@@ -18,7 +18,6 @@ const VirusPlotSvg = ({ chart }: { chart: LoadedChart}) => {
   useSignals();
 
   const matchesMediumAndUp = useMediaQuery('(min-width: 800px)');
-  console.log('VirusPlot - matchesMediumAndUp=', matchesMediumAndUp);
   const area = {
     plot: {
       width: matchesMediumAndUp ? ((document.documentElement.clientWidth * 0.7) - (2 * 50)) : (document.documentElement.clientWidth / 2.5), // Width of the plot area including margins
@@ -126,7 +125,7 @@ const VirusPlot = ({ chart }: VirusPlotProps) => {
     )
   }
 
-  if (chart?.status === SimulationRunStatuses.IN_PROGRESS && (chart as LoadedChart)?.data.length === 0) {
+  if (chart?.status === SimulationRunStatuses.IN_PROGRESS && (chart as LoadedChart)?.data?.length === 0) {
     return (
       <Paper shadow="xs" p="xl" className={styles.virusPlotRoot}>
         <Title order={2}>{ModelReferences[chart.modelType].label}</Title>
@@ -137,7 +136,7 @@ const VirusPlot = ({ chart }: VirusPlotProps) => {
 
   return (
     <Paper shadow="xs" p="sm" className={styles.virusPlotRoot}>
-        <Title order={2}>{ModelReferences[chart.modelType].label}</Title>
+      <Title order={2}>{ModelReferences[chart.modelType].label}</Title>
       <VirusPlotSvg chart={(chart as LoadedChart)} />
     </Paper>
   )
