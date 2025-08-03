@@ -1,11 +1,11 @@
 import { VirusPlot } from '@components/VirusPlot';
+import { useMediaQuery } from '@mantine/hooks';
 import { useSignals } from '@preact/signals-react/runtime';
 import { ModelReferences } from '@state/chart';
-import { displayedRunId, displayedSimulationRun, type Chart, type LoadedChart } from '@state/simulation-runs';
+import { displayedRunId, displayedSimulationRun } from '@state/simulation-runs';
 import { MetricSelector } from './MetricSelector';
 import { SimulationSelector } from './SimulationSelector';
 import styles from './VirusPlotContainer.module.css';
-import { useMediaQuery } from '@mantine/hooks';
 
 const VirusPlotContainer = () => {
 
