@@ -7,6 +7,13 @@
   align-self: flex-start;
 }
 
+@media (100px <= width <= 700px) {
+  .virusPlotContainerRoot {
+    margin-top: 0rem; /* taken care of by appRoot gap */
+  }
+  
+}
+
 .multiVirusPlotContainer {
   display: flex;
   flex-direction: row;
@@ -22,14 +29,13 @@
     flex-direction: column;
     flex-wrap: wrap;
     align-items: stretch;
-    width: calc(100% - 4rem);
   }
 }
 
 .virusPlotDisplayOptions {
   display: flex;
   flex-direction: row;
-  width: 100%;
+  width: calc(100% - 1rem);
   justify-content: center;
   align-items: center;
   gap: 1rem;

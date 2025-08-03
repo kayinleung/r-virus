@@ -1,7 +1,9 @@
 .legendRoot {
   flex-wrap: wrap;
   gap: 0.5rem;
-  margin: 0.5rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  height: 8rem;
 }
 
 .legendItem {

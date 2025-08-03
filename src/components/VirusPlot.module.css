@@ -8,7 +8,6 @@
   margin: 0.5rem;
   flex: 1 1 0;
   width: clamp(40rem, 70%, 70%); /* Responsive width */
-  width: 100%; /* Ensure full width of parent flex item */
   box-sizing: border-box; /* Prevent overflow from padding/border */
   max-height: min-content; /* Allow height to adjust based on content */
 }
@@ -17,9 +16,9 @@
 }
 @media (prefers-color-scheme: dark) {
   .virusPlotRoot {
+    width: min-content; /* Responsive width */
     & text {
       fill: white;
     }
-    /* border-color: var(--font-color-dark); */
   }
 }

@@ -28,17 +28,24 @@ const VirusPlotSvg = ({ chart }: { chart: LoadedChart}) => {
     mouseX.value = e.clientX - svgRect.left - area.plot.margin.left;
   };
 
+  const handleTouchMove = (e: React.TouchEvent<SVGSVGElement>) => {
+    const svgRect = svgRef.current?.getBoundingClientRect();
+    if(!svgRect) return;
+
+    mouseX.value = e.touches[0].clientX - svgRect.left - area.plot.margin.left;
+  };
+
   const matchesMediumAndUp = useMediaQuery('(min-width: 800px)');
   const colorScheme = useColorScheme();
   const area = {
     plot: {
-      width: matchesMediumAndUp ? ((document.documentElement.clientWidth * (0.7 / 2)) - (2 * 20)) : ((document.documentElement.clientWidth * 0.7) - (2 * 20)),
+      width: matchesMediumAndUp ? ((document.documentElement.clientWidth * (0.7 / 2)) - (2 * 20)) : ((document.documentElement.clientWidth * 0.7)),
       height: matchesMediumAndUp ? ((document.documentElement.clientHeight * 0.5) - 125) : ((document.documentElement.clientHeight * 0.33) - 125),
       margin: {
         top: matchesMediumAndUp ? 20 : 20,
         right: matchesMediumAndUp ? 20 : 10,
-        bottom: 50,
-        left: matchesMediumAndUp ? 60 : 100,
+        bottom: 20,
+        left: matchesMediumAndUp ? 60 : 20,
       },
     },
     legend: { height: 0 },
@@ -185,6 +192,8 @@ const VirusPlotSvg = ({ chart }: { chart: LoadedChart}) => {
       height={area.plot.height}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleMouseLeave}
       style={{ cursor: 'crosshair' }}
     />
   );
