@@ -8,7 +8,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 // TODO: Add another "Info" page
 const router = createBrowserRouter([
   {
-    path: "/",
+    path: "/r-virus/",
     element: <App />,
     errorElement: <div>Error</div>,
   },
