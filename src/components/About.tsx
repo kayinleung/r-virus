@@ -11,13 +11,13 @@ export const About = () => {
       <p>Data science development and data modeling done by <a href="https://www.linkedin.com/in/kayinleung/">Ka Yin Leung</a>; Web application development by <a href="https://www.linkedin.com/in/jgf5013/">John Fisher</a>.</p>
       <div className={styles.aboutImages}>
         <Image
-          src="./Kayin.webp"
+          src="/Kayin.webp"
           className={styles.aboutImage}
           alt="Ka Yin Leung"
           onClick={() => window.open("https://www.linkedin.com/in/kayinleung/", "_blank")}
         />
         <Image
-          src="./John.webp"
+          src="/John.webp"
           className={styles.aboutImage}
           alt="John Fisher"
           onClick={() => window.open("https://www.linkedin.com/in/jgf5013/", "_blank")}
