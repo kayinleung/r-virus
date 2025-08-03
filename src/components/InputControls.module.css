@@ -4,6 +4,30 @@
 	flex-direction: column;
 }
 
+@media (max-width: 700px) {
+	.inputControls {
+		flex-direction: row-reverse;
+		align-items: stretch;
+		overflow-y: scroll;
+    max-height: 30vh;
+	}
+}
+
+
+@media (max-width: 700px) {
+	.inputControlOptions {
+		flex-grow: 1;
+	}
+}
+
 .refresh {
 	align-self: flex-end;
+	position: sticky;
+	top: 0;
+}
+
+@media (max-width: 700px) {
+	.refresh {
+		align-self: flex-start;
+	}
 }

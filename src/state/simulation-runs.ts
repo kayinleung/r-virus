@@ -10,9 +10,9 @@ export type LoadingChart = {
 };
 
 export type LoadedChart = {
+  status: SimulationRunStatus;
   modelType: ModelType;
   data: DataElement[];
-  status: SimulationRunStatus;
 };
 
 export type Chart = LoadingChart | LoadedChart;

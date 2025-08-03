@@ -20,12 +20,18 @@
 
 @media (100px <= width <= 700px) {
   .appRoot {
-    margin: 1rem;
-    width: 100vw;
-    max-width: 100vw;
+    margin: 0.5rem;
     flex-direction: column;
     justify-content: space-between;
     box-sizing: border-box;
     overflow-x: hidden;
+  }
+
+
+  .navBar {
+    min-width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-self: flex-start;
   }
 }

@@ -2,13 +2,15 @@ import { lineStyles, ModelReferences, mouseMetrics, mouseX, selectedMetric, Stat
 import styles from './Legend.module.css';
 import { Paper, Title, Text } from '@mantine/core';
 import { useSignals } from '@preact/signals-react/runtime';
+import { useMediaQuery } from '@mantine/hooks';
 
 const Legend = () => {
   useSignals();
+  const matchesMediumAndUp = useMediaQuery('(min-width: 800px)');
   return (
     <Paper p="sm" className={styles.legendRoot}>
       <Title order={3}>{StateKeys[selectedMetric.value].label}{mouseX.value && `: t = ${Math.floor(mouseX.value)}`}</Title>
-      {!(mouseMetrics.value && mouseX.value) && <Text>Hover over a plot to see the legend.</Text>}
+      {!(mouseMetrics.value && mouseX.value) && <Text>{matchesMediumAndUp ? 'Hover over a plot to see the legend.' : 'Drag on the plot to see the legend.'}</Text>}
       {(mouseMetrics.value && mouseX.value) && Object.entries(mouseMetrics.value)
       .sort(([a], [b]) => {
         return ModelReferences[a as keyof typeof ModelReferences].order - ModelReferences[b as keyof typeof ModelReferences].order;

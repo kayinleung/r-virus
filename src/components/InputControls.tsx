@@ -27,7 +27,7 @@ const InputControls = () => {
     <Paper p="sm" className={styles.inputControls}>
 
       <Refresh className={styles.refresh} />
-      <div>
+      <div className={styles.inputControlOptions}>
         <Select
           label="Archetype"
           value={currentForm.value.archetype}
