@@ -24,7 +24,7 @@ const InputControls = () => {
   }
 
   return (
-    <Paper p="sm" className={styles.inputControls}>
+    <Paper shadow="xs" p="sm" className={styles.inputControls}>
 
       <Refresh className={styles.refresh} />
       <div className={styles.inputControlOptions}>

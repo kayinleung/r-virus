@@ -8,7 +8,7 @@ const Legend = () => {
   useSignals();
   const matchesMediumAndUp = useMediaQuery('(min-width: 800px)');
   return (
-    <Paper p="sm" className={styles.legendRoot}>
+    <Paper shadow="xs" p="sm" className={styles.legendRoot}>
       <Title order={3}>{StateKeys[selectedMetric.value].label}{mouseX.value && `: t = ${Math.floor(mouseX.value)}`}</Title>
       {!(mouseMetrics.value && mouseX.value) && <Text>{matchesMediumAndUp ? 'Hover over a plot to see the legend.' : 'Drag on the plot to see the legend.'}</Text>}
       {(mouseMetrics.value && mouseX.value) && Object.entries(mouseMetrics.value)
