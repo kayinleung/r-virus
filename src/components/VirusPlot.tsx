@@ -24,8 +24,26 @@ const VirusPlotSvg = ({ chart }: { chart: LoadedChart}) => {
   const handleMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {
     const svgRect = svgRef.current?.getBoundingClientRect();
     if(!svgRect) return;
+    
+    // Get mouse x position within plot area
+    const mouseXPos = e.clientX - svgRect.left - area.plot.margin.left;
+    mouseX.value = mouseXPos;
 
-    mouseX.value = e.clientX - svgRect.left - area.plot.margin.left;
+    // Find the closest time value from the data to the mouse position
+    const mouseTime = x.invert(mouseXPos);
+    let closestTime = data[0]?.time;
+    let minDist = Math.abs(mouseTime - closestTime);
+
+    for (let i = 1; i < data.length; i++) {
+      const dist = Math.abs(mouseTime - data[i].time);
+      if (dist < minDist) {
+        closestTime = data[i].time;
+        minDist = dist;
+      }
+    }
+
+    // Set mouseMetrics.value.t to the closest time
+    mouseMetrics.value.t = closestTime;
   };
 
   const handleTouchMove = (e: React.TouchEvent<SVGSVGElement>) => {

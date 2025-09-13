@@ -34,13 +34,14 @@ export const infectionStates: InfectionStateMap = {
 export const selectedMetric = signal<StateKey>(StateKeys.I.value);
 
 export const mouseX = signal<number | null>(null);
-export type MouseMetricKeys = Exclude<keyof typeof ModelReferences, 'all'>;
+export type MouseMetricKeys = Exclude<keyof typeof ModelReferences, 'all'> | 't';
 
 type MouseMetric = Record<MouseMetricKeys, number|null>;
 export const mouseMetrics = signal<MouseMetric>({
   model_reference: null,
   model_network_poisson: null,
-  model_network_negative_binomial: null
+  model_network_negative_binomial: null,
+  t: null
 });
 
 export const lineStyles = {

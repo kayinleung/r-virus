@@ -5,10 +5,17 @@ import { archetypeCorollaries, archetypeOptions, currentForm, MAX_INDEX, MIN_IND
 import { NumberInput, Paper, Select } from '@mantine/core';
 import styles from './InputControls.module.css';
 import { Refresh } from "./Refresh";
+import { useState } from "preact/hooks";
 
 const InputControls = () => {
 
   useSignals();
+
+  const [repNum, setRepNum] = useState(currentForm.value.reproductionNumber);
+  const [serialNum, setSerialNum] = useState(currentForm.value.serialInterval);
+  const [mean, setMean] = useState(currentForm.value.mu);
+  const [disp, setDisp] = useState(currentForm.value.dispersion);
+  const [p, setP] = useState(currentForm.value.populationSize);
 
   const handleArchetypeChange = (archetype: string | null) => {
     updateArchetypeCorollaries(archetype as typeof archetypeOptions[number]);
@@ -22,6 +29,7 @@ const InputControls = () => {
   function handleNumberChange({ field, value }: NumberChangeProps) {
     currentForm.value[field] = value;
   }
+
 
   return (
     <Paper shadow="xs" p="sm" className={styles.inputControls}>
@@ -39,35 +47,35 @@ const InputControls = () => {
           value={currentForm.value.reproductionNumber}
           min={archetypeCorollaries.value.reproductionNumber.range[MIN_INDEX]}
           max={archetypeCorollaries.value.reproductionNumber.range[MAX_INDEX]}
-          onChange={(value) => handleNumberChange({ field: "reproductionNumber", value: Number(value) }) }
+          onChange={(value) =>  { setRepNum(Number(value)); handleNumberChange({ field: "reproductionNumber", value: Number(value) }) }}
         />
         <NumberInput
           label="Serial Interval"
           value={currentForm.value.serialInterval}
           min={archetypeCorollaries.value.serialInterval.range[MIN_INDEX]}
           max={archetypeCorollaries.value.serialInterval.range[MAX_INDEX]}
-          onChange={(value) => handleNumberChange({ field: "serialInterval", value: Number(value) }) }
+          onChange={(value) =>  { setSerialNum(Number(value)); handleNumberChange({ field: "serialInterval", value: Number(value) }) }}
         />
         <NumberInput
           label="Mean Degree"
           value={currentForm.value.mu}
           min={0}
           max={100}
-          onChange={(value) => handleNumberChange({ field: "mu", value: Number(value) }) }
+          onChange={(value) => { setMean(Number(value)); handleNumberChange({ field: "mu", value: Number(value) }) }}
         />
         <NumberInput
           label="Dispersion"
           value={currentForm.value.dispersion}
           min={0}
           max={10}
-          onChange={(value) => handleNumberChange({ field: "dispersion", value: Number(value) }) }
+          onChange={(value) => { setDisp(Number(value)); handleNumberChange({ field: "dispersion", value: Number(value) }) }}
         />
         <NumberInput
           label="Population"
-          value={currentForm.value.populationSize}
+          value={p}
           min={10}
           max={1e10}
-          onChange={(value) => handleNumberChange({ field: "populationSize", value: Number(value) }) }
+          onChange={(value) => { setP(Number(value)); handleNumberChange({ field: "populationSize", value: Number(value) }) }}
         />
       </div>
     </Paper>

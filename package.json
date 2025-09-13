@@ -18,7 +18,7 @@
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
     "@fortawesome/react-fontawesome": "^0.2.2",
-    "@mantine/core": "^8.2.1",
+    "@mantine/core": "^8.3.1",
     "@mantine/form": "^8.2.1",
     "@mantine/hooks": "^8.2.1",
     "@preact/signals-react": "^3.0.1",
@@ -55,5 +55,6 @@
     "vite": "^6.1.0",
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^3.2.3"
-  }
+  },
+  "packageManager": "yarn@1.22.22+sha1.ac34549e6aa8e7ead463a7407e1c7390f61a6610"
 }

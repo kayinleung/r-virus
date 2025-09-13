@@ -25,6 +25,8 @@ const archetypes = {
       range: [2.78, 4.19],
     }
   } },
+  // TODO: JFisher
+  // '3': { value: 2, label: 'user', corollaries: {} },
 } as const;
 
 
@@ -66,6 +68,10 @@ export type DataElement = {
   };
 };
 
+export type DataElementError = {
+  model_type: ModelType;
+};
+
 export type ErrorMessage = {
   simulation_id: string;
   message?: string;
@@ -77,7 +83,7 @@ export const currentForm = signal<FormValues>({
   modelType: 'model_reference',
   degreeDistribution: 'poisson',
   infection: 'SEIR',
-  timeEnd: 75,
+  timeEnd: 100,
   increment: 1,
   seedInfected: 1e-3,
   mu: 5.4,
@@ -100,9 +106,13 @@ export const updateArchetypeCorollaries = (archetypeLabel: ArchetypeOption) => {
   currentForm.value = {
     ...currentForm.value,
     archetype: archetypeLabel,
-    reproductionNumber: archetype.corollaries.reproductionNumber.default,
-    serialInterval: archetype.corollaries.serialInterval.default,
   };
+  // TODO: JFisher
+  // if(archetype.corollaries?.reproductionNumber !== undefined) {
+  //   currentForm.value = {
+  //     ...currentForm.value,
+  //     reproductionNumber: archetype.corollaries?.reproductionNumber?.default,
+  //   }
 };
 
 export const archetypeCorollaries = computed(() => {

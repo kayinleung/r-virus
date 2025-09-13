@@ -18,10 +18,15 @@ export type LoadedChart = {
 export type Chart = LoadingChart | LoadedChart;
 
 
+type EndStat = {
+  totalRecovered: number;
+};
+
 export type SimulationRun = {
   formValues: FormValues;
   status: MultiRunStatus;
   charts: Chart[];
+  endStats: EndStat;
 };
 
 export type MultiSimulationRun = {
@@ -56,6 +61,7 @@ export const simulationRuns = signal<MultiSimulationRun>({
     },
     status: MultiRunStatuses.LOADING_R,
     charts: [],
+    endStats: { totalRecovered: 0 },
   },
 });
 
@@ -70,6 +76,7 @@ export const createNewRun = () => {
       },
       status: MultiRunStatuses.IN_PROGRESS,
       charts: [],
+      endStats: { totalRecovered: 0 },
     },
   };
 };

@@ -1,5 +1,7 @@
-import type { DataElement, ErrorMessage } from '@state/form-controls';
+import { ModelReferences } from '@state/chart';
+import type { DataElement, DataElementError, ErrorMessage } from '@state/form-controls';
 import { executingSimulationRunNumber, LoadedChart, simulationRuns, SimulationRunStatuses } from '@state/simulation-runs';
+import { mode } from 'd3';
 import type { WebR as WebRType } from 'webr';
 
 export type ParsedDataMessage = {
@@ -7,7 +9,7 @@ export type ParsedDataMessage = {
   remainingString: string;
 }
 export type ParsedErrorMessage = {
-  error: ErrorMessage;
+  dataElement: DataElementError;
   isError: true;
 };
 
@@ -28,17 +30,12 @@ export const extractJsonObject = (inputString: string): ParsedMessage | null => 
     if(!(parsedMessage && typeof parsedMessage === 'object')) {
       return null;
     }
-    if ('error' in parsedMessage) {
+    if(typeof (parsedMessage as DataElement).state?.['S'] !== 'number') {
+      const message = parsedMessage as DataElementError;
+      console.error('webREventReader - Invalid data element - missing or invalid state.S');
       return {
-        ...parsedMessage,
-        isError: true,
-      } as ParsedErrorMessage;
-    }
-    if(typeof (parsedMessage as DataElement).state['S'] !== 'number') {
-      return {
-        error: {
-          simulation_id: (parsedMessage as DataElement).simulation_id,
-          message: 'NA data element',
+        dataElement: {
+          model_type: message?.model_type
         },
         isError: true,
       } as ParsedErrorMessage;
@@ -65,12 +62,13 @@ export const readWebRDataElementsEvents = async ({webR}: EventReaderProps) => {
   webR.flush();
 
   for await (const item of webR.stream()) {
+    console.log('webREventReader - item=', item);
     if (item.type === 'stderr') {
-      // setSimulationRunStatus({
-      //   modelType,
-      //   status: SimulationRunStatuses.ERROR,
-      // });
-      continue;
+      const parsedResult = extractJsonObject(item.data);
+      // const { dataElement } = parsedResult ?? {};
+      if ((parsedResult as ParsedErrorMessage)?.isError) {
+        console.log(`stopping ${parsedResult?.dataElement.model_type}!!!`);
+      }
     }
     try {
       webR.flush();
@@ -78,9 +76,10 @@ export const readWebRDataElementsEvents = async ({webR}: EventReaderProps) => {
       if (!parsedResult) {
         continue;
       }
-      if((parsedResult as ParsedErrorMessage).isError) {
-        continue;
-      }
+      // if((parsedResult as ParsedErrorMessage).isError) {
+      //   console.log('webREventReader - Skipping error message');
+      //   continue;
+      // }
       const { dataElement } = parsedResult as ParsedDataMessage;
       const existingCharts = (simulationRuns.value[executingSimulationRunNumber.value].charts as LoadedChart[]);
       const updatingChart = existingCharts.find((chart) => chart.modelType === dataElement.model_type);
@@ -89,6 +88,11 @@ export const readWebRDataElementsEvents = async ({webR}: EventReaderProps) => {
       if( !updatingChart ) {
         console.error(`Simulation of type ${dataElement.model_type} not found in current run - creating entry...`);
       }
+
+      const isChartInProgress = dataElement.time < simulationRuns.value[executingSimulationRunNumber.value].formValues.timeEnd;
+      const isChartInError = (parsedResult as ParsedErrorMessage).isError;
+      const chartStatus = isChartInError ? SimulationRunStatuses.ERROR :
+        (isChartInProgress ? SimulationRunStatuses.IN_PROGRESS : SimulationRunStatuses.COMPLETED);
 
       // The chart already exists, so we update it
       simulationRuns.value = {
@@ -100,9 +104,7 @@ export const readWebRDataElementsEvents = async ({webR}: EventReaderProps) => {
               ? {
                   ...chart,
                   data: [...(chart.data ?? []), dataElement],
-                  status: dataElement.time < simulationRuns.value[executingSimulationRunNumber.value].formValues.timeEnd
-                    ? SimulationRunStatuses.IN_PROGRESS
-                    : SimulationRunStatuses.COMPLETED,
+                  status: chartStatus,
                 }
               : chart
           ),
