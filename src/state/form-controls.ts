@@ -46,7 +46,6 @@ export type FormValues = {
   modelType: ModelType;
   degreeDistribution: string;
   infection: string;
-  timeEnd: number;
   increment: number;
   seedInfected: number;
   mu: number;
@@ -83,8 +82,7 @@ export const currentForm = signal<FormValues>({
   modelType: 'model_reference',
   degreeDistribution: 'poisson',
   infection: 'SEIR',
-  timeEnd: 100,
-  increment: 1,
+  increment: 0.5,
   seedInfected: 1e-3,
   mu: 5.4,
   dispersion: 10,
