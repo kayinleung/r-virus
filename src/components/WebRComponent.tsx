@@ -52,7 +52,6 @@ export const WebRComponent = () => {
         .replace(/`\${simulation_id}`/g, simulationId)
         .replace(/`\${population_size}`/g, String(currentForm.value.populationSize))
         .replace(/`\${serial_interval}`/g, String(currentForm.value.serialInterval))
-        .replace(/`\${time_end}`/g, String(currentForm.value.timeEnd))
         .replace(/`\${model_type}`/g, currentForm.value.modelType)
         .replace(/`\${reproduction_number}`/g, String(currentForm.value.reproductionNumber))
         .replace(/`\${increment}`/g, String(currentForm.value.increment))
