@@ -4,29 +4,16 @@ library(jsonlite)
 
 tryCatch({
   # negative binomial network model
-  print("Starting simulation 0...", stdout())
-  flush.console()
   size = `${dispersion}`
   prob = size / (size + `${mu}`)
 
-  print("Starting simulation 1...", stdout())
-  flush.console()
   degree_nb = list(degree_distribution = "negative_binomial", size = size, prob = prob)
   c_degree_nb = mean_excess_degree(degree_nb)
 
-  print("Starting simulation 2...", stdout())
-  flush.console()
-
-  if (c_degree_nb - `${reproduction_number}` < 0) {
-    print("Invalid parameters: c_degree_nb must be greater than reproduction_number", stderr())
-    print("Invalid parameters: c_degree_nb must be greater than reproduction_number", stdout())
-    flush.console()
-    stop("Invalid parameters: c_degree_nb must be greater than reproduction_number")
+  if (c_degree_nb - `${reproduction_number}` <= 0) {
+    message("Invalid parameters: c_degree_nb must be greater than reproduction_number")
   }
 
-
-  print("Starting simulation 3...", stdout())
-  flush.console()
   infectiousness_rate_nb = 2 / `${serial_interval}`
   recovery_rate_nb = 2 / `${serial_interval}`
   transmission_rate_nb = `${reproduction_number}` * recovery_rate_nb / (c_degree_nb - `${reproduction_number}`)
@@ -42,31 +29,20 @@ tryCatch({
     degree_nb
   ) 
 
-  print("Starting simulation 4...", stdout())
-  flush.console()
   #poisson network model
   lambda = `${mu}`
 
   degree_poisson = list(degree_distribution = "poisson", lambda = lambda)
   c_degree_poisson = mean_excess_degree(degree_poisson)
 
-  print("Starting simulation 5...", stdout())
-  flush.console()
-  if (c_degree_poisson - `${reproduction_number}` < 0) {
-    print("Invalid parameters: c_degree_poisson must be greater than reproduction_number", stderr())
-    print("Invalid parameters: c_degree_poisson must be greater than reproduction_number", stdout())
-    flush.console()
-    stop("Invalid parameters: c_degree_poisson must be greater than reproduction_number")
+  if (c_degree_poisson - `${reproduction_number}` <= 0) {
+    message("Invalid parameters: c_degree_poisson must be greater than reproduction_number")
   }
 
-  print("Starting simulation 6...", stdout())
-  flush.console()
   infectiousness_rate_poisson = 2 / `${serial_interval}`
   recovery_rate_poisson = 2 / `${serial_interval}`
   transmission_rate_poisson = `${reproduction_number}` * recovery_rate_poisson / (c_degree_poisson - `${reproduction_number}`)
 
-  print("Starting simulation 7...", stdout())
-  flush.console()
   params_p <- c(list(
     transmission_rate = transmission_rate_poisson,
     infectiousness_rate = infectiousness_rate_poisson,
@@ -75,8 +51,6 @@ tryCatch({
     seed_infected = `${seed_infected}`
   ), degree_poisson)
 
-  print("Starting simulation 8...", stdout())
-  flush.console()
   # reference model
   infectiousness_rate_reference = 2 / `${serial_interval}`
   recovery_rate_reference = 2 / `${serial_interval}`
@@ -89,16 +63,27 @@ tryCatch({
           seed_infected = `${seed_infected}`
   )
 
-  print("Starting simulation 9...", stdout())
-  flush.console()
-  models_combined(simulation_id = "`${simulation_id}`", time_end = `${time_end}`, increment = `${increment}`, params_p, params_nb, params_reference)
+  # calculate theoretical final size
+  final_size_reference <- theory_reference_final_size(r_0 = `${reproduction_number}`)
 
-  print("Starting simulation 10...", stdout())
-  flush.console()
+  # simulate
+  time_end <- ceiling(2 * `${serial_interval}`)
+  combined_states <- models_combined(time_end, increment = `${increment}`, params_p, params_nb, params_reference)
+  for (i in 3:30) {
+    print(final_size_reference - combined_states$reference["R"] / `${population_size}`)
+    if (final_size_reference - combined_states$reference["R"] / `${population_size}` > 1E-5) {
+        for (t in seq(time_end, time_end + `${serial_interval}`, by = increment)) {
+          current_state_network_p <- simulate_outbreak_seir_network(t, increment, combined_states$network_poisson, params_p)
+          current_state_network_nb <- simulate_outbreak_seir_network(t, increment, combined_states$network_nb, params_nb)
+          current_state_reference <- simulate_outbreak_seir_reference(t, increment, combined_states$reference, params_reference)
+      }
+    }
+  }
+  
+
 }, error = function(e) {
   print(jsonlite::toJSON(
-    list(error = list(simulation_id = "`${simulation_id}`"), 
-        message = conditionMessage(e)), 
+    list(message = conditionMessage(e)), 
     auto_unbox = TRUE, 
     pretty = FALSE
   ), stderr())
