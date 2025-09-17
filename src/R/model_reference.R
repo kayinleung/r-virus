@@ -67,16 +67,25 @@ tryCatch({
   final_size_reference <- theory_reference_final_size(r_0 = `${reproduction_number}`)
 
   # simulate
-  time_end <- ceiling(2 * `${serial_interval}`)
+  time_end <- ceiling(6 * `${serial_interval}`)
   combined_states <- models_combined(time_end, increment = `${increment}`, params_p, params_nb, params_reference)
-  for (i in 3:30) {
-    print(final_size_reference - combined_states$reference["R"] / `${population_size}`)
-    if (final_size_reference - combined_states$reference["R"] / `${population_size}` > 1E-5) {
-        for (t in seq(time_end, time_end + `${serial_interval}`, by = increment)) {
-          current_state_network_p <- simulate_outbreak_seir_network(t, increment, combined_states$network_poisson, params_p)
-          current_state_network_nb <- simulate_outbreak_seir_network(t, increment, combined_states$network_nb, params_nb)
-          current_state_reference <- simulate_outbreak_seir_reference(t, increment, combined_states$reference, params_reference)
+  
+  # initial value for the next steps
+  current_state_network_p <- combined_states$network_poisson
+  current_state_network_nb <- combined_states$network_nb
+  current_state_reference <- combined_states$reference
+
+  for (i in 7:20) {
+    # check if final size is already reached
+    if (final_size_reference - current_state_reference["R"] / `${population_size}` > 1E-4) {
+      # determine the next time steps
+      time_interval <- seq(time_end + `${increment}`, time_end + `${serial_interval}`, by = `${increment}`)
+        for (t in time_interval) {
+          current_state_network_p <- simulate_outbreak_seir_network(t, `${increment}`, current_state_network_p, params_p)
+          current_state_network_nb <- simulate_outbreak_seir_network(t, `${increment}`, current_state_network_nb, params_nb)
+          current_state_reference <- escape2024:::simulate_outbreak_seir_reference(t, `${increment}`, current_state_reference, params_reference)$current
       }
+      time_end <- time_interval[length(time_interval)]
     }
   }
   
