@@ -83,7 +83,7 @@ export const currentForm = signal<FormValues>({
   degreeDistribution: 'poisson',
   infection: 'SEIR',
   increment: 0.5,
-  seedInfected: 1e-3,
+  seedInfected: 1e-5,
   mu: 5.4,
   dispersion: 10,
   serialInterval: archetypes[DEFAULT_ARCHETYPE].corollaries.serialInterval.default,
