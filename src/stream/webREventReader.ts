@@ -1,7 +1,5 @@
-import { ModelReferences } from '@state/chart';
-import type { DataElement, DataElementError, ErrorMessage } from '@state/form-controls';
+import type { DataElement, DataElementError } from '@state/form-controls';
 import { executingSimulationRunNumber, LoadedChart, simulationRuns, SimulationRunStatuses } from '@state/simulation-runs';
-import { mode } from 'd3';
 import type { WebR as WebRType } from 'webr';
 
 export type ParsedDataMessage = {
@@ -89,11 +87,9 @@ export const readWebRDataElementsEvents = async ({webR}: EventReaderProps) => {
         console.error(`Simulation of type ${dataElement.model_type} not found in current run - creating entry...`);
       }
 
-      const isChartInProgress = dataElement.time < simulationRuns.value[executingSimulationRunNumber.value].formValues.timeEnd;
       const isChartInError = (parsedResult as ParsedErrorMessage).isError;
-      const chartStatus = isChartInError ? SimulationRunStatuses.ERROR :
-        (isChartInProgress ? SimulationRunStatuses.IN_PROGRESS : SimulationRunStatuses.COMPLETED);
-
+      const chartStatus = isChartInError ? SimulationRunStatuses.IN_PROGRESS : (dataElement.status || SimulationRunStatuses.IN_PROGRESS);
+      
       // The chart already exists, so we update it
       simulationRuns.value = {
         ...simulationRuns.value,

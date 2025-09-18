@@ -65,8 +65,8 @@ export type DataElement = {
     R: number;
     incidence: number;
   };
+  status: SimulationRunStatus;
 };
-
 export type DataElementError = {
   model_type: ModelType;
 };

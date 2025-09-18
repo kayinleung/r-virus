@@ -79,6 +79,9 @@ export const WebRComponent = () => {
           }],
           formValues: currentForm.value,
           status: MultiRunStatuses.IN_PROGRESS,
+          endStats: {
+            totalRecovered:0 // TODO: JFisher - fixme later
+          }
         }
       };
       webR.evalRVoid(parameterizedRCode, { captureStreams: false });
