@@ -81,14 +81,30 @@ tryCatch({
       # determine the next time steps
       time_interval <- seq(time_end + `${increment}`, time_end + `${serial_interval}`, by = `${increment}`)
         for (t in time_interval) {
-          current_state_network_p <- simulate_outbreak_seir_network(t, `${increment}`, current_state_network_p, params_p)
-          current_state_network_nb <- simulate_outbreak_seir_network(t, `${increment}`, current_state_network_nb, params_nb)
-          current_state_reference <- escape2024:::simulate_outbreak_seir_reference(t, `${increment}`, current_state_reference, params_reference)$current
+          current_state_network_p <- simulate_outbreak_seir_network(
+            t, `${increment}`, current_state_network_p, params_p, "IN_PROGRESS"
+            )
+          current_state_network_nb <- simulate_outbreak_seir_network(
+            t, `${increment}`, current_state_network_nb, params_nb, "IN_PROGRESS"
+            )
+          current_state_reference <- simulate_outbreak_seir_reference(
+            t, `${increment}`, current_state_reference, params_reference, "IN_PROGRESS"
+            )$current
       }
       time_end <- time_interval[length(time_interval)]
     }
   }
-  
+
+  # simulation status COMPLETED
+  current_state_network_p <- simulate_outbreak_seir_network(
+    time_end + `${increment}`, `${increment}`, current_state_network_p, params_p, "COMPLETED"
+    )
+  current_state_network_nb <- simulate_outbreak_seir_network(
+    time_end + `${increment}`, `${increment}`, current_state_network_nb, params_nb, "COMPLETED"
+    )
+  current_state_reference <- simulate_outbreak_seir_reference(
+    time_end + `${increment}`, `${increment}`, current_state_reference, params_reference, "COMPLETED"
+    )$current
 
 }, error = function(e) {
   print(jsonlite::toJSON(
