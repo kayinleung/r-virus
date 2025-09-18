@@ -46,7 +46,6 @@ export type FormValues = {
   modelType: ModelType;
   degreeDistribution: string;
   infection: string;
-  timeEnd: number;
   increment: number;
   seedInfected: number;
   mu: number;
@@ -66,8 +65,8 @@ export type DataElement = {
     R: number;
     incidence: number;
   };
+  status: SimulationRunStatus;
 };
-
 export type DataElementError = {
   model_type: ModelType;
 };
@@ -83,9 +82,8 @@ export const currentForm = signal<FormValues>({
   modelType: 'model_reference',
   degreeDistribution: 'poisson',
   infection: 'SEIR',
-  timeEnd: 100,
-  increment: 1,
-  seedInfected: 1e-3,
+  increment: 0.5,
+  seedInfected: 1e-5,
   mu: 5.4,
   dispersion: 10,
   serialInterval: archetypes[DEFAULT_ARCHETYPE].corollaries.serialInterval.default,
