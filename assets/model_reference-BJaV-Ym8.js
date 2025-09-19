@@ -68,7 +68,7 @@ tryCatch({
 
   # simulate
   time_end <- ceiling(6 * \`\${serial_interval}\`)
-  combined_states <- models_combined(time_end, increment = \`\${increment}\`, params_p, params_nb, params_reference)
+  combined_states <- models_combined(time_end, increment = \`\${increment}\`, params_p, params_nb, params_reference, "IN_PROGRESS")
   
   # initial value for the next steps
   current_state_network_p <- combined_states$network_poisson
