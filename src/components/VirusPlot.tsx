@@ -78,12 +78,12 @@ const VirusPlotSvg = ({ chart }: { chart: LoadedChart}) => {
   if (!data || data.length === 0) return;
 
   /* gather plot information */
-  const time = data.map((d) => d.time);
+  const time = data.map((d) => d.time).filter((t): t is number => t !== undefined);
   const currentMetric = selectedMetric.value;
   const x = d3.scaleLinear()
     .domain(d3.extent(time) as [number, number])
     .range([0, plotWidth]);
-  const yData = data.map(({state}) => state[currentMetric]);
+  const yData = data.map(({state}) => state?.[currentMetric]).filter((v): v is number => v !== undefined);
   const y = d3.scaleLinear()
     .domain([
       Math.min(0, d3.min(yData) || 0),
@@ -91,6 +91,10 @@ const VirusPlotSvg = ({ chart }: { chart: LoadedChart}) => {
     ])
     .nice()
     .range([plotHeight, 0]);
+
+  if(time.length === 0 || yData.length === 0) {
+    return <div>No data available for the selected metric.</div>;
+  }
 
   /* draw the plot area and axes */
   d3.select(svgRef.current).selectAll('*').remove();
@@ -119,7 +123,7 @@ const VirusPlotSvg = ({ chart }: { chart: LoadedChart}) => {
     const styleConfig = lineStyles[modelType as keyof typeof lineStyles];
     const line = d3.line<DataElement>()
       .x((d) => x(d.time))
-      .y(({ state }) => Math.max(y(state[currentMetric]), 0));
+      .y(({ state }) => Math.max(y(state?.[currentMetric]), 0));
     const path = plotGroup.append('path')
       .datum(group)
       .attr('fill', 'none')
@@ -150,9 +154,9 @@ const VirusPlotSvg = ({ chart }: { chart: LoadedChart}) => {
       let interpY = NaN;
       if (left && right && left !== right) {
         const t = (mouseTime - left.time) / (right.time - left.time);
-        interpY = left.state[currentMetric] * (1 - t) + right.state[currentMetric] * t;
+        interpY = left.state?.[currentMetric] * (1 - t) + right.state?.[currentMetric] * t;
       } else if (left) {
-        interpY = left.state[currentMetric];
+        interpY = left.state?.[currentMetric];
       }
       if (!isNaN(interpY)) {
         mouseMetrics.value[modelType as MouseMetricKeys] = interpY;
@@ -186,9 +190,9 @@ const VirusPlotSvg = ({ chart }: { chart: LoadedChart}) => {
       let interpY = NaN;
       if (left && right && left !== right) {
         const t = (mouseTime - left.time) / (right.time - left.time);
-        interpY = y(left.state[currentMetric]) * (1 - t) + y(right.state[currentMetric]) * t;
+        interpY = y(left.state?.[currentMetric]) * (1 - t) + y(right.state?.[currentMetric]) * t;
       } else if (left) {
-        interpY = y(left.state[currentMetric]);
+        interpY = y(left.state?.[currentMetric]);
       }
       if (!isNaN(interpY)) {
         plotGroup.append('circle')

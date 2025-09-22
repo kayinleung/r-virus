@@ -44,28 +44,28 @@ const InputControls = () => {
         />
         <NumberInput
           label="Reproduction Number"
-          value={currentForm.value.reproductionNumber}
+          value={repNum}
           min={archetypeCorollaries.value.reproductionNumber.range[MIN_INDEX]}
           max={archetypeCorollaries.value.reproductionNumber.range[MAX_INDEX]}
           onChange={(value) =>  { setRepNum(Number(value)); handleNumberChange({ field: "reproductionNumber", value: Number(value) }) }}
         />
         <NumberInput
           label="Serial Interval"
-          value={currentForm.value.serialInterval}
+          value={serialNum}
           min={archetypeCorollaries.value.serialInterval.range[MIN_INDEX]}
           max={archetypeCorollaries.value.serialInterval.range[MAX_INDEX]}
           onChange={(value) =>  { setSerialNum(Number(value)); handleNumberChange({ field: "serialInterval", value: Number(value) }) }}
         />
         <NumberInput
           label="Mean Degree"
-          value={currentForm.value.mu}
+          value={mean}
           min={0}
           max={100}
           onChange={(value) => { setMean(Number(value)); handleNumberChange({ field: "mu", value: Number(value) }) }}
         />
         <NumberInput
           label="Dispersion"
-          value={currentForm.value.dispersion}
+          value={disp}
           min={0}
           max={10}
           onChange={(value) => { setDisp(Number(value)); handleNumberChange({ field: "dispersion", value: Number(value) }) }}

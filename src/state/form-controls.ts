@@ -1,5 +1,6 @@
 import { computed, signal } from "@preact/signals-react";
 import type { ModelType } from "./chart";
+import { SimulationRunStatus } from "./simulation-runs";
 
 export const MIN_INDEX = 0;
 export const MAX_INDEX = 1;
