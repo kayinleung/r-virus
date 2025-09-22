@@ -1,41 +1,79 @@
 
 import { useSignals } from "@preact/signals-react/runtime";
-import { archetypeCorollaries, archetypeOptions, currentForm, MAX_INDEX, MIN_INDEX, updateArchetypeCorollaries, type NumberKeys } from "@state/form-controls";
+import { archetypeCorollaries, archetypeOptions, currentForm, MAX_INDEX, MIN_INDEX, updateArchetypeCorollaries } from "@state/form-controls";
 
+import { useForm } from '@mantine/form';
 import { NumberInput, Paper, Select } from '@mantine/core';
 import styles from './InputControls.module.css';
 import { Refresh } from "./Refresh";
-import { useState } from "preact/hooks";
+import { useEffect } from "preact/hooks";
 
 const InputControls = () => {
 
   useSignals();
 
-  const [repNum, setRepNum] = useState(currentForm.value.reproductionNumber);
-  const [serialNum, setSerialNum] = useState(currentForm.value.serialInterval);
-  const [mean, setMean] = useState(currentForm.value.mu);
-  const [disp, setDisp] = useState(currentForm.value.dispersion);
-  const [p, setP] = useState(currentForm.value.populationSize);
+  const form = useForm({
+    mode: 'uncontrolled',
+    initialValues: {
+      reproductionNumber: currentForm.value.reproductionNumber,
+      serialInterval: currentForm.value.serialInterval,
+      mu: currentForm.value.mu,
+      dispersion: currentForm.value.dispersion,
+      populationSize: currentForm.value.populationSize,
+      seedInfected: currentForm.value.seedInfected,
+    },
+    validate: {
+      reproductionNumber: (value) => validate({
+        value,
+        range: [
+          archetypeCorollaries.value?.reproductionNumber.range[MIN_INDEX] as number, archetypeCorollaries.value?.reproductionNumber.range[MAX_INDEX] as number
+        ]
+      }),
+      serialInterval: (value) => validate({
+        value,
+        range: [
+          archetypeCorollaries.value?.serialInterval.range[MIN_INDEX] as number, archetypeCorollaries.value?.serialInterval.range[MAX_INDEX] as number
+        ]
+      }),
+      mu: (value) => validate({ value, range: [0, 100] }),
+      dispersion: (value) => validate({ value, range: [0, 10] }),
+      populationSize: (value) => validate({ value, range: [10, 1e10] }),
+      seedInfected: (value) => validate({ value, range: [1, 10] }),
+    },
+
+    onValuesChange: (values) => {
+      currentForm.value = {
+        ...currentForm.value,
+        ...values
+      };
+      form.validate();
+    },
+  });
+
+  useEffect(() => {
+    form.validate();
+  });
 
   const handleArchetypeChange = (archetype: string | null) => {
     updateArchetypeCorollaries(archetype as typeof archetypeOptions[number]);
+    form.validate();
   };
 
+  type ValidateProps = { value: number; range: [number, number] };
 
-  type NumberChangeProps = {
-    field: NumberKeys,
-    value: number;
+  const validate = ({ value, range }: ValidateProps) => {
+    if (value < range[MIN_INDEX] || value > range[MAX_INDEX]) {
+      return `Range: ${range[MIN_INDEX]} - ${range[MAX_INDEX]}`;
+    }
+    return null;
   };
-  function handleNumberChange({ field, value }: NumberChangeProps) {
-    currentForm.value[field] = value;
-  }
 
 
   return (
     <Paper shadow="xs" p="sm" className={styles.inputControls}>
 
       <Refresh className={styles.refresh} />
-      <div className={styles.inputControlOptions}>
+      <form className={styles.inputControlOptions}>
         <Select
           label="Archetype"
           value={currentForm.value.archetype}
@@ -43,41 +81,32 @@ const InputControls = () => {
           data={archetypeOptions}
         />
         <NumberInput
+          {...form.getInputProps('reproductionNumber')}
           label="Reproduction Number"
-          value={repNum}
-          min={archetypeCorollaries.value.reproductionNumber.range[MIN_INDEX]}
-          max={archetypeCorollaries.value.reproductionNumber.range[MAX_INDEX]}
-          onChange={(value) =>  { setRepNum(Number(value)); handleNumberChange({ field: "reproductionNumber", value: Number(value) }) }}
+          value={currentForm.value.reproductionNumber}
         />
         <NumberInput
+          {...form.getInputProps('serialInterval')}
           label="Serial Interval"
-          value={serialNum}
-          min={archetypeCorollaries.value.serialInterval.range[MIN_INDEX]}
-          max={archetypeCorollaries.value.serialInterval.range[MAX_INDEX]}
-          onChange={(value) =>  { setSerialNum(Number(value)); handleNumberChange({ field: "serialInterval", value: Number(value) }) }}
+          value={currentForm.value.serialInterval}
         />
         <NumberInput
+          {...form.getInputProps('mu')}
           label="Mean Degree"
-          value={mean}
-          min={0}
-          max={100}
-          onChange={(value) => { setMean(Number(value)); handleNumberChange({ field: "mu", value: Number(value) }) }}
+          value={currentForm.value.mu}
         />
         <NumberInput
+          {...form.getInputProps('dispersion')}
           label="Dispersion"
-          value={disp}
-          min={0}
-          max={10}
-          onChange={(value) => { setDisp(Number(value)); handleNumberChange({ field: "dispersion", value: Number(value) }) }}
+          value={currentForm.value.dispersion}
         />
         <NumberInput
+          {...form.getInputProps('populationSize')}
+          clampBehavior="none"
           label="Population"
-          value={p}
-          min={10}
-          max={1e10}
-          onChange={(value) => { setP(Number(value)); handleNumberChange({ field: "populationSize", value: Number(value) }) }}
+          value={currentForm.value.populationSize}
         />
-      </div>
+      </form>
     </Paper>
   )
 };
