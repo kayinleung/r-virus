@@ -36,7 +36,47 @@ const archetypes: Record<string, Archetype> = {
       range: [2.78, 4.19],
     }
   } },
-  '3': { value: 3, label: 'Custom' },
+  '3': { value: 3, label: 'COVID-19 WT, A/H1N1/09, A/H1N1, A/H2N2, A/H3N2, SARS-CoV-1', corollaries: {
+    reproductionNumber: {
+      default: 2.03,
+      range: [1.38, 3.19],
+    },
+    serialInterval: {
+      default: 4.41,
+      range: [2.75, 13.06],
+    }
+  } },
+  '4': { value: 4, label: 'EBOV, MARV, NiV', corollaries: {
+    reproductionNumber: {
+      default: 0.93,
+      range: [0.12, 2.10],
+    },
+    serialInterval: {
+      default: 12.53,
+      range: [3.77, 17.60],
+    }
+  } },
+  '5': { value: 5, label: 'A/H5N1, MERS-CoV', corollaries: {
+    reproductionNumber: {
+      default: 0.50,
+      range: [0.02, 1.22],
+    },
+    serialInterval: {
+      default: 9.69,
+      range: [2.38,13.28],
+    }
+  } },
+  '6': { value: 6, label: 'LASV, MPV', corollaries: {
+    reproductionNumber: {
+      default: 1.89,
+      range: [0.07, 7.03],
+    },
+    serialInterval: {
+      default: 10.12,
+      range: [0.99, 33.23],
+    }
+  } },
+  '7': { value: 7, label: 'Custom' },
 } as const;
 
 
