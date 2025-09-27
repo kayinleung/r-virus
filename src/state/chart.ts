@@ -31,7 +31,7 @@ export const infectionStates: InfectionStateMap = {
   incidence: {label: 'Incidence' }
 };
 
-export const selectedMetric = signal<StateKey>(StateKeys.I.value);
+export const selectedMetric = signal<StateKey>(StateKeys.incidence.value);
 
 export const mouseX = signal<number | null>(null);
 export type MouseMetricKeys = Exclude<keyof typeof ModelReferences, 'all'> | 't';
