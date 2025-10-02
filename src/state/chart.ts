@@ -1,9 +1,9 @@
 import { signal } from "@preact/signals-react";
 
 export const ModelReferences = {
-  model_reference: { value: 'model_reference', label: 'Reference', order: 1 },
-  model_network_poisson: { value: 'model_network_poisson', label: 'Poisson', order: 2 },
-  model_network_negative_binomial: { value: 'model_network_negative_binomial', label: 'Negative Binomial', order: 3 },
+  model_reference: { value: 'model_reference', label: 'Reference: Mass Action', order: 1 },
+  model_network_poisson: { value: 'model_network_poisson', label: 'Network: Poisson', order: 2 },
+  model_network_negative_binomial: { value: 'model_network_negative_binomial', label: 'Network: Negative Binomial', order: 3 },
   all: { value: 'all', label: 'All Models', order: 4 },
  } as const;
 export const ModelTypes = Object.values(ModelReferences).map(model => model.value);
