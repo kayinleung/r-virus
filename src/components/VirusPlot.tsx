@@ -93,7 +93,7 @@ const VirusPlotSvg = ({ chart }: { chart: LoadedChart}) => {
     .range([plotHeight, 0]);
 
   if(time.length === 0 || yData.length === 0) {
-    return <div>No data available for the selected metric.</div>;
+    return <div>Model invalid for this combination of parameter values.</div>;
   }
 
   /* draw the plot area and axes */

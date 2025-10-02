@@ -76,7 +76,16 @@ const archetypes: Record<string, Archetype> = {
       range: [0.99, 33.23],
     }
   } },
-  '7': { value: 7, label: 'Custom' },
+  '7': { value: 7, label: 'Custom', corollaries: {
+    reproductionNumber: {
+      default: 1.3,
+      range: [0, 50],
+    },
+    serialInterval: {
+      default: 1,
+      range: [0, 100],
+    }
+  } },
 } as const;
 
 
